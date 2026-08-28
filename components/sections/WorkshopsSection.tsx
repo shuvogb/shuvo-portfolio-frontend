@@ -60,8 +60,8 @@ export function WorkshopsSection({ workshops = [], profile, isLoading }: Worksho
       quote: ws.description || `Specialized institutional training program with ${ws.organizer} focusing on hands-on practical methodology, capacity development, and impactful field execution.`,
       src: img,
       year: ws.year,
-      imageHeight: ws.imageHeight || wsConfig?.certificateHeight || 340,
-      imageFit: ws.imageFit || wsConfig?.certificateFit || 'contain',
+      imageHeight: ws.imageHeight || wsConfig?.certificateHeight || 380,
+      imageFit: ws.imageFit || wsConfig?.certificateFit || 'cover',
     };
   });
 
@@ -84,10 +84,10 @@ export function WorkshopsSection({ workshops = [], profile, isLoading }: Worksho
         {isLoading ? (
           <div className="bezel-card">
             <div className="bezel-core" style={{ padding: '2rem 1.5rem' }}>
-              <div className="relative grid grid-cols-1 gap-10 md:grid-cols-[1.1fr_1.2fr] lg:gap-14 items-center">
+              <div className="relative grid grid-cols-1 gap-10 md:grid-cols-[1.3fr_1.1fr] lg:gap-14 items-center">
                 
                 {/* Left Framed Certificate Skeleton */}
-                <div className="skeleton" style={{ height: '340px', borderRadius: '16px', padding: '0.85rem' }}>
+                <div className="skeleton" style={{ height: '380px', borderRadius: '16px', padding: '0.85rem' }}>
                   <div className="skeleton" style={{ width: '100%', height: '100%', borderRadius: '12px' }} />
                 </div>
 
@@ -124,8 +124,8 @@ export function WorkshopsSection({ workshops = [], profile, isLoading }: Worksho
               <AnimatedTestimonials
                 testimonials={formattedWorkshops}
                 autoplay={false}
-                cardHeight={wsConfig?.certificateHeight || 340}
-                imageFit={wsConfig?.certificateFit || 'contain'}
+                cardHeight={wsConfig?.certificateHeight || 380}
+                imageFit={wsConfig?.certificateFit || 'cover'}
               />
             </div>
           </div>

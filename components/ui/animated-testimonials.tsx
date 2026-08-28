@@ -53,15 +53,15 @@ export const AnimatedTestimonials = ({
   if (!testimonials || testimonials.length === 0) return null;
 
   const currentItem = testimonials[active];
-  const activeHeight = currentItem?.imageHeight || cardHeight || 340;
-  const activeFit = currentItem?.imageFit || imageFit || 'contain';
+  const activeHeight = currentItem?.imageHeight || cardHeight || 380;
+  const activeFit = currentItem?.imageFit || imageFit || 'cover';
 
   return (
     <div className="w-full px-2 py-4 font-sans antialiased md:px-6">
-      <div className="relative grid grid-cols-1 gap-10 md:grid-cols-[1.15fr_1.2fr] lg:gap-14 items-center">
+      <div className="relative grid grid-cols-1 gap-10 md:grid-cols-[1.3fr_1.1fr] lg:gap-14 items-center">
         
         {/* 3D Rotating Stack on Left with Resizable Certificate Frame */}
-        <div>
+        <div className="w-full">
           <div
             className="relative w-full transition-all duration-300"
             style={{ height: `${activeHeight}px`, minHeight: '260px' }}
@@ -101,7 +101,7 @@ export const AnimatedTestimonials = ({
                     className="absolute inset-0 origin-bottom"
                   >
                     <div className="h-full w-full rounded-2xl overflow-hidden border border-[var(--border)] shadow-xl bg-[var(--bg-elevated)] p-2 sm:p-2.5 relative flex items-center justify-center">
-                      <div className="w-full h-full rounded-xl overflow-hidden relative border border-[var(--border)] bg-[var(--bg-surface)] flex items-center justify-center p-2">
+                      <div className="w-full h-full rounded-xl overflow-hidden relative border border-[var(--border)] bg-[var(--bg-surface)] flex items-center justify-center p-1 sm:p-1.5">
                         {itemFit === 'contain' && (
                           <img
                             src={testimonial.src}
@@ -116,10 +116,10 @@ export const AnimatedTestimonials = ({
                           width={800}
                           height={600}
                           draggable={false}
-                          className={`h-full w-full relative z-10 transition-all duration-300 ${
+                          className={`h-full w-full relative z-10 transition-all duration-300 rounded-[10px] ${
                             itemFit === 'contain'
-                              ? 'object-contain object-center drop-shadow-sm'
-                              : 'object-cover object-center'
+                              ? 'object-contain object-center drop-shadow-sm p-2 sm:p-3'
+                              : 'object-cover object-center p-0.5'
                           }`}
                         />
                       </div>
