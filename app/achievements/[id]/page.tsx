@@ -183,9 +183,33 @@ export default function AchievementDetailPage({ params }: PageProps) {
         
         {isLoading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            <div className="skeleton" style={{ height: '380px', borderRadius: 'var(--radius-outer)' }} />
-            <div className="skeleton" style={{ height: '40px', width: '60%' }} />
-            <div className="skeleton" style={{ height: '120px' }} />
+            <div className="skeleton-pill" style={{ height: '28px', width: '130px' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div className="skeleton" style={{ height: '36px', width: '65%', borderRadius: '8px' }} />
+              <div className="skeleton" style={{ height: '20px', width: '40%', borderRadius: '6px' }} />
+            </div>
+            
+            {/* Carousel Skeleton */}
+            <div className="bezel-card">
+              <div className="bezel-core" style={{ padding: '0.85rem' }}>
+                <div className="skeleton" style={{ height: 'clamp(320px, 50vw, 480px)', width: '100%', borderRadius: 'var(--radius-inner)' }} />
+              </div>
+            </div>
+
+            {/* Metadata 3-Cards Skeleton */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="bezel-card">
+                  <div className="bezel-core" style={{ padding: '1.25rem 1.4rem', display: 'flex', alignItems: 'center', gap: '0.95rem', backgroundColor: 'var(--bg-surface)' }}>
+                    <div className="skeleton" style={{ width: '42px', height: '42px', borderRadius: '12px', flexShrink: 0 }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', flex: 1 }}>
+                      <div className="skeleton" style={{ height: '11px', width: '70px', borderRadius: '3px' }} />
+                      <div className="skeleton" style={{ height: '16px', width: '140px', borderRadius: '4px' }} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
@@ -363,7 +387,7 @@ export default function AchievementDetailPage({ params }: PageProps) {
               </div>
             </div>
 
-            {/* Metadata Badges Grid */}
+            {/* Metadata Badges Grid with White Background & Card Padding */}
             <div
               style={{
                 display: 'grid',
@@ -371,99 +395,102 @@ export default function AchievementDetailPage({ params }: PageProps) {
                 gap: '1rem',
               }}
             >
-              <div
-                style={{
-                  padding: '1.15rem',
-                  borderRadius: 'var(--radius-inner)',
-                  backgroundColor: 'var(--bg-elevated)',
-                  border: '1px solid var(--border)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.85rem',
-                }}
-              >
+              <div className="bezel-card">
                 <div
+                  className="bezel-core"
                   style={{
-                    width: '38px',
-                    height: '38px',
-                    borderRadius: '10px',
-                    backgroundColor: 'var(--accent-subtle)',
-                    color: 'var(--accent)',
+                    padding: '1.25rem 1.4rem',
+                    backgroundColor: 'var(--bg-surface)',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
+                    gap: '0.95rem',
                   }}
                 >
-                  <MapPin size={18} strokeWidth={1.8} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.725rem', color: 'var(--fg-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>Location</div>
-                  <div style={{ fontSize: '0.925rem', fontWeight: 700, color: 'var(--fg)' }}>{details.location}</div>
+                  <div
+                    style={{
+                      width: '42px',
+                      height: '42px',
+                      borderRadius: '12px',
+                      backgroundColor: 'var(--accent-subtle)',
+                      color: 'var(--accent)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <MapPin size={19} strokeWidth={1.8} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.725rem', color: 'var(--fg-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>Location</div>
+                    <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--fg)' }}>{details.location}</div>
+                  </div>
                 </div>
               </div>
 
-              <div
-                style={{
-                  padding: '1.15rem',
-                  borderRadius: 'var(--radius-inner)',
-                  backgroundColor: 'var(--bg-elevated)',
-                  border: '1px solid var(--border)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.85rem',
-                }}
-              >
+              <div className="bezel-card">
                 <div
+                  className="bezel-core"
                   style={{
-                    width: '38px',
-                    height: '38px',
-                    borderRadius: '10px',
-                    backgroundColor: 'var(--accent-subtle)',
-                    color: 'var(--accent)',
+                    padding: '1.25rem 1.4rem',
+                    backgroundColor: 'var(--bg-surface)',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
+                    gap: '0.95rem',
                   }}
                 >
-                  <Building size={18} strokeWidth={1.8} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.725rem', color: 'var(--fg-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>Organization / Partner</div>
-                  <div style={{ fontSize: '0.925rem', fontWeight: 700, color: 'var(--fg)' }}>{details.organization}</div>
+                  <div
+                    style={{
+                      width: '42px',
+                      height: '42px',
+                      borderRadius: '12px',
+                      backgroundColor: 'var(--accent-subtle)',
+                      color: 'var(--accent)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Building size={19} strokeWidth={1.8} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.725rem', color: 'var(--fg-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>Organization / Partner</div>
+                    <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--fg)' }}>{details.organization}</div>
+                  </div>
                 </div>
               </div>
 
-              <div
-                style={{
-                  padding: '1.15rem',
-                  borderRadius: 'var(--radius-inner)',
-                  backgroundColor: 'var(--bg-elevated)',
-                  border: '1px solid var(--border)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.85rem',
-                }}
-              >
+              <div className="bezel-card">
                 <div
+                  className="bezel-core"
                   style={{
-                    width: '38px',
-                    height: '38px',
-                    borderRadius: '10px',
-                    backgroundColor: 'var(--accent-subtle)',
-                    color: 'var(--accent)',
+                    padding: '1.25rem 1.4rem',
+                    backgroundColor: 'var(--bg-surface)',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
+                    gap: '0.95rem',
                   }}
                 >
-                  <Layers size={18} strokeWidth={1.8} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.725rem', color: 'var(--fg-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>Scope & Execution</div>
-                  <div style={{ fontSize: '0.925rem', fontWeight: 700, color: 'var(--fg)' }}>{details.scope}</div>
+                  <div
+                    style={{
+                      width: '42px',
+                      height: '42px',
+                      borderRadius: '12px',
+                      backgroundColor: 'var(--accent-subtle)',
+                      color: 'var(--accent)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Layers size={19} strokeWidth={1.8} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.725rem', color: 'var(--fg-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>Scope & Execution</div>
+                    <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--fg)' }}>{details.scope}</div>
+                  </div>
                 </div>
               </div>
             </div>
