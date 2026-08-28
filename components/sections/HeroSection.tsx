@@ -37,68 +37,11 @@ function Portrait3DCard({ avatarSrc, name }: { avatarSrc: string; name?: string 
   };
 
   return (
-    <div style={{ perspective: '1200px', width: '100%', maxWidth: '360px', position: 'relative' }}>
-      
-      {/* Floating Stat Badge 1 - Top Left */}
-      <motion.div
-        animate={{ y: [0, -10, 0] }}
-        transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut' }}
-        style={{
-          position: 'absolute',
-          top: '-18px',
-          left: '-20px',
-          zIndex: 10,
-        }}
-        className="hidden sm:block"
-      >
-        <div
-          className="bezel-card"
-          style={{
-            borderRadius: '16px',
-            boxShadow: '0 12px 30px -8px rgba(0, 0, 0, 0.18)',
-          }}
-        >
-          <div
-            className="bezel-core"
-            style={{
-              padding: '0.65rem 0.95rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.65rem',
-              backgroundColor: 'var(--bg-card)',
-            }}
-          >
-            <div
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '9px',
-                backgroundColor: 'var(--accent-subtle)',
-                color: 'var(--accent)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}
-            >
-              <FileText size={15} strokeWidth={1.8} />
-            </div>
-            <div>
-              <p style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--fg)', lineHeight: 1, margin: 0 }}>
-                2 Papers
-              </p>
-              <p style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--fg-muted)', margin: 0, marginTop: '2px' }}>
-                Published & Indexed
-              </p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Main 3D Tilt Portrait Card with subtle floating motion */}
+    <div style={{ perspective: '1200px', width: '100%', maxWidth: '300px' }}>
+      {/* Main 3D Tilt Portrait Card with smooth floating motion */}
       <motion.div
         animate={{ y: [0, -6, 0] }}
-        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+        transition={{ duration: 4.8, repeat: Infinity, ease: 'easeInOut' }}
       >
         <motion.div
           ref={cardRef}
@@ -148,62 +91,6 @@ function Portrait3DCard({ avatarSrc, name }: { avatarSrc: string; name?: string 
         </motion.div>
       </motion.div>
 
-      {/* Floating Stat Badge 2 - Bottom Right */}
-      <motion.div
-        animate={{ y: [0, 10, 0] }}
-        transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
-        style={{
-          position: 'absolute',
-          bottom: '-16px',
-          right: '-20px',
-          zIndex: 10,
-        }}
-        className="hidden sm:block"
-      >
-        <div
-          className="bezel-card"
-          style={{
-            borderRadius: '16px',
-            boxShadow: '0 12px 30px -8px rgba(0, 0, 0, 0.18)',
-          }}
-        >
-          <div
-            className="bezel-core"
-            style={{
-              padding: '0.65rem 0.95rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.65rem',
-              backgroundColor: 'var(--bg-card)',
-            }}
-          >
-            <div
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '9px',
-                backgroundColor: 'var(--accent-subtle)',
-                color: 'var(--accent)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}
-            >
-              <Calendar size={15} strokeWidth={1.8} />
-            </div>
-            <div>
-              <p style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--fg)', lineHeight: 1, margin: 0 }}>
-                20+ Events
-              </p>
-              <p style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--fg-muted)', margin: 0, marginTop: '2px' }}>
-                Organized & Coordinated
-              </p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
       <style>{`
         .portrait-3d-card {
           width: 100%;
@@ -232,11 +119,11 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
 
   const avatarSrc = profile?.avatarUrl || '/images/shuvo.png';
 
-  const statsList = [
-    { value: '20+', label: 'Events Organized', icon: Calendar, sublabel: 'Youth & Academic', duration: 4.2, delay: 0 },
-    { value: '2', label: 'Academic Papers', icon: FileText, sublabel: 'Published / Review', duration: 3.8, delay: 0.4 },
-    { value: '100+', label: 'Fieldwork Reach', icon: Users, sublabel: 'Char Communities', duration: 4.6, delay: 0.8 },
-  ];
+  const stats = {
+    events: { value: '20+', label: 'Events Organized', icon: Calendar, sublabel: 'Youth & Academic' },
+    papers: { value: '2', label: 'Academic Papers', icon: FileText, sublabel: 'Published / Review' },
+    reach: { value: '100+', label: 'Fieldwork Reach', icon: Users, sublabel: 'Char Communities' },
+  };
 
   return (
     <section
@@ -255,7 +142,7 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
       <div className="container">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '4rem', alignItems: 'center' }}>
           
-          {/* Left Column: Academic Thesis & Metrics */}
+          {/* Left Column: Academic Thesis & Introduction */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -350,114 +237,184 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
                 </span>
               </button>
             </div>
-
-            {/* Structured Metric Badges with Smooth Floating Motion */}
-            <div className="hero-stats-grid">
-              {statsList.map(({ value, label, icon: Icon, sublabel, duration, delay }) => (
-                <motion.div
-                  key={label}
-                  animate={{ y: [0, -6, 0] }}
-                  transition={{ duration, repeat: Infinity, ease: 'easeInOut', delay }}
-                  className="bezel-card"
-                  style={{
-                    borderRadius: '16px',
-                    transition: 'transform 0.25s ease, border-color 0.25s ease',
-                  }}
-                >
-                  <div
-                    className="bezel-core stat-card-inner"
-                    style={{
-                      padding: '1rem 1.15rem',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
-                      <p
-                        style={{
-                          fontSize: '1.85rem',
-                          fontWeight: 800,
-                          color: 'var(--fg)',
-                          lineHeight: 1,
-                          letterSpacing: '-0.035em',
-                          margin: 0,
-                        }}
-                      >
-                        {value}
-                      </p>
-                      <div
-                        style={{
-                          width: '28px',
-                          height: '28px',
-                          borderRadius: '8px',
-                          backgroundColor: 'var(--accent-subtle)',
-                          color: 'var(--accent)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        <Icon size={14} strokeWidth={1.8} />
-                      </div>
-                    </div>
-
-                    <div>
-                      <p
-                        style={{
-                          fontSize: '0.85rem',
-                          fontWeight: 700,
-                          color: 'var(--fg)',
-                          letterSpacing: '-0.01em',
-                          margin: 0,
-                          lineHeight: 1.3,
-                        }}
-                      >
-                        {label}
-                      </p>
-
-                      <p
-                        style={{
-                          fontSize: '0.725rem',
-                          fontWeight: 500,
-                          color: 'var(--fg-muted)',
-                          marginTop: '0.15rem',
-                          marginBottom: 0,
-                        }}
-                      >
-                        {sublabel}
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
           </motion.div>
 
-          {/* Right Column: Interactive 3D Parallax Tilt Portrait Showcase with Floating Badges */}
+          {/* Right Column: 3-Side Floating Stats Surrounding User's Portrait (Zero Overlap) */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.15, ease: [0.32, 0.72, 0, 1] }}
             style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
           >
-            <Portrait3DCard avatarSrc={avatarSrc} name={profile?.name} />
+            <div className="hero-portrait-stage">
+              
+              {/* SIDE 1: Left Floating Stat Card */}
+              <motion.div
+                animate={{ y: [0, -8, 0] }}
+                transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut' }}
+                className="stat-side-left"
+              >
+                <div className="stat-pill-card">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                    <div className="stat-pill-icon">
+                      <Calendar size={14} strokeWidth={1.8} />
+                    </div>
+                    <div>
+                      <p className="stat-pill-value">{stats.events.value}</p>
+                      <p className="stat-pill-label">{stats.events.label}</p>
+                      <p className="stat-pill-sublabel">{stats.events.sublabel}</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* CENTER: Unobstructed 3D Tilt Portrait */}
+              <Portrait3DCard avatarSrc={avatarSrc} name={profile?.name} />
+
+              {/* SIDE 2: Right Floating Stat Card */}
+              <motion.div
+                animate={{ y: [0, 8, 0] }}
+                transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
+                className="stat-side-right"
+              >
+                <div className="stat-pill-card">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                    <div className="stat-pill-icon">
+                      <FileText size={14} strokeWidth={1.8} />
+                    </div>
+                    <div>
+                      <p className="stat-pill-value">{stats.papers.value}</p>
+                      <p className="stat-pill-label">{stats.papers.label}</p>
+                      <p className="stat-pill-sublabel">{stats.papers.sublabel}</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* SIDE 3: Bottom Floating Stat Card */}
+              <motion.div
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
+                className="stat-side-bottom"
+              >
+                <div className="stat-pill-card stat-pill-bottom">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                    <div className="stat-pill-icon">
+                      <Users size={14} strokeWidth={1.8} />
+                    </div>
+                    <div>
+                      <p className="stat-pill-value">{stats.reach.value}</p>
+                      <p className="stat-pill-label">{stats.reach.label}</p>
+                      <p className="stat-pill-sublabel">{stats.reach.sublabel}</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+            </div>
           </motion.div>
 
         </div>
       </div>
 
       <style>{`
-        .hero-stats-grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 0.75rem;
-          margin-top: 2.5rem;
-          padding-top: 1.75rem;
-          border-top: 1px solid var(--border);
+        .hero-portrait-stage {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          max-width: 320px;
+          margin: 1.5rem auto 2.5rem;
         }
 
-        @media (min-width: 540px) {
-          .hero-stats-grid {
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
+        /* ─── 3-Side Floating Positions (Zero Overlap on Image) ─── */
+        .stat-side-left {
+          position: absolute;
+          left: -110px;
+          top: 30%;
+          transform: translateY(-50%);
+          z-index: 25;
+        }
+
+        .stat-side-right {
+          position: absolute;
+          right: -110px;
+          top: 20%;
+          transform: translateY(-50%);
+          z-index: 25;
+        }
+
+        .stat-side-bottom {
+          position: absolute;
+          bottom: -28px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 25;
+        }
+
+        .stat-pill-card {
+          padding: 0.65rem 0.95rem;
+          background-color: var(--bg-surface);
+          border: 1px solid var(--border-strong);
+          border-radius: 16px;
+          box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.08);
+          white-space: nowrap;
+        }
+
+        .stat-pill-bottom {
+          min-width: 200px;
+        }
+
+        .stat-pill-icon {
+          width: 32px;
+          height: 32px;
+          border-radius: 9px;
+          background-color: var(--accent-subtle);
+          color: var(--accent);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .stat-pill-value {
+          font-size: 1.15rem;
+          font-weight: 800;
+          color: var(--fg);
+          line-height: 1;
+          letter-spacing: -0.02em;
+          margin: 0;
+        }
+
+        .stat-pill-label {
+          font-size: 0.75rem;
+          font-weight: 700;
+          color: var(--fg);
+          margin: 2px 0 0 0;
+          line-height: 1.2;
+          white-space: nowrap;
+        }
+
+        .stat-pill-sublabel {
+          font-size: 0.675rem;
+          font-weight: 500;
+          color: var(--fg-muted);
+          margin: 1px 0 0 0;
+          white-space: nowrap;
+        }
+
+        @media (max-width: 640px) {
+          .stat-side-left {
+            left: -20px;
+            top: 20%;
+          }
+          .stat-side-right {
+            right: -20px;
+            top: 45%;
+          }
+          .stat-side-bottom {
+            bottom: -24px;
           }
         }
       `}</style>
