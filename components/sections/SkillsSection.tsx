@@ -2,12 +2,33 @@
 
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Terminal, Users, Layers } from 'lucide-react';
+import { Terminal, Users, Layers, BarChart3, FileSpreadsheet, Camera, Palette, Award, MessageSquare, Brain, CalendarCheck, Lightbulb, Compass, FileText, Presentation, Database, ClipboardList } from 'lucide-react';
+import { SectionBadge } from '@/components/ui/SectionBadge';
 import type { Skill } from '@/types/portfolio';
 
 interface SkillsSectionProps {
   skills?: Skill[];
   isLoading: boolean;
+}
+
+function getSkillIcon(name: string, category: string) {
+  const lower = name.toLowerCase();
+  if (lower.includes('excel')) return <FileSpreadsheet size={18} style={{ color: '#107c41' }} />;
+  if (lower.includes('word')) return <FileText size={18} style={{ color: '#2b579a' }} />;
+  if (lower.includes('powerpoint')) return <Presentation size={18} style={{ color: '#d24726' }} />;
+  if (lower.includes('canva') || lower.includes('design')) return <Palette size={18} style={{ color: '#00c4cc' }} />;
+  if (lower.includes('spss') || lower.includes('quantitative')) return <BarChart3 size={18} style={{ color: 'var(--accent)' }} />;
+  if (lower.includes('data collection') || lower.includes('survey')) return <ClipboardList size={18} style={{ color: 'var(--accent)' }} />;
+  if (lower.includes('research method') || lower.includes('social research')) return <Database size={18} style={{ color: 'var(--accent)' }} />;
+  if (lower.includes('photo') || lower.includes('media')) return <Camera size={18} />;
+  if (lower.includes('leader')) return <Award size={18} style={{ color: 'var(--accent)' }} />;
+  if (lower.includes('communicat')) return <MessageSquare size={18} />;
+  if (lower.includes('analytic') || lower.includes('think') || lower.includes('critical')) return <Brain size={18} />;
+  if (lower.includes('event') || lower.includes('planning')) return <CalendarCheck size={18} />;
+  if (lower.includes('creativ') || lower.includes('problem')) return <Lightbulb size={18} />;
+  if (lower.includes('team') || lower.includes('collab') || lower.includes('mentor')) return <Users size={18} />;
+  if (lower.includes('climate') || lower.includes('advocacy')) return <Compass size={18} style={{ color: 'var(--accent)' }} />;
+  return category === 'technical' ? <Terminal size={18} /> : <Compass size={18} />;
 }
 
 export function SkillsSection({ skills = [], isLoading }: SkillsSectionProps) {
@@ -25,16 +46,16 @@ export function SkillsSection({ skills = [], isLoading }: SkillsSectionProps) {
   return (
     <section id="skills" className="section" aria-label="Skills & Competencies">
       <div className="container">
-        
+
         {/* Header */}
         <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1.5rem' }}>
           <div>
-            <span className="section-eyebrow">
-              <Layers size={13} /> Competencies
-            </span>
-            <h2 className="section-title">Skills & Methodologies</h2>
+            <SectionBadge icon={<Layers size={13} />}>
+              Competencies & Methodologies
+            </SectionBadge>
+            <h2 className="section-title">Skills & Capabilities</h2>
             <p className="section-description">
-              Quantitative software tools, social research methodologies, and organizational leadership capabilities.
+              Quantitative analysis software, survey methodologies, media tools, and organizational governance capabilities.
             </p>
           </div>
 
@@ -79,9 +100,9 @@ export function SkillsSection({ skills = [], isLoading }: SkillsSectionProps) {
           </div>
         </div>
 
-        {/* Skills Cards */}
+        {/* Skills Cards Grid */}
         {isLoading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="skeleton" style={{ height: '76px' }} />
             ))}
@@ -89,11 +110,13 @@ export function SkillsSection({ skills = [], isLoading }: SkillsSectionProps) {
         ) : (
           <motion.div
             layout
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}
           >
             <AnimatePresence mode="popLayout">
               {filteredSkills.map((skill) => {
                 const isTech = skill.category === 'technical';
+                const icon = getSkillIcon(skill.name, skill.category);
+
                 return (
                   <motion.div
                     key={skill._id}
@@ -115,8 +138,8 @@ export function SkillsSection({ skills = [], isLoading }: SkillsSectionProps) {
                     >
                       <div
                         style={{
-                          width: '36px',
-                          height: '36px',
+                          width: '40px',
+                          height: '40px',
                           borderRadius: '10px',
                           backgroundColor: isTech ? 'var(--accent-subtle)' : 'var(--bg-elevated)',
                           color: isTech ? 'var(--accent)' : 'var(--fg)',
@@ -127,14 +150,14 @@ export function SkillsSection({ skills = [], isLoading }: SkillsSectionProps) {
                           flexShrink: 0,
                         }}
                       >
-                        {isTech ? <Terminal size={16} /> : <Users size={16} />}
+                        {icon}
                       </div>
 
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--fg)', marginBottom: '0.15rem' }}>
+                        <p style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--fg)', marginBottom: '0.15rem' }}>
                           {skill.name}
                         </p>
-                        <span className="mono" style={{ fontSize: '0.725rem', color: 'var(--fg-muted)', textTransform: 'capitalize' }}>
+                        <span className="mono" style={{ fontSize: '0.7rem', color: 'var(--fg-muted)', textTransform: 'capitalize' }}>
                           {skill.category}
                         </span>
                       </div>

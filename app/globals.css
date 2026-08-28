@@ -168,18 +168,19 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 3.5rem;
 }
 
-.section-eyebrow {
+.section-eyebrow,
+.section-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  font-family: var(--font-mono);
-  font-size: 0.725rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: 0.785rem;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
   color: var(--accent);
-  margin-bottom: 0.75rem;
-  padding: 0.35rem 0.85rem;
+  margin-bottom: 0.85rem;
+  padding: 0.35rem 0.9rem;
   border-radius: var(--radius-pill);
   background-color: var(--accent-subtle);
   border: 1px solid var(--accent-border);
@@ -200,17 +201,19 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.75;
 }
 
-/* ─── Double-Bezel (Doppelrand) Architecture ───────────────────────────────── */
-.bezel-card {
+/* ─── Machined Double-Bezel (Doppelrand) Architecture ───────────────────── */
+.bezel-card,
+.bento-card {
   padding: 6px;
   border-radius: var(--radius-outer);
   background-color: var(--bezel-outer);
   border: 1px solid var(--bezel-border);
-  transition: transform 0.3s var(--ease-spring), border-color 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-spring);
+  transition: transform 0.25s var(--ease-spring), border-color 0.25s var(--ease-spring), box-shadow 0.25s var(--ease-spring);
 }
 
-.bezel-core {
-  padding: 1.75rem;
+.bezel-core,
+.bento-core {
+  padding: 1.65rem;
   border-radius: var(--radius-inner);
   background-color: var(--bezel-inner);
   border: 1px solid var(--bezel-inner-border);
@@ -218,11 +221,13 @@ h1, h2, h3, h4, h5, h6 {
   height: 100%;
 }
 
-.bezel-card-interactive {
+.bezel-card-interactive,
+.bento-card-interactive {
   cursor: pointer;
 }
 
-.bezel-card-interactive:hover {
+.bezel-card-interactive:hover,
+.bento-card-interactive:hover {
   transform: translateY(-3px);
   border-color: var(--accent-border);
   box-shadow: var(--shadow-float);

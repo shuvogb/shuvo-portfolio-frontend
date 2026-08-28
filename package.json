@@ -19,6 +19,7 @@
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-hook-form": "^7.86.0",
+    "react-icons": "^5.7.0",
     "sonner": "^2.0.8",
     "uuid": "^14.0.2",
     "zod": "^3.25.76",

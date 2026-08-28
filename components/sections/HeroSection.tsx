@@ -1,12 +1,106 @@
 'use client';
 
-import { motion } from 'motion/react';
-import { ArrowUpRight, BookOpen, ArrowDown, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { useRef } from 'react';
+import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
+import { ArrowUpRight, BookOpen, FlaskConical } from 'lucide-react';
+import { SectionBadge } from '@/components/ui/SectionBadge';
 import type { Profile } from '@/types/portfolio';
 
 interface HeroSectionProps {
   profile?: Profile;
   isLoading: boolean;
+}
+
+function Portrait3DCard({ avatarSrc, name }: { avatarSrc: string; name?: string }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useSpring(x, { stiffness: 240, damping: 22 });
+  const mouseYSpring = useSpring(y, { stiffness: 240, damping: 22 });
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ['10deg', '-10deg']);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ['-10deg', '10deg']);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const xPct = (e.clientX - rect.left) / rect.width - 0.5;
+    const yPct = (e.clientY - rect.top) / rect.height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <div style={{ perspective: '1200px', width: '100%', maxWidth: '320px' }}>
+      <motion.div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{
+          rotateX,
+          rotateY,
+          transformStyle: 'preserve-3d',
+        }}
+        whileHover={{ scale: 1.03 }}
+        transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+        className="bezel-card portrait-3d-card"
+      >
+        <div
+          className="bezel-core"
+          style={{
+            padding: '6px',
+            borderRadius: '18px',
+            overflow: 'hidden',
+            position: 'relative',
+            transform: 'translateZ(20px)',
+          }}
+        >
+          <div
+            style={{
+              width: '100%',
+              aspectRatio: '1 / 1.15',
+              borderRadius: '14px',
+              overflow: 'hidden',
+              position: 'relative',
+            }}
+          >
+            <img
+              src={avatarSrc}
+              alt={name || 'Shuvo Molla'}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: 'center 20%',
+                display: 'block',
+              }}
+            />
+          </div>
+        </div>
+      </motion.div>
+
+      <style>{`
+        .portrait-3d-card {
+          width: 100%;
+          cursor: pointer;
+          border-radius: 24px;
+          padding: 6px;
+          position: relative;
+          transition: box-shadow 0.35s ease, border-color 0.35s ease;
+        }
+        .portrait-3d-card:hover {
+          border-color: var(--accent) !important;
+          box-shadow: 0 0 35px -2px var(--accent-border), 0 20px 40px -10px rgba(0, 0, 0, 0.35) !important;
+        }
+      `}</style>
+    </div>
+  );
 }
 
 export function HeroSection({ profile, isLoading }: HeroSectionProps) {
@@ -15,9 +109,6 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
   };
   const scrollToResearch = () => {
     document.getElementById('research')?.scrollIntoView({ behavior: 'smooth' });
-  };
-  const scrollToAbout = () => {
-    document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const avatarSrc = profile?.avatarUrl || '/images/shuvo.png';
@@ -31,104 +122,79 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
         minHeight: '94vh',
         display: 'flex',
         alignItems: 'center',
-        paddingTop: '8rem',
-        paddingBottom: '6rem',
+        paddingTop: '7.5rem',
+        paddingBottom: '5.5rem',
         borderBottom: '1px solid var(--border)',
       }}
     >
       <div className="container">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '4rem', alignItems: 'center' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '4rem', alignItems: 'center' }}>
           
-          {/* Left Column: Academic Thesis & Action Islands */}
+          {/* Left Column: Academic Thesis & Metrics */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
           >
-            {/* Status Eyebrow */}
+            {/* Reusable SectionBadge */}
             <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center' }}>
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.35rem 0.85rem',
-                  borderRadius: 'var(--radius-pill)',
-                  backgroundColor: 'var(--bg-surface)',
-                  border: '1px solid var(--border-strong)',
-                  boxShadow: 'var(--shadow-sm)',
-                  fontSize: '0.785rem',
-                  fontWeight: 600,
-                  color: 'var(--fg)',
-                }}
-              >
-                <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#10b981' }} />
-                <span>Available for Research & Community Initiatives</span>
-              </div>
+              <SectionBadge icon={<FlaskConical size={13} />} style={{ marginBottom: 0 }}>
+                Open for Research & Community Initiatives
+              </SectionBadge>
             </div>
 
-            {/* Main Headline */}
+            {/* Name */}
             <h1
               style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(2.5rem, 5vw, 3.85rem)',
-                fontWeight: 700,
-                letterSpacing: '-0.025em',
-                lineHeight: 1.1,
-                marginBottom: '1rem',
+                fontSize: 'clamp(2.75rem, 5.5vw, 4.25rem)',
+                fontWeight: 800,
+                letterSpacing: '-0.04em',
+                lineHeight: 1.06,
+                marginBottom: '0.75rem',
                 color: 'var(--fg)',
               }}
             >
               {isLoading ? (
                 <span className="skeleton" style={{ display: 'block', height: '60px', width: '340px' }} />
               ) : (
-                <>
-                  {profile?.name || 'Shuvo Molla'}
-                </>
+                profile?.name || 'Shuvo Molla'
               )}
             </h1>
 
             {/* Sub-Headline */}
             <p
               style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: 'clamp(1.05rem, 2vw, 1.25rem)',
+                fontSize: 'clamp(1.1rem, 2vw, 1.25rem)',
                 fontWeight: 600,
                 color: 'var(--accent)',
+                lineHeight: 1.4,
                 marginBottom: '1.25rem',
-                lineHeight: 1.45,
-                letterSpacing: '-0.01em',
               }}
             >
-              {isLoading ? (
-                <span className="skeleton" style={{ display: 'block', height: '26px', width: '420px' }} />
-              ) : (
-                profile?.headline || 'Sociology & Social Work Undergraduate'
-              )}
+              Sociology & Social Work Researcher
             </p>
 
-            {/* Narrative Summary */}
+            {/* Concise Summary */}
             <p
               style={{
                 fontSize: '1rem',
-                lineHeight: 1.85,
+                lineHeight: 1.8,
                 color: 'var(--fg-muted)',
-                marginBottom: '2.5rem',
-                maxWidth: '560px',
+                marginBottom: '2rem',
+                maxWidth: '520px',
               }}
             >
               {isLoading ? (
                 <>
                   <span className="skeleton" style={{ display: 'block', height: '16px', marginBottom: '8px' }} />
-                  <span className="skeleton" style={{ display: 'block', height: '16px', marginBottom: '8px', width: '90%' }} />
-                  <span className="skeleton" style={{ display: 'block', height: '16px', width: '65%' }} />
+                  <span className="skeleton" style={{ display: 'block', height: '16px', width: '75%' }} />
                 </>
               ) : (
-                profile?.summary
+                'Undergraduate researcher with hands-on experience in quantitative social methods (SPSS), char community studies, and youth development initiatives.'
               )}
             </p>
 
-            {/* Island CTAs */}
+            {/* Action Buttons */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', alignItems: 'center' }}>
               <button
                 onClick={scrollToContact}
@@ -151,37 +217,38 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
                   <BookOpen size={14} />
                 </span>
               </button>
-
-              <button
-                onClick={scrollToAbout}
-                className="btn btn-ghost"
-                aria-label="Explore Profile details"
-              >
-                Explore Bio <ArrowDown size={14} />
-              </button>
             </div>
 
-            {/* Quick Metrics Concentric Grid */}
+            {/* Structured Bento Metrics */}
             <div
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '1rem',
-                marginTop: '3rem',
-                paddingTop: '2rem',
+                gap: '0.85rem',
+                marginTop: '2.5rem',
+                paddingTop: '1.75rem',
                 borderTop: '1px solid var(--border)',
               }}
             >
               {[
                 { value: '20+', label: 'Events Organized' },
                 { value: '2', label: 'Peer-Reviewed Papers' },
-                { value: '100+', label: 'Daily Fieldwork Reach' },
+                { value: '100+', label: 'Fieldwork Reach' },
               ].map(({ value, label }) => (
-                <div key={label}>
-                  <p style={{ fontSize: '1.85rem', fontWeight: 800, color: 'var(--fg)', lineHeight: 1, letterSpacing: '-0.035em' }}>
+                <div
+                  key={label}
+                  style={{
+                    padding: '0.85rem 1rem',
+                    borderRadius: '14px',
+                    backgroundColor: 'var(--bg-surface)',
+                    border: '1px solid var(--border)',
+                    boxShadow: 'var(--shadow-sm)',
+                  }}
+                >
+                  <p style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--fg)', lineHeight: 1, letterSpacing: '-0.03em' }}>
                     {value}
                   </p>
-                  <p className="mono" style={{ fontSize: '0.725rem', color: 'var(--fg-muted)', marginTop: '0.35rem' }}>
+                  <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--fg-muted)', marginTop: '0.35rem', lineHeight: 1.25 }}>
                     {label}
                   </p>
                 </div>
@@ -189,68 +256,14 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
             </div>
           </motion.div>
 
-          {/* Right Column: User Portrait in Doppelrand (Double-Bezel) Enclosure */}
+          {/* Right Column: Interactive 3D Parallax Tilt Portrait Showcase */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.15, ease: [0.32, 0.72, 0, 1] }}
             style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
           >
-            <div style={{ width: '100%', maxWidth: '390px' }}>
-              
-              {/* Outer Shell (Double-Bezel) */}
-              <div className="bezel-card" style={{ position: 'relative' }}>
-                
-                {/* Inner Core */}
-                <div
-                  className="bezel-core"
-                  style={{
-                    padding: '0',
-                    overflow: 'hidden',
-                    aspectRatio: '4 / 5',
-                    position: 'relative',
-                  }}
-                >
-                  <img
-                    src={avatarSrc}
-                    alt={profile?.name || 'Shuvo Molla'}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      display: 'block',
-                    }}
-                  />
-                </div>
-
-                {/* Concentric Floating Pill Badge */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: '-1rem',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    backgroundColor: 'var(--bg-surface)',
-                    border: '1px solid var(--border-strong)',
-                    borderRadius: 'var(--radius-pill)',
-                    padding: '0.55rem 1.15rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.55rem',
-                    boxShadow: 'var(--shadow-float)',
-                    whiteSpace: 'nowrap',
-                    zIndex: 10,
-                  }}
-                >
-                  <ShieldCheck size={16} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--fg)' }}>
-                    Published Academic Co-Author
-                  </span>
-                </div>
-
-              </div>
-
-            </div>
+            <Portrait3DCard avatarSrc={avatarSrc} name={profile?.name} />
           </motion.div>
 
         </div>

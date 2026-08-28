@@ -10,6 +10,7 @@ export interface Profile {
   email?: string;
   socialLinks?: {
     linkedin?: string;
+    facebook?: string;
     orcid?: string;
     researchGate?: string;
     github?: string;
