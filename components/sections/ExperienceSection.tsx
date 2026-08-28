@@ -199,7 +199,33 @@ export function ExperienceSection({ experience = [], profile, isLoading }: Exper
           {isLoading ? (
             Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="timeline-item-wrapper">
-                <div className="skeleton" style={{ height: '150px', borderRadius: 'var(--radius-outer)', width: '100%' }} />
+                <div className="timeline-dot-static skeleton" style={{ width: '12px', height: '12px', borderRadius: '50%' }} />
+                <div className="bezel-card" style={{ width: '100%' }}>
+                  <div className="bezel-core" style={{ padding: '1.4rem 1.6rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.65rem' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                        <div className="skeleton" style={{ height: '20px', width: `${180 + (i % 2) * 50}px`, borderRadius: '6px' }} />
+                        <div className="skeleton" style={{ height: '14px', width: '150px', borderRadius: '4px' }} />
+                      </div>
+                      <div className="skeleton-pill" style={{ height: '26px', width: '130px' }} />
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', paddingTop: '0.35rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <div className="skeleton" style={{ width: '6px', height: '6px', borderRadius: '50%', flexShrink: 0 }} />
+                        <div className="skeleton" style={{ height: '13px', width: '92%', borderRadius: '4px' }} />
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <div className="skeleton" style={{ width: '6px', height: '6px', borderRadius: '50%', flexShrink: 0 }} />
+                        <div className="skeleton" style={{ height: '13px', width: '85%', borderRadius: '4px' }} />
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <div className="skeleton" style={{ width: '6px', height: '6px', borderRadius: '50%', flexShrink: 0 }} />
+                        <div className="skeleton" style={{ height: '13px', width: '68%', borderRadius: '4px' }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             ))
           ) : (

@@ -17,6 +17,8 @@ import {
   Building,
   Calendar,
   AlertTriangle,
+  Upload,
+  ImageIcon,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { toast } from 'sonner';
@@ -31,12 +33,51 @@ import {
 } from '@/components/ui/drawer';
 import type { Workshop } from '@/types/portfolio';
 
+const WORKSHOP_IMAGES: Record<string, string> = {
+  climate: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=1200&auto=format&fit=crop',
+  marketing: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop',
+  pollution: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=1200&auto=format&fit=crop',
+  photo: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=1200&auto=format&fit=crop',
+  theatre: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?q=80&w=1200&auto=format&fit=crop',
+};
+
+const DEFAULT_IMAGES = [
+  'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=1200&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=1200&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=1200&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?q=80&w=1200&auto=format&fit=crop',
+];
+
+export function getWorkshopImage(ws: { title?: string; imageUrl?: string }, idx = 0): string {
+  if (ws.imageUrl && ws.imageUrl.trim() !== '') return ws.imageUrl;
+  const lowerTitle = (ws.title || '').toLowerCase();
+  if (lowerTitle.includes('climate') || lowerTitle.includes('ndc') || lowerTitle.includes('net zero')) {
+    return WORKSHOP_IMAGES.climate;
+  }
+  if (lowerTitle.includes('marketing') || lowerTitle.includes('digital')) {
+    return WORKSHOP_IMAGES.marketing;
+  }
+  if (lowerTitle.includes('pollution') || lowerTitle.includes('lead') || lowerTitle.includes('youth leaders')) {
+    return WORKSHOP_IMAGES.pollution;
+  }
+  if (lowerTitle.includes('photo') || lowerTitle.includes('capture') || lowerTitle.includes('reality')) {
+    return WORKSHOP_IMAGES.photo;
+  }
+  if (lowerTitle.includes('theatre') || lowerTitle.includes('acting') || lowerTitle.includes('drama')) {
+    return WORKSHOP_IMAGES.theatre;
+  }
+  return DEFAULT_IMAGES[idx % DEFAULT_IMAGES.length];
+}
+
 const workshopItemSchema = z.object({
   title: z.string().min(1, 'Workshop / certification title is required'),
   organizer: z.string().min(1, 'Organizing body is required'),
   year: z.number().min(1900).max(2100),
   description: z.string().optional(),
   imageUrl: z.string().url('Invalid image URL').optional().or(z.literal('')),
+  imageHeight: z.number().optional(),
+  imageFit: z.string().optional(),
   order: z.number(),
 });
 
@@ -44,6 +85,8 @@ const headerFormSchema = z.object({
   badge: z.string().optional(),
   title: z.string().optional(),
   description: z.string().optional(),
+  certificateHeight: z.number().optional(),
+  certificateFit: z.string().optional(),
 });
 
 type WorkshopFormValues = z.infer<typeof workshopItemSchema>;
@@ -55,6 +98,8 @@ export default function AdminWorkshopsPage() {
   const [headerDrawerOpen, setHeaderDrawerOpen] = useState(false);
   const [editWorkshop, setEditWorkshop] = useState<(Workshop & { _id: string }) | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   // Fetch all workshops
   const { data: workshops = [], isLoading: isWsLoading } = useQuery<(Workshop & { _id: string })[]>({
@@ -81,6 +126,7 @@ export default function AdminWorkshopsPage() {
     handleSubmit: handleWsSubmit,
     reset: resetWsForm,
     watch: watchWs,
+    setValue: setValueWs,
     formState: { errors: wsErrors, isSubmitting: isWsSubmitting, isDirty: isWsDirty },
   } = useForm<WorkshopFormValues>({
     resolver: zodResolver(workshopItemSchema),
@@ -90,6 +136,8 @@ export default function AdminWorkshopsPage() {
       year: new Date().getFullYear(),
       description: '',
       imageUrl: '',
+      imageHeight: 260,
+      imageFit: 'cover',
       order: 0,
     },
   });
@@ -99,6 +147,8 @@ export default function AdminWorkshopsPage() {
     register: registerHeader,
     handleSubmit: handleHeaderSubmit,
     reset: resetHeaderForm,
+    setValue: setValueHeader,
+    watch: watchHeader,
     formState: { isSubmitting: isHeaderSubmitting, isDirty: isHeaderDirty },
   } = useForm<HeaderFormValues>({
     resolver: zodResolver(headerFormSchema),
@@ -107,30 +157,48 @@ export default function AdminWorkshopsPage() {
       title: 'Workshops & Certifications',
       description:
         'Specialized training programs in quantitative social methodology, field research ethics, climate negotiations, and leadership.',
+      certificateHeight: 340,
+      certificateFit: 'cover',
     },
   });
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImageFile(file);
+    const localUrl = URL.createObjectURL(file);
+    setValueWs('imageUrl', localUrl, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+  };
+
   const openCreateWs = () => {
     setEditWorkshop(null);
+    setImageFile(null);
     resetWsForm({
       title: '',
       organizer: '',
       year: new Date().getFullYear(),
       description: '',
       imageUrl: '',
+      imageHeight: 260,
+      imageFit: 'cover',
       order: workshops.length > 0 ? Math.max(...workshops.map((w) => w.order || 0)) + 1 : 1,
     });
     setWsDrawerOpen(true);
   };
 
-  const openEditWs = (ws: Workshop & { _id: string }) => {
+  const openEditWs = (ws: Workshop & { _id: string }, idx = 0) => {
+    const wsImg = getWorkshopImage(ws, idx);
     setEditWorkshop(ws);
+    setImageFile(null);
     resetWsForm({
       title: ws.title,
       organizer: ws.organizer,
       year: ws.year,
       description: ws.description || '',
-      imageUrl: ws.imageUrl || '',
+      imageUrl: ws.imageUrl || wsImg,
+      imageHeight: ws.imageHeight || 260,
+      imageFit: ws.imageFit || 'cover',
       order: ws.order || 0,
     });
     setWsDrawerOpen(true);
@@ -143,6 +211,8 @@ export default function AdminWorkshopsPage() {
       description:
         profile?.workshopsSection?.description ||
         'Specialized training programs in quantitative social methodology, field research ethics, climate negotiations, and leadership.',
+      certificateHeight: profile?.workshopsSection?.certificateHeight || 340,
+      certificateFit: profile?.workshopsSection?.certificateFit || 'cover',
     });
     setHeaderDrawerOpen(true);
   };
@@ -156,6 +226,8 @@ export default function AdminWorkshopsPage() {
         year: data.year,
         description: data.description,
         imageUrl: data.imageUrl,
+        imageHeight: data.imageHeight || 260,
+        imageFit: data.imageFit || 'cover',
         order: data.order,
       };
 
@@ -168,6 +240,7 @@ export default function AdminWorkshopsPage() {
       qc.invalidateQueries({ queryKey: ['admin-workshops'] });
       qc.invalidateQueries({ queryKey: ['portfolio'] });
       toast.success(editWorkshop ? 'Workshop updated successfully' : 'Workshop record added successfully');
+      setImageFile(null);
       setWsDrawerOpen(false);
       setEditWorkshop(null);
     },
@@ -210,7 +283,32 @@ export default function AdminWorkshopsPage() {
   });
 
   const onWsSubmit = async (data: WorkshopFormValues) => {
-    await saveWsMutation.mutateAsync(data);
+    let finalImageUrl = data.imageUrl;
+
+    if (imageFile) {
+      try {
+        setUploading(true);
+        const formData = new FormData();
+        formData.append('file', imageFile);
+        formData.append('altText', `Workshop image for ${data.title}`);
+
+        const res = await api.post('/admin/media/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        finalImageUrl = res.data.data.url;
+      } catch {
+        toast.error('Failed to upload workshop image to Cloudinary. Please try again.');
+        setUploading(false);
+        return;
+      } finally {
+        setUploading(false);
+      }
+    }
+
+    await saveWsMutation.mutateAsync({
+      ...data,
+      imageUrl: finalImageUrl,
+    });
   };
 
   const onHeaderSubmit = async (data: HeaderFormValues) => {
@@ -222,12 +320,16 @@ export default function AdminWorkshopsPage() {
   const currentYear = watchWs('year');
   const currentDesc = watchWs('description');
   const currentImg = watchWs('imageUrl');
+  const currentHeight = watchWs('imageHeight') || 260;
+  const currentFit = watchWs('imageFit') || 'cover';
 
   const currentHeaderBadge = profile?.workshopsSection?.badge || 'Professional Development';
   const currentHeaderTitle = profile?.workshopsSection?.title || 'Workshops & Certifications';
   const currentHeaderDesc =
     profile?.workshopsSection?.description ||
     'Specialized training programs in quantitative social methodology, field research ethics, climate negotiations, and leadership.';
+  const currentHeaderHeight = watchHeader('certificateHeight') || profile?.workshopsSection?.certificateHeight || 340;
+  const currentHeaderFit = watchHeader('certificateFit') || profile?.workshopsSection?.certificateFit || 'cover';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -324,87 +426,104 @@ export default function AdminWorkshopsPage() {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {workshops.map((ws) => (
-            <div
-              key={ws._id}
-              className="card bezel-card"
-              style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'space-between',
-                padding: '1.25rem 1.5rem',
-                gap: '1.25rem',
-                backgroundColor: 'var(--bg-surface)',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              <div style={{ display: 'flex', gap: '1.25rem', flex: 1, minWidth: 0 }}>
-                {ws.imageUrl && (
-                  <div style={{ width: '80px', height: '65px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, backgroundColor: 'var(--bg-elevated)' }}>
-                    <img src={ws.imageUrl} alt={ws.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  </div>
-                )}
-
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
-                    <span
-                      style={{
-                        fontSize: '0.75rem',
-                        color: 'var(--accent)',
-                        fontWeight: 650,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.3rem',
-                        padding: '0.15rem 0.55rem',
-                        borderRadius: '9999px',
-                        backgroundColor: 'var(--accent-subtle)',
-                        border: '1px solid var(--accent-border)',
-                      }}
-                    >
-                      <Calendar size={11} />
-                      <span>{ws.year}</span>
-                    </span>
-                    <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--fg)', margin: 0, lineHeight: 1.35 }}>
-                      {ws.title}
-                    </h3>
+          {workshops.map((ws, idx) => {
+            const wsImg = getWorkshopImage(ws, idx);
+            return (
+              <div
+                key={ws._id}
+                className="card bezel-card"
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  justifyContent: 'space-between',
+                  padding: '1.25rem 1.5rem',
+                  gap: '1.25rem',
+                  backgroundColor: 'var(--bg-surface)',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <div style={{ display: 'flex', gap: '1.25rem', flex: 1, minWidth: 0, alignItems: 'flex-start' }}>
+                  {/* Certificate Photo Thumbnail */}
+                  <div
+                    style={{
+                      width: '90px',
+                      height: '72px',
+                      borderRadius: '10px',
+                      overflow: 'hidden',
+                      flexShrink: 0,
+                      backgroundColor: 'var(--bg-elevated)',
+                      border: '1px solid var(--border)',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                    }}
+                  >
+                    <img
+                      src={wsImg}
+                      alt={ws.title}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
                   </div>
 
-                  <p style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--accent)', fontWeight: 600, fontSize: '0.85rem', margin: '0 0 0.35rem' }}>
-                    <Building size={13} />
-                    <span>Organized by {ws.organizer}</span>
-                  </p>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
+                      <span
+                        style={{
+                          fontSize: '0.75rem',
+                          color: 'var(--accent)',
+                          fontWeight: 650,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.3rem',
+                          padding: '0.15rem 0.55rem',
+                          borderRadius: '9999px',
+                          backgroundColor: 'var(--accent-subtle)',
+                          border: '1px solid var(--accent-border)',
+                        }}
+                      >
+                        <Calendar size={11} />
+                        <span>{ws.year}</span>
+                      </span>
+                      <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--fg)', margin: 0, lineHeight: 1.35 }}>
+                        {ws.title}
+                      </h3>
+                    </div>
 
-                  {ws.description && (
-                    <p style={{ fontSize: '0.8rem', color: 'var(--fg-muted)', margin: 0, lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                      {ws.description}
+                    <p style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--accent)', fontWeight: 600, fontSize: '0.85rem', margin: '0 0 0.35rem' }}>
+                      <Building size={13} />
+                      <span>Organized by {ws.organizer}</span>
                     </p>
-                  )}
+
+                    {ws.description && (
+                      <p style={{ fontSize: '0.8rem', color: 'var(--fg-muted)', margin: 0, lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {ws.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.45rem', flexShrink: 0, alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', opacity: 0.6, marginRight: '0.35rem' }}>
+                    #{ws.order}
+                  </span>
+                  <button
+                    onClick={() => openEditWs(ws, idx)}
+                    className="btn btn-outline"
+                    style={{ padding: '0.4rem 0.75rem', fontSize: '0.775rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                  >
+                    <Pencil size={12} />
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    onClick={() => setDeleteId(ws._id)}
+                    className="btn btn-outline"
+                    style={{ padding: '0.4rem 0.6rem', color: '#ef4444', borderColor: 'var(--border)' }}
+                    title="Delete workshop"
+                  >
+                    <Trash2 size={13} />
+                  </button>
                 </div>
               </div>
-
-              <div style={{ display: 'flex', gap: '0.45rem', flexShrink: 0, alignItems: 'center' }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', opacity: 0.6, marginRight: '0.35rem' }}>
-                  #{ws.order}
-                </span>
-                <button
-                  onClick={() => openEditWs(ws)}
-                  className="btn btn-outline"
-                  style={{ padding: '0.4rem 0.75rem', fontSize: '0.775rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-                >
-                  <Pencil size={12} />
-                  <span>Edit</span>
-                </button>
-                <button
-                  onClick={() => setDeleteId(ws._id)}
-                  className="btn btn-outline"
-                  style={{ padding: '0.4rem 0.6rem', color: '#ef4444', borderColor: 'var(--border)' }}
-                  title="Delete workshop"
-                >
-                  <Trash2 size={13} />
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -423,33 +542,244 @@ export default function AdminWorkshopsPage() {
             <DrawerBody>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.35rem' }}>
                 
-                {/* Live Card Preview */}
-                <div style={{ padding: '1rem 1.25rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '14px', border: '1px solid var(--border)' }}>
-                  <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--fg-muted)', marginBottom: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    Live Preview in 3D Showcase Card
-                  </p>
-                  <div style={{ padding: '1.15rem', backgroundColor: 'var(--bg-surface)', borderRadius: '12px', border: '1px solid var(--border)', display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-                    <div style={{ width: '90px', height: '80px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, backgroundColor: 'var(--bg-elevated)' }}>
-                      <img
-                        src={currentImg || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=600&auto=format&fit=crop'}
-                        alt="Preview"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
+                {/* Live Card Preview (Image on Top with Real Certificate Proportions) */}
+                <div style={{ padding: '1.15rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '16px', border: '1px solid var(--border)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                    <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--fg-muted)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      Live Preview in Showcase Card
+                    </p>
+                    <span
+                      style={{
+                        fontSize: '0.725rem',
+                        fontWeight: 700,
+                        color: 'var(--accent)',
+                        backgroundColor: 'var(--accent-subtle)',
+                        border: '1px solid var(--accent-border)',
+                        padding: '0.15rem 0.55rem',
+                        borderRadius: '9999px',
+                      }}
+                    >
+                      {currentHeight}px · {currentFit === 'contain' ? 'Contain (Uncropped)' : 'Cover (Fill)'}
+                    </span>
+                  </div>
+
+                  {/* Framed Card with Certificate Image on Top */}
+                  <div
+                    style={{
+                      backgroundColor: 'var(--bg-surface)',
+                      borderRadius: '14px',
+                      border: '1px solid var(--border)',
+                      overflow: 'hidden',
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                    }}
+                  >
+                    {/* Top Certificate Image Frame with Outer Padding & Framing */}
+                    <div
+                      style={{
+                        padding: '0.85rem 0.85rem 0.35rem 0.85rem',
+                        backgroundColor: 'var(--bg-surface)',
+                        transition: 'all 0.25s ease',
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: 'relative',
+                          width: '100%',
+                          height: `${currentHeight}px`,
+                          backgroundColor: 'var(--bg-elevated)',
+                          borderRadius: '12px',
+                          border: '1px solid var(--border)',
+                          overflow: 'hidden',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
+                          transition: 'height 0.25s ease',
+                        }}
+                      >
+                        {currentFit === 'contain' && (
+                          <img
+                            src={currentImg || getWorkshopImage({ title: currentTitle }, 0)}
+                            alt=""
+                            aria-hidden="true"
+                            style={{
+                              position: 'absolute',
+                              inset: 0,
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              filter: 'blur(20px)',
+                              opacity: 0.25,
+                              transform: 'scale(1.15)',
+                              pointerEvents: 'none',
+                            }}
+                          />
+                        )}
+                        <img
+                          src={currentImg || getWorkshopImage({ title: currentTitle }, 0)}
+                          alt="Preview Certificate"
+                          style={{
+                            position: 'relative',
+                            zIndex: 1,
+                            width: '100%',
+                            height: '100%',
+                            objectFit: currentFit === 'contain' ? 'contain' : 'cover',
+                            objectPosition: 'center',
+                            padding: currentFit === 'contain' ? '0.75rem' : '0.45rem',
+                            borderRadius: '11px',
+                            transition: 'all 0.25s ease',
+                          }}
+                        />
+                      </div>
                     </div>
 
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <span style={{ fontSize: '0.65rem', fontWeight: 650, color: 'var(--accent)', backgroundColor: 'var(--accent-subtle)', border: '1px solid var(--accent-border)', padding: '0.1rem 0.45rem', borderRadius: '9999px' }}>
-                        {currentYear || '2024'}
-                      </span>
-                      <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--fg)', margin: '0.35rem 0 0.2rem', lineHeight: 1.3 }}>
-                        {currentTitle || 'National Advocacy and Training Workshop...'}
+                    {/* Bottom Details */}
+                    <div style={{ padding: '1.25rem 1.35rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.45rem' }}>
+                        <span
+                          style={{
+                            fontSize: '0.7rem',
+                            fontWeight: 700,
+                            color: 'var(--accent)',
+                            backgroundColor: 'var(--accent-subtle)',
+                            border: '1px solid var(--accent-border)',
+                            padding: '0.15rem 0.55rem',
+                            borderRadius: '9999px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.3rem',
+                          }}
+                        >
+                          <Calendar size={11} />
+                          {currentYear || '2024'}
+                        </span>
+                      </div>
+
+                      <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--fg)', margin: '0 0 0.35rem', lineHeight: 1.35 }}>
+                        {currentTitle || 'National Advocacy and Training Workshop on Youth and Women Engagement...'}
                       </h4>
-                      <p style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 600, margin: '0 0 0.35rem' }}>
-                        Organized by {currentOrg || 'Nature Conservation Management (NACOM)'}
+
+                      <p style={{ fontSize: '0.825rem', color: 'var(--accent)', fontWeight: 600, margin: '0 0 0.45rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                        <Building size={13} />
+                        <span>Organized by {currentOrg || 'Nature Conservation Management (NACOM)'}</span>
                       </p>
-                      <p style={{ fontSize: '0.725rem', color: 'var(--fg-muted)', margin: 0, lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                        {currentDesc || 'Specialized institutional training program focusing on practical methodology...'}
+
+                      <p style={{ fontSize: '0.8rem', color: 'var(--fg-muted)', margin: 0, lineHeight: 1.55 }}>
+                        {currentDesc || 'Specialized institutional training program focusing on practical methodology, capacity development, and impactful field execution.'}
                       </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Certificate Image Resizing & Framing Controls */}
+                <div style={{ padding: '1.15rem 1.25rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '14px', border: '1px solid var(--border)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                    <label className="admin-label" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                      <SlidersHorizontal size={14} />
+                      <span>Certificate Image Height / Size</span>
+                    </label>
+                    <span
+                      style={{
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        color: 'var(--accent)',
+                        fontFamily: 'monospace',
+                        backgroundColor: 'var(--accent-subtle)',
+                        padding: '0.15rem 0.55rem',
+                        borderRadius: '6px',
+                        border: '1px solid var(--accent-border)',
+                      }}
+                    >
+                      {currentHeight}px
+                    </span>
+                  </div>
+
+                  {/* Range Slider */}
+                  <input
+                    type="range"
+                    min={160}
+                    max={450}
+                    step={10}
+                    value={currentHeight}
+                    onChange={(e) => setValueWs('imageHeight', Number(e.target.value), { shouldDirty: true })}
+                    style={{ width: '100%', accentColor: 'var(--accent)', cursor: 'pointer', marginBottom: '0.85rem' }}
+                  />
+
+                  {/* Quick Preset Buttons */}
+                  <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                    {[
+                      { label: 'Compact (200px)', val: 200 },
+                      { label: 'Standard (260px)', val: 260 },
+                      { label: 'Large (320px)', val: 320 },
+                      { label: 'Expanded (380px)', val: 380 },
+                    ].map((preset) => (
+                      <button
+                        key={preset.val}
+                        type="button"
+                        onClick={() => setValueWs('imageHeight', preset.val, { shouldDirty: true })}
+                        className="btn btn-outline"
+                        style={{
+                          fontSize: '0.725rem',
+                          padding: '0.3rem 0.65rem',
+                          borderRadius: '8px',
+                          backgroundColor: currentHeight === preset.val ? 'var(--accent-subtle)' : undefined,
+                          borderColor: currentHeight === preset.val ? 'var(--accent-border)' : undefined,
+                          color: currentHeight === preset.val ? 'var(--accent)' : undefined,
+                          fontWeight: currentHeight === preset.val ? 700 : 500,
+                        }}
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Framing Fit Mode Toggle */}
+                  <div>
+                    <label className="admin-label" style={{ fontSize: '0.775rem', marginBottom: '0.45rem' }}>
+                      Certificate Framing / Fit Mode
+                    </label>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem' }}>
+                      <button
+                        type="button"
+                        onClick={() => setValueWs('imageFit', 'cover', { shouldDirty: true })}
+                        className="btn btn-outline"
+                        style={{
+                          fontSize: '0.8rem',
+                          padding: '0.5rem',
+                          borderRadius: '9px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.4rem',
+                          backgroundColor: currentFit === 'cover' ? 'var(--accent-subtle)' : undefined,
+                          borderColor: currentFit === 'cover' ? 'var(--accent)' : undefined,
+                          color: currentFit === 'cover' ? 'var(--accent)' : undefined,
+                          fontWeight: currentFit === 'cover' ? 700 : 500,
+                        }}
+                      >
+                        <span>Cover (Fill Frame)</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setValueWs('imageFit', 'contain', { shouldDirty: true })}
+                        className="btn btn-outline"
+                        style={{
+                          fontSize: '0.8rem',
+                          padding: '0.5rem',
+                          borderRadius: '9px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.4rem',
+                          backgroundColor: currentFit === 'contain' ? 'var(--accent-subtle)' : undefined,
+                          borderColor: currentFit === 'contain' ? 'var(--accent)' : undefined,
+                          color: currentFit === 'contain' ? 'var(--accent)' : undefined,
+                          fontWeight: currentFit === 'contain' ? 700 : 500,
+                        }}
+                      >
+                        <span>Contain (Full Certificate)</span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -501,15 +831,55 @@ export default function AdminWorkshopsPage() {
                   </div>
                 </div>
 
-                {/* Image URL & Display Order */}
-                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem' }}>
+                {/* Image Upload & Display Order */}
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem', alignItems: 'start' }}>
                   <div>
-                    <label className="admin-label">Photo / Certificate Image URL</label>
-                    <input
-                      {...registerWs('imageUrl')}
-                      className="admin-input"
-                      placeholder="https://images.unsplash.com/photo-..."
-                    />
+                    <label className="admin-label">Photo / Certificate Image</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                      <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <label
+                          className="btn btn-outline"
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.45rem',
+                            padding: '0.45rem 0.95rem',
+                            fontSize: '0.8rem',
+                            borderRadius: '10px',
+                            cursor: 'pointer',
+                            flexShrink: 0,
+                          }}
+                        >
+                          <Upload size={14} />
+                          <span>{imageFile ? `Selected: ${imageFile.name}` : 'Upload Certificate Photo'}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageSelect}
+                            style={{ display: 'none' }}
+                          />
+                        </label>
+                        {imageFile && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setImageFile(null);
+                              setValueWs('imageUrl', editWorkshop?.imageUrl || '', { shouldDirty: true });
+                            }}
+                            className="btn btn-outline"
+                            style={{ fontSize: '0.75rem', padding: '0.45rem 0.65rem', borderRadius: '8px', color: '#ef4444' }}
+                          >
+                            Clear
+                          </button>
+                        )}
+                      </div>
+
+                      <input
+                        {...registerWs('imageUrl')}
+                        className="admin-input"
+                        placeholder="Or paste image URL (https://...)"
+                      />
+                    </div>
                     {wsErrors.imageUrl && (
                       <p style={{ color: '#ef4444', fontSize: '0.75rem', margin: '0.2rem 0 0' }}>
                         {wsErrors.imageUrl.message}
@@ -559,7 +929,7 @@ export default function AdminWorkshopsPage() {
               </button>
               <button
                 type="submit"
-                disabled={!isWsDirty || isWsSubmitting || saveWsMutation.isPending}
+                disabled={!isWsDirty || isWsSubmitting || saveWsMutation.isPending || uploading}
                 className="btn btn-primary"
                 style={{
                   display: 'inline-flex',
@@ -573,10 +943,10 @@ export default function AdminWorkshopsPage() {
                   transition: 'opacity 0.15s ease',
                 }}
               >
-                {isWsSubmitting || saveWsMutation.isPending ? (
+                {isWsSubmitting || saveWsMutation.isPending || uploading ? (
                   <>
                     <Loader2 size={14} className="animate-spin" />
-                    <span>Saving Workshop...</span>
+                    <span>{uploading ? 'Uploading Image...' : 'Saving Workshop...'}</span>
                   </>
                 ) : (
                   <>
@@ -597,9 +967,9 @@ export default function AdminWorkshopsPage() {
           <form onSubmit={handleHeaderSubmit(onHeaderSubmit)} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             
             <DrawerHeader>
-              <DrawerTitle>Customize Workshops Section Header</DrawerTitle>
+              <DrawerTitle>Customize Workshops Section & Display</DrawerTitle>
               <DrawerDescription>
-                Customize badge, main title, and descriptive subtitle shown above the workshops showcase.
+                Customize badge, main title, descriptive subtitle, and default certificate sizing for the showcase.
               </DrawerDescription>
             </DrawerHeader>
 
@@ -631,12 +1001,68 @@ export default function AdminWorkshopsPage() {
                     rows={4}
                     style={{
                       height: 'auto',
-                      minHeight: '100px',
+                      minHeight: '90px',
                       padding: '0.75rem 0.95rem',
                       lineHeight: 1.6,
                     }}
                     placeholder="Specialized training programs in quantitative social methodology, field research ethics, climate negotiations, and leadership."
                   />
+                </div>
+
+                {/* Section Default Certificate Height & Fit */}
+                <div style={{ padding: '1rem 1.15rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.65rem' }}>
+                    <label className="admin-label" style={{ margin: 0 }}>Section Default Certificate Height</label>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent)', fontFamily: 'monospace' }}>
+                      {currentHeaderHeight}px
+                    </span>
+                  </div>
+
+                  <input
+                    type="range"
+                    min={200}
+                    max={450}
+                    step={10}
+                    value={currentHeaderHeight}
+                    onChange={(e) => setValueHeader('certificateHeight', Number(e.target.value), { shouldDirty: true })}
+                    style={{ width: '100%', accentColor: 'var(--accent)', cursor: 'pointer', marginBottom: '0.75rem' }}
+                  />
+
+                  <div>
+                    <label className="admin-label" style={{ fontSize: '0.75rem', marginBottom: '0.4rem' }}>Default Framing Fit Mode</label>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                      <button
+                        type="button"
+                        onClick={() => setValueHeader('certificateFit', 'cover', { shouldDirty: true })}
+                        className="btn btn-outline"
+                        style={{
+                          fontSize: '0.75rem',
+                          padding: '0.4rem',
+                          backgroundColor: currentHeaderFit === 'cover' ? 'var(--accent-subtle)' : undefined,
+                          borderColor: currentHeaderFit === 'cover' ? 'var(--accent)' : undefined,
+                          color: currentHeaderFit === 'cover' ? 'var(--accent)' : undefined,
+                          fontWeight: currentHeaderFit === 'cover' ? 700 : 500,
+                        }}
+                      >
+                        Cover (Fill Frame)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setValueHeader('certificateFit', 'contain', { shouldDirty: true })}
+                        className="btn btn-outline"
+                        style={{
+                          fontSize: '0.75rem',
+                          padding: '0.4rem',
+                          backgroundColor: currentHeaderFit === 'contain' ? 'var(--accent-subtle)' : undefined,
+                          borderColor: currentHeaderFit === 'contain' ? 'var(--accent)' : undefined,
+                          color: currentHeaderFit === 'contain' ? 'var(--accent)' : undefined,
+                          fontWeight: currentHeaderFit === 'contain' ? 700 : 500,
+                        }}
+                      >
+                        Contain (Uncropped)
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </DrawerBody>

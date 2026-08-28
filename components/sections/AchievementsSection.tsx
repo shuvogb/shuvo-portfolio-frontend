@@ -47,10 +47,30 @@ export function AchievementsSection({ achievements = [], profile, isLoading }: A
           {isLoading
             ? Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="bezel-card">
-                  <div className="bezel-core" style={{ padding: '0.85rem' }}>
-                    <div className="skeleton" style={{ height: '160px', borderRadius: 'var(--radius-inner)', marginBottom: '0.85rem' }} />
-                    <div className="skeleton" style={{ height: '20px', width: '60%', marginBottom: '0.5rem' }} />
-                    <div className="skeleton" style={{ height: '50px' }} />
+                  <div className="bezel-core" style={{ padding: '0.85rem', display: 'flex', flexDirection: 'column', height: '100%', gap: '0.75rem' }}>
+                    {/* Top Framed Image Skeleton */}
+                    <div className="skeleton" style={{ width: '100%', height: '170px', borderRadius: '12px' }} />
+
+                    {/* Category & Year Row */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div className="skeleton-pill" style={{ height: '22px', width: '85px' }} />
+                      <div className="skeleton" style={{ height: '14px', width: '40px', borderRadius: '4px' }} />
+                    </div>
+
+                    {/* Title Skeleton */}
+                    <div className="skeleton" style={{ height: '18px', width: `${70 + (i % 3) * 10}%`, borderRadius: '4px' }} />
+
+                    {/* Description Lines */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', flex: 1 }}>
+                      <div className="skeleton" style={{ height: '13px', width: '100%', borderRadius: '4px' }} />
+                      <div className="skeleton" style={{ height: '13px', width: '75%', borderRadius: '4px' }} />
+                    </div>
+
+                    {/* Link Footer */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '0.5rem', borderTop: '1px solid var(--border)' }}>
+                      <div className="skeleton" style={{ height: '14px', width: '100px', borderRadius: '4px' }} />
+                      <div className="skeleton" style={{ width: '14px', height: '14px', borderRadius: '4px' }} />
+                    </div>
                   </div>
                 </div>
               ))

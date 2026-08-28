@@ -85,143 +85,168 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
             {/* Identity & Direct Contact Card */}
             <div className="bezel-card about-identity-card">
               <div className="bezel-core" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '1.5rem', height: '100%' }}>
-                <div>
-                  {/* Avatar & Title */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-                    <div
-                      style={{
-                        width: '64px',
-                        height: '64px',
-                        borderRadius: '16px',
-                        border: '1px solid var(--border)',
-                        overflow: 'hidden',
-                        flexShrink: 0,
-                        backgroundColor: 'var(--bg-elevated)',
-                      }}
-                    >
-                      {isLoading || !avatarSrc ? (
-                        <div className="skeleton" style={{ width: '100%', height: '100%' }} />
-                      ) : (
+                {isLoading ? (
+                  <div>
+                    {/* Avatar & Title Skeleton */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+                      <div className="skeleton" style={{ width: '64px', height: '64px', borderRadius: '16px', flexShrink: 0 }} />
+                      <div style={{ minWidth: 0, flex: 1, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                        <div className="skeleton" style={{ height: '22px', width: '150px', borderRadius: '6px' }} />
+                        <div className="skeleton" style={{ height: '15px', width: '180px', borderRadius: '6px' }} />
+                        <div className="skeleton" style={{ height: '13px', width: '130px', borderRadius: '6px' }} />
+                      </div>
+                    </div>
+
+                    {/* Contact Button Skeletons */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                      <div className="skeleton" style={{ height: '42px', borderRadius: '12px', width: '100%' }} />
+                      <div className="skeleton" style={{ height: '42px', borderRadius: '12px', width: '100%' }} />
+                      <div className="skeleton" style={{ height: '42px', borderRadius: '12px', width: '100%' }} />
+                    </div>
+
+                    {/* Social Row Skeleton */}
+                    <div style={{ display: 'flex', gap: '0.75rem', paddingTop: '1rem', borderTop: '1px solid var(--border)', marginTop: '1.25rem' }}>
+                      <div className="skeleton" style={{ height: '36px', flex: 1, borderRadius: '10px' }} />
+                      <div className="skeleton" style={{ height: '36px', flex: 1, borderRadius: '10px' }} />
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    {/* Avatar & Title */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+                      <div
+                        style={{
+                          width: '64px',
+                          height: '64px',
+                          borderRadius: '16px',
+                          border: '1px solid var(--border)',
+                          overflow: 'hidden',
+                          flexShrink: 0,
+                          backgroundColor: 'var(--bg-elevated)',
+                        }}
+                      >
                         <img
-                          src={avatarSrc}
+                          src={avatarSrc || '/images/shuvo.png'}
                           alt={profile?.name || 'Shuvo Molla'}
                           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         />
+                      </div>
+
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--fg)', marginBottom: '0.15rem' }}>
+                          {profile?.name || 'Shuvo Molla'}
+                        </h3>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--accent)', fontWeight: 600 }}>
+                          {about?.department || 'Sociology & Social Work'}
+                        </p>
+                        <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)' }}>
+                          {about?.university || 'Gono Bishwabidyalay · Savar'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Direct Contact Options with Icons */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                      {profile?.email && (
+                        <button
+                          onClick={() => copyToClipboard(profile.email!, 'Email')}
+                          title="Click to copy email address"
+                          className="btn btn-secondary"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            width: '100%',
+                            padding: '0.65rem 0.85rem',
+                            borderRadius: '12px',
+                            fontSize: '0.825rem',
+                            gap: '0.5rem',
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', minWidth: 0, overflow: 'hidden' }}>
+                            <Mail size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '0.8rem' }}>{profile.email}</span>
+                          </div>
+                          <span style={{ fontSize: '0.7rem', color: 'var(--fg-muted)', flexShrink: 0 }}>Copy</span>
+                        </button>
+                      )}
+
+                      {profile?.phone && (
+                        <button
+                          onClick={() => copyToClipboard(profile.phone!, 'Phone number')}
+                          title="Click to copy phone number"
+                          className="btn btn-secondary"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            width: '100%',
+                            padding: '0.65rem 0.85rem',
+                            borderRadius: '12px',
+                            fontSize: '0.825rem',
+                            gap: '0.5rem',
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', minWidth: 0 }}>
+                            <Phone size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+                            <span style={{ fontSize: '0.8rem' }}>{profile.phone}</span>
+                          </div>
+                          <span style={{ fontSize: '0.7rem', color: 'var(--fg-muted)', flexShrink: 0 }}>Copy</span>
+                        </button>
+                      )}
+
+                      {profile?.presentAddress && (
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.6rem',
+                            padding: '0.65rem 0.85rem',
+                            borderRadius: '12px',
+                            backgroundColor: 'var(--bg-elevated)',
+                            border: '1px solid var(--border)',
+                            fontSize: '0.825rem',
+                            color: 'var(--fg-muted)',
+                          }}
+                        >
+                          <MapPin size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+                          <span style={{ fontSize: '0.8rem' }}>{profile.presentAddress}</span>
+                        </div>
                       )}
                     </div>
-
-                    <div style={{ minWidth: 0, flex: 1 }}>
-                      <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--fg)', marginBottom: '0.15rem' }}>
-                        {profile?.name || 'Shuvo Molla'}
-                      </h3>
-                      <p style={{ fontSize: '0.85rem', color: 'var(--accent)', fontWeight: 600 }}>
-                        {about?.department || 'Sociology & Social Work'}
-                      </p>
-                      <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)' }}>
-                        {about?.university || 'Gono Bishwabidyalay · Savar'}
-                      </p>
-                    </div>
                   </div>
-
-                  {/* Direct Contact Options with Icons */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-                    {profile?.email && (
-                      <button
-                        onClick={() => copyToClipboard(profile.email!, 'Email')}
-                        title="Click to copy email address"
-                        className="btn btn-secondary"
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          width: '100%',
-                          padding: '0.65rem 0.85rem',
-                          borderRadius: '12px',
-                          fontSize: '0.825rem',
-                          gap: '0.5rem',
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', minWidth: 0, overflow: 'hidden' }}>
-                          <Mail size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '0.8rem' }}>{profile.email}</span>
-                        </div>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--fg-muted)', flexShrink: 0 }}>Copy</span>
-                      </button>
-                    )}
-
-                    {profile?.phone && (
-                      <button
-                        onClick={() => copyToClipboard(profile.phone!, 'Phone number')}
-                        title="Click to copy phone number"
-                        className="btn btn-secondary"
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          width: '100%',
-                          padding: '0.65rem 0.85rem',
-                          borderRadius: '12px',
-                          fontSize: '0.825rem',
-                          gap: '0.5rem',
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', minWidth: 0 }}>
-                          <Phone size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-                          <span style={{ fontSize: '0.8rem' }}>{profile.phone}</span>
-                        </div>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--fg-muted)', flexShrink: 0 }}>Copy</span>
-                      </button>
-                    )}
-
-                    {profile?.presentAddress && (
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.6rem',
-                          padding: '0.65rem 0.85rem',
-                          borderRadius: '12px',
-                          backgroundColor: 'var(--bg-elevated)',
-                          border: '1px solid var(--border)',
-                          fontSize: '0.825rem',
-                          color: 'var(--fg-muted)',
-                        }}
-                      >
-                        <MapPin size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-                        <span style={{ fontSize: '0.8rem' }}>{profile.presentAddress}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                )}
 
                 {/* Social Channels Row */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', paddingTop: '1rem', borderTop: '1px solid var(--border)', flexWrap: 'wrap' }}>
-                  {profile?.socialLinks?.linkedin && (
-                    <a
-                      href={profile.socialLinks.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-secondary"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.8rem', padding: '0.45rem 0.85rem', flex: 1, justifyContent: 'center' }}
-                    >
-                      <FiLinkedin size={14} />
-                      <span>LinkedIn</span>
-                    </a>
-                  )}
+                {!isLoading && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', paddingTop: '1rem', borderTop: '1px solid var(--border)', flexWrap: 'wrap' }}>
+                    {profile?.socialLinks?.linkedin && (
+                      <a
+                        href={profile.socialLinks.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-secondary"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.8rem', padding: '0.45rem 0.85rem', flex: 1, justifyContent: 'center' }}
+                      >
+                        <FiLinkedin size={14} />
+                        <span>LinkedIn</span>
+                      </a>
+                    )}
 
-                  {profile?.socialLinks?.facebook && (
-                    <a
-                      href={profile.socialLinks.facebook}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-secondary"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.8rem', padding: '0.45rem 0.85rem', flex: 1, justifyContent: 'center' }}
-                    >
-                      <FiFacebook size={14} />
-                      <span>Facebook</span>
-                    </a>
-                  )}
-                </div>
+                    {profile?.socialLinks?.facebook && (
+                      <a
+                        href={profile.socialLinks.facebook}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-secondary"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.8rem', padding: '0.45rem 0.85rem', flex: 1, justifyContent: 'center' }}
+                      >
+                        <FiFacebook size={14} />
+                        <span>Facebook</span>
+                      </a>
+                    )}
+                  </div>
+                )}
 
               </div>
             </div>
@@ -230,54 +255,82 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
             <div className="bezel-card about-philosophy-card">
               <div className="bezel-core" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '1.5rem', height: '100%' }}>
                 
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
-                      <Compass size={18} style={{ color: 'var(--accent)' }} />
-                      <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--fg)' }}>
-                        {about?.philosophyTitle || 'Research Philosophy & Focus'}
-                      </h3>
+                {isLoading ? (
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+                      <div className="skeleton" style={{ height: '24px', width: '220px', borderRadius: '6px' }} />
+                      <div className="skeleton-pill" style={{ height: '24px', width: '130px' }} />
                     </div>
 
-                    <span className="badge badge-primary" style={{ fontSize: '0.725rem' }}>
-                      <CheckCircle2 size={11} /> {about?.philosophyBadge || 'Empirical Inquiry'}
-                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem', marginBottom: '1.5rem' }}>
+                      <div className="skeleton" style={{ height: '15px', width: '100%', borderRadius: '4px' }} />
+                      <div className="skeleton" style={{ height: '15px', width: '95%', borderRadius: '4px' }} />
+                      <div className="skeleton" style={{ height: '15px', width: '80%', borderRadius: '4px' }} />
+                    </div>
+
+                    {/* Pillars Skeleton Grid */}
+                    <div className="about-features-grid">
+                      {Array.from({ length: 3 }).map((_, idx) => (
+                        <div key={idx} className="skeleton" style={{ padding: '0.85rem', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <div className="skeleton" style={{ width: '20px', height: '20px', borderRadius: '4px' }} />
+                            <div className="skeleton" style={{ height: '14px', width: '90px', borderRadius: '4px' }} />
+                          </div>
+                          <div className="skeleton" style={{ height: '12px', width: '100%', borderRadius: '4px' }} />
+                        </div>
+                      ))}
+                    </div>
                   </div>
-
-                  <p style={{ fontSize: '0.925rem', lineHeight: 1.7, color: 'var(--fg-muted)', marginBottom: '1.5rem' }}>
-                    {about?.philosophyDescription ||
-                      'Sociology and Social Work undergraduate with hands-on experience in social research, data collection, and community development. Skilled in quantitative research methods and SPSS, with a demonstrated ability to coordinate events and engage in social advocacy.'}
-                  </p>
-                </div>
-
-                {/* Dynamic Feature Cards */}
-                <div className="about-features-grid">
-                  {pillars.map((pillar, idx) => (
-                    <div
-                      key={idx}
-                      style={{
-                        padding: '0.85rem',
-                        borderRadius: '12px',
-                        backgroundColor: 'var(--bg-elevated)',
-                        border: '1px solid var(--border)',
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.35rem', color: 'var(--accent)' }}>
-                        {idx === 0 ? (
-                          <BarChart3 size={15} strokeWidth={1.8} />
-                        ) : idx === 1 ? (
-                          <Globe size={15} strokeWidth={1.8} />
-                        ) : (
-                          <User size={15} strokeWidth={1.8} />
-                        )}
-                        <span style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--fg)' }}>{pillar.title}</span>
+                ) : (
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+                        <Compass size={18} style={{ color: 'var(--accent)' }} />
+                        <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--fg)' }}>
+                          {about?.philosophyTitle || 'Research Philosophy & Focus'}
+                        </h3>
                       </div>
-                      <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', lineHeight: 1.45, margin: 0 }}>
-                        {pillar.description}
-                      </p>
+
+                      <span className="badge badge-primary" style={{ fontSize: '0.725rem' }}>
+                        <CheckCircle2 size={11} /> {about?.philosophyBadge || 'Empirical Inquiry'}
+                      </span>
                     </div>
-                  ))}
-                </div>
+
+                    <p style={{ fontSize: '0.925rem', lineHeight: 1.7, color: 'var(--fg-muted)', marginBottom: '1.5rem' }}>
+                      {about?.philosophyDescription ||
+                        'Sociology and Social Work undergraduate with hands-on experience in social research, data collection, and community development. Skilled in quantitative research methods and SPSS, with a demonstrated ability to coordinate events and engage in social advocacy.'}
+                    </p>
+
+                    {/* Dynamic Feature Cards */}
+                    <div className="about-features-grid">
+                      {pillars.map((pillar, idx) => (
+                        <div
+                          key={idx}
+                          style={{
+                            padding: '0.85rem',
+                            borderRadius: '12px',
+                            backgroundColor: 'var(--bg-elevated)',
+                            border: '1px solid var(--border)',
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.35rem', color: 'var(--accent)' }}>
+                            {idx === 0 ? (
+                              <BarChart3 size={15} strokeWidth={1.8} />
+                            ) : idx === 1 ? (
+                              <Globe size={15} strokeWidth={1.8} />
+                            ) : (
+                              <User size={15} strokeWidth={1.8} />
+                            )}
+                            <span style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--fg)' }}>{pillar.title}</span>
+                          </div>
+                          <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', lineHeight: 1.45, margin: 0 }}>
+                            {pillar.description}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
               </div>
             </div>
@@ -287,64 +340,87 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
           {/* Bottom Standalone Card: Verified Mentors & Institutional Referees */}
           <div className="bezel-card">
             <div className="bezel-core" style={{ padding: '1.5rem' }}>
-              
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
-                  <ShieldCheck size={18} style={{ color: 'var(--accent)' }} />
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--fg)' }}>
-                    {about?.refereesTitle || 'Academic Mentors & Institutional Referees'}
-                  </h3>
-                </div>
-                <span className="badge" style={{ fontSize: '0.725rem' }}>
-                  <CheckCircle2 size={11} style={{ color: 'var(--accent)' }} /> {about?.refereesBadge || 'Verified Faculty'}
-                </span>
-              </div>
-
-              <div className="about-mentors-grid">
-                {referees.map((mentor, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      padding: '1.1rem 1.25rem',
-                      borderRadius: '14px',
-                      backgroundColor: 'var(--bg-elevated)',
-                      border: '1px solid var(--border)',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '1rem',
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: '42px',
-                        height: '42px',
-                        borderRadius: '10px',
-                        backgroundColor: 'var(--accent-subtle)',
-                        border: '1px solid var(--accent-border)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'var(--accent)',
-                        flexShrink: 0,
-                      }}
-                    >
-                      <User size={20} />
-                    </div>
-
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--fg)', marginBottom: '0.2rem' }}>
-                        {mentor.name}
-                      </p>
-                      <p style={{ fontSize: '0.8rem', color: 'var(--accent)', fontWeight: 600, marginBottom: '0.15rem' }}>
-                        {mentor.title}
-                      </p>
-                      <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)' }}>
-                        {mentor.institution}
-                      </p>
-                    </div>
+              {isLoading ? (
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+                    <div className="skeleton" style={{ height: '22px', width: '280px', borderRadius: '6px' }} />
+                    <div className="skeleton-pill" style={{ height: '24px', width: '130px' }} />
                   </div>
-                ))}
-              </div>
+
+                  <div className="about-mentors-grid">
+                    {Array.from({ length: 2 }).map((_, idx) => (
+                      <div key={idx} className="skeleton" style={{ padding: '1.1rem 1.25rem', borderRadius: '14px', display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+                        <div className="skeleton" style={{ width: '42px', height: '42px', borderRadius: '10px', flexShrink: 0 }} />
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                          <div className="skeleton" style={{ height: '16px', width: '150px', borderRadius: '4px' }} />
+                          <div className="skeleton" style={{ height: '14px', width: '200px', borderRadius: '4px' }} />
+                          <div className="skeleton" style={{ height: '12px', width: '170px', borderRadius: '4px' }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+                      <ShieldCheck size={18} style={{ color: 'var(--accent)' }} />
+                      <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--fg)' }}>
+                        {about?.refereesTitle || 'Academic Mentors & Institutional Referees'}
+                      </h3>
+                    </div>
+                    <span className="badge" style={{ fontSize: '0.725rem' }}>
+                      <CheckCircle2 size={11} style={{ color: 'var(--accent)' }} /> {about?.refereesBadge || 'Verified Faculty'}
+                    </span>
+                  </div>
+
+                  <div className="about-mentors-grid">
+                    {referees.map((mentor, idx) => (
+                      <div
+                        key={idx}
+                        style={{
+                          padding: '1.1rem 1.25rem',
+                          borderRadius: '14px',
+                          backgroundColor: 'var(--bg-elevated)',
+                          border: '1px solid var(--border)',
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: '1rem',
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: '42px',
+                            height: '42px',
+                            borderRadius: '10px',
+                            backgroundColor: 'var(--accent-subtle)',
+                            border: '1px solid var(--accent-border)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'var(--accent)',
+                            flexShrink: 0,
+                          }}
+                        >
+                          <User size={20} />
+                        </div>
+
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--fg)', marginBottom: '0.2rem' }}>
+                            {mentor.name}
+                          </p>
+                          <p style={{ fontSize: '0.8rem', color: 'var(--accent)', fontWeight: 600, marginBottom: '0.15rem' }}>
+                            {mentor.title}
+                          </p>
+                          <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)' }}>
+                            {mentor.institution}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </div>
 

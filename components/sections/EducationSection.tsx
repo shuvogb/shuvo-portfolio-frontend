@@ -140,7 +140,22 @@ export function EducationSection({ education = [], profile, isLoading }: Educati
           {isLoading ? (
             Array.from({ length: 2 }).map((_, i) => (
               <div key={i} className="timeline-item-wrapper">
-                <div className="skeleton" style={{ height: '120px', borderRadius: 'var(--radius-outer)', width: '100%' }} />
+                <div className="timeline-dot-static skeleton" style={{ width: '12px', height: '12px', borderRadius: '50%' }} />
+                <div className="bezel-card" style={{ width: '100%' }}>
+                  <div className="bezel-core" style={{ padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.65rem' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                        <div className="skeleton" style={{ height: '20px', width: `${200 + i * 40}px`, borderRadius: '6px' }} />
+                        <div className="skeleton" style={{ height: '14px', width: '180px', borderRadius: '4px' }} />
+                      </div>
+                      <div className="skeleton-pill" style={{ height: '26px', width: '120px' }} />
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', paddingTop: '0.25rem' }}>
+                      <div className="skeleton-pill" style={{ height: '22px', width: '105px' }} />
+                    </div>
+                  </div>
+                </div>
               </div>
             ))
           ) : (

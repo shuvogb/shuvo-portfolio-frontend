@@ -225,11 +225,27 @@ export function SkillsSection({ skills = [], profile, isLoading }: SkillsSection
           </div>
         </div>
 
-        {/* Compact Bezel Card Grid with Preserved Doppelrand Padding Architecture */}
+        {/* Compact Bezel Card Grid with Detailed Bordered Skeleton Cards */}
         {isLoading ? (
           <div className="skills-grid">
             {Array.from({ length: 9 }).map((_, i) => (
-              <div key={i} className="skeleton" style={{ height: '70px', borderRadius: '16px' }} />
+              <div key={i} className="bezel-card">
+                <div
+                  className="bezel-core"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.85rem',
+                    padding: '0.8rem 1rem',
+                  }}
+                >
+                  <div className="skeleton" style={{ width: '36px', height: '36px', borderRadius: '10px', flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                    <div className="skeleton" style={{ height: '15px', width: `${60 + (i % 4) * 12}%`, borderRadius: '4px' }} />
+                    <div className="skeleton-pill" style={{ height: '14px', width: '55px' }} />
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         ) : (

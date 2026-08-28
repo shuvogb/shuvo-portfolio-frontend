@@ -497,13 +497,28 @@ h1, h2, h3, h4, h5, h6 {
 /* ─── Skeleton ─────────────────────────────────────────────────────────────── */
 .skeleton {
   background-color: var(--bg-elevated);
-  border-radius: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  animation: pulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.skeleton-pill {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  animation: pulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.skeleton-circle {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 50%;
   animation: pulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
+  50% { opacity: 0.42; }
 }
 
 /* ─── Focus & Accessibility ────────────────────────────────────────────────── */

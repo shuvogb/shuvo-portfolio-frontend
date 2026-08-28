@@ -60,6 +60,8 @@ export function WorkshopsSection({ workshops = [], profile, isLoading }: Worksho
       quote: ws.description || `Specialized institutional training program with ${ws.organizer} focusing on hands-on practical methodology, capacity development, and impactful field execution.`,
       src: img,
       year: ws.year,
+      imageHeight: ws.imageHeight || wsConfig?.certificateHeight || 340,
+      imageFit: ws.imageFit || wsConfig?.certificateFit || 'cover',
     };
   });
 
@@ -78,17 +80,53 @@ export function WorkshopsSection({ workshops = [], profile, isLoading }: Worksho
           </p>
         </div>
 
-        {/* 3D Animated Showcase */}
+        {/* 3D Animated Showcase with Detailed Showcase Skeleton */}
         {isLoading ? (
           <div className="bezel-card">
-            <div className="bezel-core" style={{ padding: '3rem' }}>
-              <div className="skeleton" style={{ height: '340px', borderRadius: 'var(--radius-inner)' }} />
+            <div className="bezel-core" style={{ padding: '2rem 1.5rem' }}>
+              <div className="relative grid grid-cols-1 gap-10 md:grid-cols-[1.1fr_1.2fr] lg:gap-14 items-center">
+                
+                {/* Left Framed Certificate Skeleton */}
+                <div className="skeleton" style={{ height: '340px', borderRadius: '16px', padding: '0.85rem' }}>
+                  <div className="skeleton" style={{ width: '100%', height: '100%', borderRadius: '12px' }} />
+                </div>
+
+                {/* Right Text Details Skeleton */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', padding: '0.5rem 0' }}>
+                  <div className="skeleton-pill" style={{ height: '24px', width: '65px' }} />
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+                    <div className="skeleton" style={{ height: '22px', width: '90%', borderRadius: '6px' }} />
+                    <div className="skeleton" style={{ height: '22px', width: '65%', borderRadius: '6px' }} />
+                  </div>
+
+                  <div className="skeleton" style={{ height: '16px', width: '220px', borderRadius: '4px' }} />
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', marginTop: '0.5rem' }}>
+                    <div className="skeleton" style={{ height: '14px', width: '98%', borderRadius: '4px' }} />
+                    <div className="skeleton" style={{ height: '14px', width: '90%', borderRadius: '4px' }} />
+                    <div className="skeleton" style={{ height: '14px', width: '65%', borderRadius: '4px' }} />
+                  </div>
+
+                  {/* Navigation Arrows Skeleton */}
+                  <div style={{ display: 'flex', gap: '0.75rem', paddingTop: '1.25rem' }}>
+                    <div className="skeleton-circle" style={{ width: '40px', height: '40px' }} />
+                    <div className="skeleton-circle" style={{ width: '40px', height: '40px' }} />
+                  </div>
+                </div>
+
+              </div>
             </div>
           </div>
         ) : (
           <div className="bezel-card">
             <div className="bezel-core" style={{ padding: '2rem 1.5rem' }}>
-              <AnimatedTestimonials testimonials={formattedWorkshops} autoplay={false} />
+              <AnimatedTestimonials
+                testimonials={formattedWorkshops}
+                autoplay={false}
+                cardHeight={wsConfig?.certificateHeight || 340}
+                imageFit={wsConfig?.certificateFit || 'cover'}
+              />
             </div>
           </div>
         )}

@@ -191,12 +191,16 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
           >
-            {/* Reusable SectionBadge */}
-            <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center' }}>
-              <SectionBadge icon={<FlaskConical size={13} />} style={{ marginBottom: 0 }}>
-                {statusBadgeText}
-              </SectionBadge>
-            </div>
+            {/* Reusable SectionBadge / Skeleton */}
+            {isLoading ? (
+              <div className="skeleton-pill" style={{ width: '280px', height: '32px', marginBottom: '1.5rem' }} />
+            ) : (
+              <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center' }}>
+                <SectionBadge icon={<FlaskConical size={13} />} style={{ marginBottom: 0 }}>
+                  {statusBadgeText}
+                </SectionBadge>
+              </div>
+            )}
 
             {/* Name */}
             <h1
@@ -210,7 +214,9 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
               }}
             >
               {isLoading ? (
-                <span className="skeleton" style={{ display: 'block', height: '60px', width: '340px' }} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                  <span className="skeleton" style={{ display: 'block', height: '56px', width: '360px', borderRadius: '10px' }} />
+                </div>
               ) : (
                 profile?.name || 'Shuvo Molla'
               )}
@@ -230,14 +236,14 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
               }}
             >
               {isLoading ? (
-                <span className="skeleton" style={{ display: 'block', height: '24px', width: '280px' }} />
+                <span className="skeleton" style={{ display: 'block', height: '24px', width: '380px', borderRadius: '8px' }} />
               ) : (
                 profile?.headline || 'Sociology & Social Work Undergraduate — Social Research · Community Development'
               )}
             </h2>
 
             {/* Bio summary */}
-            <p
+            <div
               style={{
                 fontSize: '1rem',
                 lineHeight: 1.7,
@@ -247,40 +253,50 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
               }}
             >
               {isLoading ? (
-                <>
-                  <span className="skeleton" style={{ display: 'block', height: '16px', width: '100%', marginBottom: '0.5rem' }} />
-                  <span className="skeleton" style={{ display: 'block', height: '16px', width: '75%' }} />
-                </>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <span className="skeleton" style={{ display: 'block', height: '16px', width: '100%', borderRadius: '6px' }} />
+                  <span className="skeleton" style={{ display: 'block', height: '16px', width: '92%', borderRadius: '6px' }} />
+                  <span className="skeleton" style={{ display: 'block', height: '16px', width: '70%', borderRadius: '6px' }} />
+                </div>
               ) : (
-                profile?.summary ||
-                'Undergraduate researcher with hands-on experience in quantitative social methods (SPSS), char community studies, and youth development initiatives.'
+                <p style={{ margin: 0 }}>
+                  {profile?.summary ||
+                    'Undergraduate researcher with hands-on experience in quantitative social methods (SPSS), char community studies, and youth development initiatives.'}
+                </p>
               )}
-            </p>
+            </div>
 
             {/* Action Buttons */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', alignItems: 'center' }}>
-              <button
-                onClick={() => handleCtaClick(primaryCta.link)}
-                className="btn-island btn-island-primary"
-                aria-label={`Action: ${primaryCta.label}`}
-              >
-                <span>{primaryCta.label}</span>
-                <span className="btn-island-icon">
-                  <ArrowUpRight size={14} />
-                </span>
-              </button>
+            {isLoading ? (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', alignItems: 'center' }}>
+                <div className="skeleton-pill" style={{ height: '44px', width: '145px' }} />
+                <div className="skeleton-pill" style={{ height: '44px', width: '155px' }} />
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', alignItems: 'center' }}>
+                <button
+                  onClick={() => handleCtaClick(primaryCta.link)}
+                  className="btn-island btn-island-primary"
+                  aria-label={`Action: ${primaryCta.label}`}
+                >
+                  <span>{primaryCta.label}</span>
+                  <span className="btn-island-icon">
+                    <ArrowUpRight size={14} />
+                  </span>
+                </button>
 
-              <button
-                onClick={() => handleCtaClick(secondaryCta.link)}
-                className="btn-island btn-island-secondary"
-                aria-label={`Action: ${secondaryCta.label}`}
-              >
-                <span>{secondaryCta.label}</span>
-                <span className="btn-island-icon">
-                  <BookOpen size={14} />
-                </span>
-              </button>
-            </div>
+                <button
+                  onClick={() => handleCtaClick(secondaryCta.link)}
+                  className="btn-island btn-island-secondary"
+                  aria-label={`Action: ${secondaryCta.label}`}
+                >
+                  <span>{secondaryCta.label}</span>
+                  <span className="btn-island-icon">
+                    <BookOpen size={14} />
+                  </span>
+                </button>
+              </div>
+            )}
           </motion.div>
 
           {/* Right Column: 3-Side Floating Stats Surrounding User's Portrait (Zero Overlap) */}
@@ -299,16 +315,26 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
                 className="stat-side-left"
               >
                 <div className="stat-pill-card">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                    <div className="stat-pill-icon">
-                      <stats.events.icon size={14} strokeWidth={1.8} />
+                  {isLoading ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                      <div className="skeleton" style={{ width: '30px', height: '30px', borderRadius: '8px', flexShrink: 0 }} />
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                        <div className="skeleton" style={{ height: '16px', width: '45px', borderRadius: '4px' }} />
+                        <div className="skeleton" style={{ height: '11px', width: '75px', borderRadius: '4px' }} />
+                      </div>
                     </div>
-                    <div>
-                      <p className="stat-pill-value">{stats.events.value}</p>
-                      <p className="stat-pill-label">{stats.events.label}</p>
-                      <p className="stat-pill-sublabel">{stats.events.sublabel}</p>
+                  ) : (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                      <div className="stat-pill-icon">
+                        <stats.events.icon size={14} strokeWidth={1.8} />
+                      </div>
+                      <div>
+                        <p className="stat-pill-value">{stats.events.value}</p>
+                        <p className="stat-pill-label">{stats.events.label}</p>
+                        <p className="stat-pill-sublabel">{stats.events.sublabel}</p>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </motion.div>
 
@@ -322,16 +348,26 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
                 className="stat-side-right"
               >
                 <div className="stat-pill-card">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                    <div className="stat-pill-icon">
-                      <stats.papers.icon size={14} strokeWidth={1.8} />
+                  {isLoading ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                      <div className="skeleton" style={{ width: '30px', height: '30px', borderRadius: '8px', flexShrink: 0 }} />
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                        <div className="skeleton" style={{ height: '16px', width: '45px', borderRadius: '4px' }} />
+                        <div className="skeleton" style={{ height: '11px', width: '75px', borderRadius: '4px' }} />
+                      </div>
                     </div>
-                    <div>
-                      <p className="stat-pill-value">{stats.papers.value}</p>
-                      <p className="stat-pill-label">{stats.papers.label}</p>
-                      <p className="stat-pill-sublabel">{stats.papers.sublabel}</p>
+                  ) : (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                      <div className="stat-pill-icon">
+                        <stats.papers.icon size={14} strokeWidth={1.8} />
+                      </div>
+                      <div>
+                        <p className="stat-pill-value">{stats.papers.value}</p>
+                        <p className="stat-pill-label">{stats.papers.label}</p>
+                        <p className="stat-pill-sublabel">{stats.papers.sublabel}</p>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </motion.div>
 
@@ -342,16 +378,26 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
                 className="stat-side-bottom"
               >
                 <div className="stat-pill-card stat-pill-bottom">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                    <div className="stat-pill-icon">
-                      <stats.reach.icon size={14} strokeWidth={1.8} />
+                  {isLoading ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                      <div className="skeleton" style={{ width: '30px', height: '30px', borderRadius: '8px', flexShrink: 0 }} />
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                        <div className="skeleton" style={{ height: '16px', width: '45px', borderRadius: '4px' }} />
+                        <div className="skeleton" style={{ height: '11px', width: '75px', borderRadius: '4px' }} />
+                      </div>
                     </div>
-                    <div>
-                      <p className="stat-pill-value">{stats.reach.value}</p>
-                      <p className="stat-pill-label">{stats.reach.label}</p>
-                      <p className="stat-pill-sublabel">{stats.reach.sublabel}</p>
+                  ) : (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                      <div className="stat-pill-icon">
+                        <stats.reach.icon size={14} strokeWidth={1.8} />
+                      </div>
+                      <div>
+                        <p className="stat-pill-value">{stats.reach.value}</p>
+                        <p className="stat-pill-label">{stats.reach.label}</p>
+                        <p className="stat-pill-sublabel">{stats.reach.sublabel}</p>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </motion.div>
 

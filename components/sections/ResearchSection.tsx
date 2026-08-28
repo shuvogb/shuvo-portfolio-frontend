@@ -51,10 +51,38 @@ export function ResearchSection({ publications = [], profile, isLoading }: Resea
           {isLoading
             ? Array.from({ length: 2 }).map((_, i) => (
                 <div key={i} className="bezel-card">
-                  <div className="bezel-core" style={{ padding: '1.5rem' }}>
-                    <div className="skeleton" style={{ height: '24px', width: '35%', marginBottom: '1rem' }} />
-                    <div className="skeleton" style={{ height: '32px', width: '85%', marginBottom: '0.75rem' }} />
-                    <div className="skeleton" style={{ height: '20px', width: '50%' }} />
+                  <div className="bezel-core" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {/* Top Status & Meta Pill Row Skeleton */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.65rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                        <div className="skeleton-pill" style={{ height: '24px', width: '140px' }} />
+                        <div className="skeleton-pill" style={{ height: '24px', width: '60px' }} />
+                      </div>
+                    </div>
+
+                    {/* Paper Title Skeleton */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+                      <div className="skeleton" style={{ height: '22px', width: '85%', borderRadius: '6px' }} />
+                      <div className="skeleton" style={{ height: '22px', width: '55%', borderRadius: '6px' }} />
+                    </div>
+
+                    {/* Authors & Source Meta Skeleton */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <div className="skeleton" style={{ height: '14px', width: '220px', borderRadius: '4px' }} />
+                      <div className="skeleton" style={{ height: '14px', width: '310px', borderRadius: '4px' }} />
+                    </div>
+
+                    {/* Description Summary */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                      <div className="skeleton" style={{ height: '13px', width: '96%', borderRadius: '4px' }} />
+                      <div className="skeleton" style={{ height: '13px', width: '70%', borderRadius: '4px' }} />
+                    </div>
+
+                    {/* Bottom Action Row */}
+                    <div style={{ display: 'flex', gap: '0.75rem', paddingTop: '0.5rem', borderTop: '1px solid var(--border)' }}>
+                      <div className="skeleton" style={{ height: '34px', width: '125px', borderRadius: '8px' }} />
+                      <div className="skeleton" style={{ height: '34px', width: '110px', borderRadius: '8px' }} />
+                    </div>
                   </div>
                 </div>
               ))

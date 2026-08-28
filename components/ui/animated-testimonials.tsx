@@ -10,14 +10,20 @@ export type Testimonial = {
   designation: string;
   src: string;
   year?: number | string;
+  imageHeight?: number;
+  imageFit?: string;
 };
 
 export const AnimatedTestimonials = ({
   testimonials,
   autoplay = false,
+  cardHeight = 340,
+  imageFit = 'cover',
 }: {
   testimonials: Testimonial[];
   autoplay?: boolean;
+  cardHeight?: number;
+  imageFit?: string;
 }) => {
   const [active, setActive] = useState(0);
 
@@ -46,57 +52,81 @@ export const AnimatedTestimonials = ({
 
   if (!testimonials || testimonials.length === 0) return null;
 
+  const currentItem = testimonials[active];
+  const activeHeight = currentItem?.imageHeight || cardHeight || 340;
+  const activeFit = currentItem?.imageFit || imageFit || 'cover';
+
   return (
     <div className="w-full px-2 py-4 font-sans antialiased md:px-6">
-      <div className="relative grid grid-cols-1 gap-10 md:grid-cols-[1fr_1.3fr] lg:gap-14 items-center">
+      <div className="relative grid grid-cols-1 gap-10 md:grid-cols-[1.1fr_1.2fr] lg:gap-14 items-center">
         
-        {/* 3D Rotating Stack on Left */}
+        {/* 3D Rotating Stack on Left with Resizable Certificate Frame */}
         <div>
-          <div className="relative h-72 sm:h-80 md:h-92 w-full">
+          <div
+            className="relative w-full transition-all duration-300"
+            style={{ height: `${Math.max(260, Math.min(activeHeight, 480))}px` }}
+          >
             <AnimatePresence>
-              {testimonials.map((testimonial, index) => (
-                <motion.div
-                  key={testimonial.src + index}
-                  initial={{
-                    opacity: 0,
-                    scale: 0.9,
-                    z: -100,
-                    rotate: randomRotateY(),
-                  }}
-                  animate={{
-                    opacity: isActive(index) ? 1 : 0.7,
-                    scale: isActive(index) ? 1 : 0.95,
-                    z: isActive(index) ? 0 : -100,
-                    rotate: isActive(index) ? 0 : randomRotateY(),
-                    zIndex: isActive(index)
-                      ? 40
-                      : testimonials.length + 2 - index,
-                    y: isActive(index) ? [0, -60, 0] : 0,
-                  }}
-                  exit={{
-                    opacity: 0,
-                    scale: 0.9,
-                    z: 100,
-                    rotate: randomRotateY(),
-                  }}
-                  transition={{
-                    duration: 0.4,
-                    ease: "easeInOut",
-                  }}
-                  className="absolute inset-0 origin-bottom"
-                >
-                  <div className="h-full w-full rounded-2xl overflow-hidden border border-[var(--border)] shadow-xl bg-[var(--bg-elevated)]">
-                    <img
-                      src={testimonial.src}
-                      alt={testimonial.name}
-                      width={600}
-                      height={600}
-                      draggable={false}
-                      className="h-full w-full object-cover object-center"
-                    />
-                  </div>
-                </motion.div>
-              ))}
+              {testimonials.map((testimonial, index) => {
+                const itemFit = testimonial.imageFit || activeFit;
+                return (
+                  <motion.div
+                    key={testimonial.src + index}
+                    initial={{
+                      opacity: 0,
+                      scale: 0.9,
+                      z: -100,
+                      rotate: randomRotateY(),
+                    }}
+                    animate={{
+                      opacity: isActive(index) ? 1 : 0.7,
+                      scale: isActive(index) ? 1 : 0.95,
+                      z: isActive(index) ? 0 : -100,
+                      rotate: isActive(index) ? 0 : randomRotateY(),
+                      zIndex: isActive(index)
+                        ? 40
+                        : testimonials.length + 2 - index,
+                      y: isActive(index) ? [0, -60, 0] : 0,
+                    }}
+                    exit={{
+                      opacity: 0,
+                      scale: 0.9,
+                      z: 100,
+                      rotate: randomRotateY(),
+                    }}
+                    transition={{
+                      duration: 0.4,
+                      ease: "easeInOut",
+                    }}
+                    className="absolute inset-0 origin-bottom"
+                  >
+                    <div className="h-full w-full rounded-2xl overflow-hidden border border-[var(--border)] shadow-xl bg-[var(--bg-elevated)] p-2.5 sm:p-3 relative flex items-center justify-center">
+                      <div className="w-full h-full rounded-xl overflow-hidden relative border border-[var(--border)] bg-[var(--bg-surface)] flex items-center justify-center">
+                        {itemFit === 'contain' && (
+                          <img
+                            src={testimonial.src}
+                            alt=""
+                            aria-hidden="true"
+                            className="absolute inset-0 w-full h-full object-cover blur-xl opacity-25 scale-110 pointer-events-none"
+                          />
+                        )}
+                        <img
+                          src={testimonial.src}
+                          alt={testimonial.name}
+                          width={800}
+                          height={600}
+                          draggable={false}
+                          className={`h-full w-full relative z-10 transition-all duration-300 ${
+                            itemFit === 'contain'
+                              ? 'object-contain object-center p-3 drop-shadow-md'
+                              : 'object-cover object-center p-1'
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </AnimatePresence>
           </div>
         </div>

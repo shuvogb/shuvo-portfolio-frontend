@@ -81,6 +81,8 @@ export interface Profile {
     badge?: string;
     title?: string;
     description?: string;
+    certificateHeight?: number;
+    certificateFit?: string;
   };
   contactSection?: {
     badge?: string;
@@ -181,6 +183,8 @@ export interface Workshop {
   year: number;
   description?: string;
   imageUrl?: string;
+  imageHeight?: number;
+  imageFit?: string;
   order: number;
 }
 

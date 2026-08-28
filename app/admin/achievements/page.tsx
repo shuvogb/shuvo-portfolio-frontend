@@ -25,6 +25,7 @@ import {
   Image as ImageIcon,
   MapPin,
   AlertTriangle,
+  Upload,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { toast } from 'sonner';
@@ -77,6 +78,8 @@ export default function AdminAchievementsPage() {
   const [headerDrawerOpen, setHeaderDrawerOpen] = useState(false);
   const [editAchievement, setEditAchievement] = useState<(Achievement & { _id: string }) | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   // Fetch all achievements
   const { data: achievements = [], isLoading: isAchsLoading } = useQuery<(Achievement & { _id: string })[]>({
@@ -103,6 +106,7 @@ export default function AdminAchievementsPage() {
     handleSubmit: handleAchSubmit,
     reset: resetAchForm,
     watch: watchAch,
+    setValue: setValueAch,
     control: achControl,
     formState: { errors: achErrors, isSubmitting: isAchSubmitting, isDirty: isAchDirty },
   } = useForm<AchievementFormValues>({
@@ -134,8 +138,18 @@ export default function AdminAchievementsPage() {
     },
   });
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImageFile(file);
+    const localUrl = URL.createObjectURL(file);
+    setValueAch('imageUrl', localUrl, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+  };
+
   const openCreateAch = () => {
     setEditAchievement(null);
+    setImageFile(null);
     resetAchForm({
       highlight: '',
       category: 'Community Development',
@@ -151,6 +165,7 @@ export default function AdminAchievementsPage() {
   const openEditAch = (ach: Achievement & { _id: string }, idx: number) => {
     const details = getAchievementDetails(ach, idx);
     setEditAchievement(ach);
+    setImageFile(null);
     resetAchForm({
       highlight: ach.highlight || ach.title || details.highlight,
       category: ach.category || details.category,
@@ -198,6 +213,7 @@ export default function AdminAchievementsPage() {
       qc.invalidateQueries({ queryKey: ['admin-achievements'] });
       qc.invalidateQueries({ queryKey: ['portfolio'] });
       toast.success(editAchievement ? 'Achievement updated successfully' : 'Achievement added successfully');
+      setImageFile(null);
       setAchDrawerOpen(false);
       setEditAchievement(null);
     },
@@ -240,7 +256,32 @@ export default function AdminAchievementsPage() {
   });
 
   const onAchSubmit = async (data: AchievementFormValues) => {
-    await saveAchMutation.mutateAsync(data);
+    let finalImageUrl = data.imageUrl;
+
+    if (imageFile) {
+      try {
+        setUploading(true);
+        const formData = new FormData();
+        formData.append('file', imageFile);
+        formData.append('altText', `Achievement photo for ${data.highlight}`);
+
+        const res = await api.post('/admin/media/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        finalImageUrl = res.data.data.url;
+      } catch {
+        toast.error('Failed to upload image. Please try again.');
+        setUploading(false);
+        return;
+      } finally {
+        setUploading(false);
+      }
+    }
+
+    await saveAchMutation.mutateAsync({
+      ...data,
+      imageUrl: finalImageUrl,
+    });
   };
 
   const onHeaderSubmit = async (data: HeaderFormValues) => {
@@ -522,14 +563,54 @@ export default function AdminAchievementsPage() {
                 </div>
 
                 {/* Image URL & Display Order */}
-                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem', alignItems: 'start' }}>
                   <div>
-                    <label className="admin-label">Image URL / Unsplash Photo</label>
-                    <input
-                      {...registerAch('imageUrl')}
-                      className="admin-input"
-                      placeholder="https://images.unsplash.com/photo-..."
-                    />
+                    <label className="admin-label">Card Feature Image</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                      <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <label
+                          className="btn btn-outline"
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.45rem',
+                            padding: '0.45rem 0.95rem',
+                            fontSize: '0.8rem',
+                            borderRadius: '10px',
+                            cursor: 'pointer',
+                            flexShrink: 0,
+                          }}
+                        >
+                          <Upload size={14} />
+                          <span>{imageFile ? `Selected: ${imageFile.name}` : 'Upload Photo'}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageSelect}
+                            style={{ display: 'none' }}
+                          />
+                        </label>
+                        {imageFile && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setImageFile(null);
+                              setValueAch('imageUrl', editAchievement?.imageUrl || '', { shouldDirty: true });
+                            }}
+                            className="btn btn-outline"
+                            style={{ fontSize: '0.75rem', padding: '0.45rem 0.65rem', borderRadius: '8px', color: '#ef4444' }}
+                          >
+                            Clear
+                          </button>
+                        )}
+                      </div>
+
+                      <input
+                        {...registerAch('imageUrl')}
+                        className="admin-input"
+                        placeholder="Or paste image URL (https://...)"
+                      />
+                    </div>
                     {achErrors.imageUrl && (
                       <p style={{ color: '#ef4444', fontSize: '0.75rem', margin: '0.2rem 0 0' }}>
                         {achErrors.imageUrl.message}
@@ -583,7 +664,7 @@ export default function AdminAchievementsPage() {
               </button>
               <button
                 type="submit"
-                disabled={!isAchDirty || isAchSubmitting || saveAchMutation.isPending}
+                disabled={!isAchDirty || isAchSubmitting || saveAchMutation.isPending || uploading}
                 className="btn btn-primary"
                 style={{
                   display: 'inline-flex',
@@ -597,10 +678,10 @@ export default function AdminAchievementsPage() {
                   transition: 'opacity 0.15s ease',
                 }}
               >
-                {isAchSubmitting || saveAchMutation.isPending ? (
+                {isAchSubmitting || saveAchMutation.isPending || uploading ? (
                   <>
                     <Loader2 size={14} className="animate-spin" />
-                    <span>Saving Achievement...</span>
+                    <span>{uploading ? 'Uploading Image...' : 'Saving Achievement...'}</span>
                   </>
                 ) : (
                   <>
