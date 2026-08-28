@@ -20,55 +20,105 @@ import {
   Database,
   ClipboardList,
   Terminal,
+  Code2,
+  Globe,
+  Shield,
+  Sparkles,
+  Star,
+  TrendingUp,
+  Target,
+  PieChart,
+  Cpu,
+  Zap,
+  BookOpen,
+  FolderKanban,
+  CheckCircle2,
 } from 'lucide-react';
 import { SectionBadge } from '@/components/ui/SectionBadge';
-import type { Skill } from '@/types/portfolio';
+import type { Skill, Profile } from '@/types/portfolio';
 
 interface SkillsSectionProps {
   skills?: Skill[];
+  profile?: Profile;
   isLoading: boolean;
 }
 
-function getSkillIcon(name: string, category: string) {
+export const SKILL_ICON_MAP: Record<string, React.ComponentType<{ size?: number; strokeWidth?: number; style?: React.CSSProperties }>> = {
+  barchart: BarChart3,
+  spreadsheet: FileSpreadsheet,
+  filetext: FileText,
+  presentation: Presentation,
+  camera: Camera,
+  palette: Palette,
+  award: Award,
+  message: MessageSquare,
+  brain: Brain,
+  calendar: CalendarCheck,
+  users: Users,
+  lightbulb: Lightbulb,
+  compass: Compass,
+  database: Database,
+  clipboard: ClipboardList,
+  terminal: Terminal,
+  code: Code2,
+  globe: Globe,
+  shield: Shield,
+  sparkles: Sparkles,
+  star: Star,
+  trending: TrendingUp,
+  target: Target,
+  piechart: PieChart,
+  cpu: Cpu,
+  zap: Zap,
+  book: BookOpen,
+  kanban: FolderKanban,
+  check: CheckCircle2,
+  layers: Layers,
+};
+
+export function renderSkillIcon(iconKey?: string, name = '', category = 'technical') {
+  if (iconKey && SKILL_ICON_MAP[iconKey.toLowerCase()]) {
+    const IconComponent = SKILL_ICON_MAP[iconKey.toLowerCase()];
+    return <IconComponent size={18} strokeWidth={1.75} style={{ color: category === 'technical' ? 'var(--accent)' : 'var(--fg)' }} />;
+  }
+
   const lower = name.toLowerCase();
 
-  // Technical Skills (Outline stroke icons)
-  if (lower.includes('spss') || lower.includes('quantitative')) {
+  // Smart fallback matching
+  if (lower.includes('spss') || lower.includes('quantitative') || lower.includes('stata')) {
     return <BarChart3 size={18} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
   }
-  if (lower.includes('excel')) {
+  if (lower.includes('excel') || lower.includes('sheet')) {
     return <FileSpreadsheet size={18} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
   }
-  if (lower.includes('word')) {
+  if (lower.includes('word') || lower.includes('document')) {
     return <FileText size={18} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
   }
-  if (lower.includes('powerpoint')) {
+  if (lower.includes('powerpoint') || lower.includes('presentation') || lower.includes('slide')) {
     return <Presentation size={18} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
   }
-  if (lower.includes('canva') || lower.includes('visual design')) {
+  if (lower.includes('canva') || lower.includes('visual') || lower.includes('design')) {
     return <Palette size={18} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
   }
-  if (lower.includes('research method') || lower.includes('social research')) {
+  if (lower.includes('research method') || lower.includes('social research') || lower.includes('database')) {
     return <Database size={18} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
   }
-  if (lower.includes('data collection') || lower.includes('survey')) {
+  if (lower.includes('data collection') || lower.includes('survey') || lower.includes('fieldwork')) {
     return <ClipboardList size={18} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
   }
-  if (lower.includes('photo') || lower.includes('media')) {
+  if (lower.includes('photo') || lower.includes('media') || lower.includes('video')) {
     return <Camera size={18} strokeWidth={1.75} style={{ color: 'var(--fg)' }} />;
   }
-
-  // Professional Skills (Outline stroke icons)
-  if (lower.includes('leader')) {
+  if (lower.includes('leader') || lower.includes('governance')) {
     return <Award size={18} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
   }
-  if (lower.includes('communicat')) {
+  if (lower.includes('communicat') || lower.includes('interpersonal')) {
     return <MessageSquare size={18} strokeWidth={1.75} style={{ color: 'var(--fg)' }} />;
   }
   if (lower.includes('analytic') || lower.includes('think') || lower.includes('critical')) {
     return <Brain size={18} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
   }
-  if (lower.includes('event') || lower.includes('planning')) {
+  if (lower.includes('event') || lower.includes('planning') || lower.includes('coordinat')) {
     return <CalendarCheck size={18} strokeWidth={1.75} style={{ color: 'var(--fg)' }} />;
   }
   if (lower.includes('team') || lower.includes('collab') || lower.includes('mentor')) {
@@ -77,7 +127,7 @@ function getSkillIcon(name: string, category: string) {
   if (lower.includes('creativ') || lower.includes('problem')) {
     return <Lightbulb size={18} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
   }
-  if (lower.includes('climate') || lower.includes('advocacy') || lower.includes('youth')) {
+  if (lower.includes('climate') || lower.includes('advocacy') || lower.includes('youth') || lower.includes('community')) {
     return <Compass size={18} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
   }
 
@@ -88,8 +138,15 @@ function getSkillIcon(name: string, category: string) {
   );
 }
 
-export function SkillsSection({ skills = [], isLoading }: SkillsSectionProps) {
+export function SkillsSection({ skills = [], profile, isLoading }: SkillsSectionProps) {
   const [activeTab, setActiveTab] = useState<'all' | 'technical' | 'professional'>('all');
+
+  const skillsConfig = profile?.skillsSection;
+  const sectionBadge = skillsConfig?.badge || 'Competencies & Methodologies';
+  const sectionTitle = skillsConfig?.title || 'Skills & Capabilities';
+  const sectionDesc =
+    skillsConfig?.description ||
+    'Quantitative analysis software, survey methodologies, media tools, and organizational governance capabilities.';
 
   const filteredSkills = useMemo(() => {
     const list = skills.filter((skill) => {
@@ -116,11 +173,11 @@ export function SkillsSection({ skills = [], isLoading }: SkillsSectionProps) {
         <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1.5rem', marginBottom: '2.5rem' }}>
           <div>
             <SectionBadge icon={<Layers size={13} strokeWidth={1.75} />}>
-              Competencies & Methodologies
+              {sectionBadge}
             </SectionBadge>
-            <h2 className="section-title">Skills & Capabilities</h2>
+            <h2 className="section-title">{sectionTitle}</h2>
             <p className="section-description" style={{ marginTop: '0.45rem' }}>
-              Quantitative analysis software, survey methodologies, media tools, and organizational governance capabilities.
+              {sectionDesc}
             </p>
           </div>
 
@@ -187,7 +244,7 @@ export function SkillsSection({ skills = [], isLoading }: SkillsSectionProps) {
             >
               {filteredSkills.map((skill) => {
                 const isTech = skill.category === 'technical';
-                const icon = getSkillIcon(skill.name, skill.category);
+                const icon = renderSkillIcon(skill.icon, skill.name, skill.category);
 
                 return (
                   <div

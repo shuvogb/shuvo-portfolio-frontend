@@ -24,7 +24,7 @@ export default function HomePage() {
       <main id="main-content">
         <HeroSection profile={data?.profile} isLoading={isLoading} />
         <AboutSection profile={data?.profile} isLoading={isLoading} />
-        <SkillsSection skills={data?.skills} isLoading={isLoading} />
+        <SkillsSection skills={data?.skills} profile={data?.profile} isLoading={isLoading} />
         <ExperienceSection experience={data?.experience} isLoading={isLoading} />
         <ResearchSection publications={data?.publications} isLoading={isLoading} />
         <AchievementsSection achievements={data?.achievements} isLoading={isLoading} />

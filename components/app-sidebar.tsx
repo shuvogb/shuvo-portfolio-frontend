@@ -82,8 +82,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           icon: User,
           items: [
             {
-              title: 'Bio & Contact',
+              title: 'Hero & Identity',
               url: '/admin/profile',
+            },
+            {
+              title: 'Background & Scholarship',
+              url: '/admin/about',
             },
             {
               title: 'Skills Matrix',

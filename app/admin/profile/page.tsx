@@ -2,19 +2,16 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
   Save,
   Loader2,
   Upload,
-  Plus,
-  Trash2,
   SlidersHorizontal,
   ArrowUpRight,
   BookOpen,
-  ExternalLink,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { toast } from 'sonner';
@@ -27,15 +24,6 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer';
-
-const referenceSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  title: z.string().min(1, 'Title is required'),
-  institution: z.string().min(1, 'Institution is required'),
-  phone: z.string().optional(),
-  email: z.string().email('Invalid email').optional().or(z.literal('')),
-  isPublic: z.boolean().optional(),
-});
 
 const heroStatItemSchema = z.object({
   value: z.string().min(1, 'Value is required'),
@@ -63,34 +51,6 @@ const profileSchema = z.object({
     .optional(),
   primaryCta: actionCtaSchema.optional(),
   secondaryCta: actionCtaSchema.optional(),
-  presentAddress: z.string().optional(),
-  permanentAddress: z.string().optional(),
-  phone: z.string().optional(),
-  email: z.string().email('Invalid email').optional().or(z.literal('')),
-  socialLinks: z
-    .object({
-      linkedin: z.string().url('Invalid URL').optional().or(z.literal('')),
-      orcid: z.string().optional(),
-      researchGate: z.string().url('Invalid URL').optional().or(z.literal('')),
-      github: z.string().url('Invalid URL').optional().or(z.literal('')),
-      twitter: z.string().url('Invalid URL').optional().or(z.literal('')),
-      facebook: z.string().url('Invalid URL').optional().or(z.literal('')),
-    })
-    .optional(),
-  privateInfo: z
-    .object({
-      fathersName: z.string().optional(),
-      mothersName: z.string().optional(),
-      dateOfBirth: z.string().optional(),
-      gender: z.string().optional(),
-      maritalStatus: z.string().optional(),
-      nationality: z.string().optional(),
-      religion: z.string().optional(),
-      bloodGroup: z.string().optional(),
-      isPublic: z.boolean().optional(),
-    })
-    .optional(),
-  references: z.array(referenceSchema).optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -131,7 +91,8 @@ export default function AdminProfilePage() {
   const [uploading, setUploading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
-  const { data: profile, isLoading } = useQuery<ProfileFormValues>({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: profile, isLoading } = useQuery<any>({
     queryKey: ['admin-profile'],
     queryFn: async () => {
       const res = await api.get('/admin/profile');
@@ -145,7 +106,6 @@ export default function AdminProfilePage() {
     reset,
     watch,
     setValue,
-    control,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -158,9 +118,6 @@ export default function AdminProfilePage() {
       },
       primaryCta: { label: 'Get in Touch', link: '#contact' },
       secondaryCta: { label: 'Publications', link: '#publications' },
-      socialLinks: {},
-      privateInfo: {},
-      references: [],
     },
   });
 
@@ -169,20 +126,18 @@ export default function AdminProfilePage() {
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.max(textareaRef.current.scrollHeight, 120)}px`;
+      textareaRef.current.style.height = `${Math.max(textareaRef.current.scrollHeight, 100)}px`;
     }
   }, [summaryValue, drawerOpen]);
-
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'references',
-  });
 
   useEffect(() => {
     if (profile) {
       reset({
-        ...profile,
+        name: profile.name,
+        headline: profile.headline,
+        summary: profile.summary,
         statusBadge: profile.statusBadge || 'Open for Research & Community Initiatives',
+        avatarUrl: profile.avatarUrl,
         heroStats: {
           events: profile.heroStats?.events || { value: '20+', label: 'Events Organized', sublabel: 'Youth & Academic' },
           papers: profile.heroStats?.papers || { value: '2', label: 'Academic Papers', sublabel: 'Published / Review' },
@@ -208,7 +163,10 @@ export default function AdminProfilePage() {
 
   const saveMutation = useMutation({
     mutationFn: async (data: ProfileFormValues) => {
-      return api.put('/admin/profile', data);
+      return api.put('/admin/profile', {
+        ...profile,
+        ...data,
+      });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-profile'] });
@@ -281,10 +239,10 @@ export default function AdminProfilePage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--fg)', letterSpacing: '-0.03em', marginBottom: '0.35rem' }}>
-            Hero & Identity Profile
+            Hero & Identity
           </h1>
           <p style={{ color: 'var(--fg-muted)', fontSize: '0.9rem', margin: 0 }}>
-            Manage the hero banner, thesis statement, floating stat badges, and public contact information.
+            Manage the hero banner, headline, thesis statement, portrait photo, and floating stat badges.
           </p>
         </div>
 
@@ -400,7 +358,7 @@ export default function AdminProfilePage() {
             <DrawerHeader>
               <DrawerTitle>Customize Hero Section & Profile</DrawerTitle>
               <DrawerDescription>
-                Make live adjustments to your hero thesis, portrait photo, 3-side floating stats, and CTAs.
+                Make live adjustments to your hero headline, portrait photo, 3-side floating stats, and CTAs.
               </DrawerDescription>
             </DrawerHeader>
 
@@ -408,7 +366,7 @@ export default function AdminProfilePage() {
               
               {/* SECTION 1: Status & Core Thesis */}
               <div style={{ padding: '1.4rem 1.6rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '16px', border: '1px solid var(--border)' }}>
-                <SectionBadgeNumber num="01" title="Hero Status & Primary Thesis" />
+                <SectionBadgeNumber num="01" title="Hero Status & Primary Headline" />
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                   <div>
@@ -453,18 +411,18 @@ export default function AdminProfilePage() {
                       onInput={(e) => {
                         const target = e.currentTarget;
                         target.style.height = 'auto';
-                        target.style.height = `${Math.max(target.scrollHeight, 120)}px`;
+                        target.style.height = `${Math.max(target.scrollHeight, 100)}px`;
                       }}
                       className="admin-input"
                       style={{
                         height: 'auto',
-                        minHeight: '120px',
+                        minHeight: '100px',
                         overflow: 'hidden',
                         resize: 'none',
                         padding: '0.75rem 0.95rem',
                         lineHeight: 1.65,
                       }}
-                      placeholder="Undergraduate researcher with hands-on experience in quantitative social methods..."
+                      placeholder="Sociology & Social Work researcher specializing in quantitative methods..."
                     />
                     {errors.summary && <span className="text-xs text-red-500 mt-1 block">{errors.summary.message}</span>}
                   </div>
@@ -515,7 +473,7 @@ export default function AdminProfilePage() {
 
               {/* SECTION 3: 3-Side Floating Stats */}
               <div style={{ padding: '1.4rem 1.6rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '16px', border: '1px solid var(--border)' }}>
-                <SectionBadgeNumber num="03" title="Floating Highlight Stat Badges" />
+                <SectionBadgeNumber num="03" title="Hero Floating Highlight Stat Badges" />
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                   {/* Stat 1: Events */}
@@ -583,7 +541,7 @@ export default function AdminProfilePage() {
                 </div>
               </div>
 
-              {/* SECTION 4: Call-To-Action Buttons */}
+              {/* SECTION 4: Action CTA Buttons */}
               <div style={{ padding: '1.4rem 1.6rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '16px', border: '1px solid var(--border)' }}>
                 <SectionBadgeNumber num="04" title="Action CTA Buttons" />
 
@@ -604,74 +562,6 @@ export default function AdminProfilePage() {
                     <label className="admin-label">Secondary Button Link / Anchor</label>
                     <input {...register('secondaryCta.link')} className="admin-input" placeholder="#publications" />
                   </div>
-                </div>
-              </div>
-
-              {/* SECTION 5: Social & Academic Networks */}
-              <div style={{ padding: '1.4rem 1.6rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '16px', border: '1px solid var(--border)' }}>
-                <SectionBadgeNumber num="05" title="Social & Academic Profiles" />
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
-                  <div>
-                    <label className="admin-label">LinkedIn URL</label>
-                    <input {...register('socialLinks.linkedin')} className="admin-input" placeholder="https://linkedin.com/in/..." />
-                  </div>
-                  <div>
-                    <label className="admin-label">ResearchGate URL</label>
-                    <input {...register('socialLinks.researchGate')} className="admin-input" placeholder="https://researchgate.net/profile/..." />
-                  </div>
-                  <div>
-                    <label className="admin-label">ORCID Identifier</label>
-                    <input {...register('socialLinks.orcid')} className="admin-input" placeholder="0000-0002-..." />
-                  </div>
-                  <div>
-                    <label className="admin-label">GitHub URL</label>
-                    <input {...register('socialLinks.github')} className="admin-input" placeholder="https://github.com/..." />
-                  </div>
-                  <div>
-                    <label className="admin-label">Twitter / X URL</label>
-                    <input {...register('socialLinks.twitter')} className="admin-input" placeholder="https://x.com/..." />
-                  </div>
-                  <div>
-                    <label className="admin-label">Facebook URL</label>
-                    <input {...register('socialLinks.facebook')} className="admin-input" placeholder="https://facebook.com/..." />
-                  </div>
-                </div>
-              </div>
-
-              {/* SECTION 6: References List */}
-              <div style={{ padding: '1.4rem 1.6rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '16px', border: '1px solid var(--border)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <SectionBadgeNumber num="06" title={`References (${fields.length})`} />
-                  <button
-                    type="button"
-                    onClick={() => append({ name: '', title: '', institution: '', phone: '', email: '', isPublic: false })}
-                    className="btn btn-outline"
-                    style={{ fontSize: '0.75rem', padding: '0.35rem 0.75rem', display: 'flex', alignItems: 'center', gap: '0.35rem', borderRadius: '8px' }}
-                  >
-                    <Plus size={13} />
-                    <span>Add Reference</span>
-                  </button>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                  {fields.map((field, index) => (
-                    <div key={field.id} style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', backgroundColor: 'var(--bg-surface)', padding: '0.85rem', borderRadius: '10px', border: '1px solid var(--border)' }}>
-                      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.65rem' }}>
-                        <input {...register(`references.${index}.name` as const)} className="admin-input" placeholder="Referee Name" />
-                        <input {...register(`references.${index}.title` as const)} className="admin-input" placeholder="Designation" />
-                        <input {...register(`references.${index}.institution` as const)} className="admin-input" placeholder="Institution" />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => remove(index)}
-                        style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem' }}
-                        title="Delete reference"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  ))}
                 </div>
               </div>
 

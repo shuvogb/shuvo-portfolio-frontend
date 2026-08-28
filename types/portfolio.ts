@@ -35,6 +35,28 @@ export interface Profile {
     bloodGroup?: string;
     isPublic: boolean;
   };
+  aboutSection?: {
+    badge?: string;
+    title?: string;
+    description?: string;
+    department?: string;
+    university?: string;
+    philosophyBadge?: string;
+    philosophyTitle?: string;
+    philosophyDescription?: string;
+    pillars?: Array<{
+      title: string;
+      description: string;
+      icon?: string;
+    }>;
+    refereesBadge?: string;
+    refereesTitle?: string;
+  };
+  skillsSection?: {
+    badge?: string;
+    title?: string;
+    description?: string;
+  };
   references?: Array<{
     name: string;
     title: string;
@@ -49,6 +71,7 @@ export interface Skill {
   _id: string;
   category: 'technical' | 'professional';
   name: string;
+  icon?: string;
   order: number;
 }
 

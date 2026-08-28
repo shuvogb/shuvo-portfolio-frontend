@@ -19,6 +19,45 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
     toast.success(`${label} copied to clipboard`);
   };
 
+  const about = profile?.aboutSection;
+
+  const defaultPillars = [
+    {
+      title: 'Quantitative',
+      description: 'Cross-sectional surveys, SPSS statistical analysis, and demographic modeling.',
+      icon: 'barchart',
+    },
+    {
+      title: 'Char Studies',
+      description: 'Multidimensional deprivation, climate resilience, and riverine char communities.',
+      icon: 'globe',
+    },
+    {
+      title: 'Advocacy',
+      description: 'Youth mobilization, climate justice with YouthNet, and career mentorship.',
+      icon: 'user',
+    },
+  ];
+
+  const pillars = (about?.pillars && about.pillars.length > 0) ? about.pillars : defaultPillars;
+
+  const referees = (profile?.references && profile.references.length > 0)
+    ? profile.references
+    : [
+        {
+          name: 'Dr. Md. Tariqul Islam',
+          title: 'Director, Center for Multidisciplinary Research',
+          institution: 'Gono Bishwabidyalay · Savar, Dhaka',
+          isPublic: true,
+        },
+        {
+          name: 'Dr. Subrina Rahman',
+          title: 'Senior Lecturer, Dept. of Sociology & Social Work',
+          institution: 'Gono Bishwabidyalay · Savar, Dhaka',
+          isPublic: true,
+        },
+      ];
+
   return (
     <section id="about" className="section bg-grid-pattern" aria-label="About Shuvo Molla">
       <div className="container">
@@ -26,11 +65,14 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
         {/* Section Header */}
         <div className="section-header">
           <SectionBadge icon={<User size={13} />}>
-            Academic Bio & Background
+            {about?.badge || 'Academic Bio & Background'}
           </SectionBadge>
-          <h2 className="section-title">Background & Scholarship</h2>
+          <h2 className="section-title">
+            {about?.title || 'Background & Scholarship'}
+          </h2>
           <p className="section-description">
-            Sociology and Social Work researcher with deep focus on empirical methodologies, statistical modeling with SPSS, and grassroots community initiatives.
+            {about?.description ||
+              'Sociology and Social Work researcher with deep focus on empirical methodologies, statistical modeling with SPSS, and grassroots community initiatives.'}
           </p>
         </div>
 
@@ -73,10 +115,10 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
                         {profile?.name || 'Shuvo Molla'}
                       </h3>
                       <p style={{ fontSize: '0.85rem', color: 'var(--accent)', fontWeight: 600 }}>
-                        Sociology & Social Work
+                        {about?.department || 'Sociology & Social Work'}
                       </p>
                       <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)' }}>
-                        Gono Bishwabidyalay · Savar
+                        {about?.university || 'Gono Bishwabidyalay · Savar'}
                       </p>
                     </div>
                   </div>
@@ -193,72 +235,48 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
                       <Compass size={18} style={{ color: 'var(--accent)' }} />
                       <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--fg)' }}>
-                        Research Philosophy & Focus
+                        {about?.philosophyTitle || 'Research Philosophy & Focus'}
                       </h3>
                     </div>
 
                     <span className="badge badge-primary" style={{ fontSize: '0.725rem' }}>
-                      <CheckCircle2 size={11} /> Empirical Inquiry
+                      <CheckCircle2 size={11} /> {about?.philosophyBadge || 'Empirical Inquiry'}
                     </span>
                   </div>
 
                   <p style={{ fontSize: '0.925rem', lineHeight: 1.7, color: 'var(--fg-muted)', marginBottom: '1.5rem' }}>
-                    Sociology and Social Work undergraduate with hands-on experience in social research, data collection, and community development. Skilled in quantitative research methods and SPSS, with a demonstrated ability to coordinate events and engage in social advocacy.
+                    {about?.philosophyDescription ||
+                      'Sociology and Social Work undergraduate with hands-on experience in social research, data collection, and community development. Skilled in quantitative research methods and SPSS, with a demonstrated ability to coordinate events and engage in social advocacy.'}
                   </p>
                 </div>
 
-                {/* 3 Standalone Feature Cards */}
+                {/* Dynamic Feature Cards */}
                 <div className="about-features-grid">
-                  <div
-                    style={{
-                      padding: '0.85rem',
-                      borderRadius: '12px',
-                      backgroundColor: 'var(--bg-elevated)',
-                      border: '1px solid var(--border)',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.35rem', color: 'var(--accent)' }}>
-                      <BarChart3 size={15} strokeWidth={1.8} />
-                      <span style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--fg)' }}>Quantitative</span>
+                  {pillars.map((pillar, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        padding: '0.85rem',
+                        borderRadius: '12px',
+                        backgroundColor: 'var(--bg-elevated)',
+                        border: '1px solid var(--border)',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.35rem', color: 'var(--accent)' }}>
+                        {idx === 0 ? (
+                          <BarChart3 size={15} strokeWidth={1.8} />
+                        ) : idx === 1 ? (
+                          <Globe size={15} strokeWidth={1.8} />
+                        ) : (
+                          <User size={15} strokeWidth={1.8} />
+                        )}
+                        <span style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--fg)' }}>{pillar.title}</span>
+                      </div>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', lineHeight: 1.45, margin: 0 }}>
+                        {pillar.description}
+                      </p>
                     </div>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', lineHeight: 1.45, margin: 0 }}>
-                      Cross-sectional surveys, SPSS statistical analysis, and demographic modeling.
-                    </p>
-                  </div>
-
-                  <div
-                    style={{
-                      padding: '0.85rem',
-                      borderRadius: '12px',
-                      backgroundColor: 'var(--bg-elevated)',
-                      border: '1px solid var(--border)',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.35rem', color: 'var(--accent)' }}>
-                      <Globe size={15} strokeWidth={1.8} />
-                      <span style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--fg)' }}>Char Studies</span>
-                    </div>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', lineHeight: 1.45, margin: 0 }}>
-                      Multidimensional deprivation, climate resilience, and riverine char communities.
-                    </p>
-                  </div>
-
-                  <div
-                    style={{
-                      padding: '0.85rem',
-                      borderRadius: '12px',
-                      backgroundColor: 'var(--bg-elevated)',
-                      border: '1px solid var(--border)',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.35rem', color: 'var(--accent)' }}>
-                      <User size={15} strokeWidth={1.8} />
-                      <span style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--fg)' }}>Advocacy</span>
-                    </div>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', lineHeight: 1.45, margin: 0 }}>
-                      Youth mobilization, climate justice with YouthNet, and career mentorship.
-                    </p>
-                  </div>
+                  ))}
                 </div>
 
               </div>
@@ -274,29 +292,18 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
                   <ShieldCheck size={18} style={{ color: 'var(--accent)' }} />
                   <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--fg)' }}>
-                    Academic Mentors & Institutional Referees
+                    {about?.refereesTitle || 'Academic Mentors & Institutional Referees'}
                   </h3>
                 </div>
                 <span className="badge" style={{ fontSize: '0.725rem' }}>
-                  <CheckCircle2 size={11} style={{ color: 'var(--accent)' }} /> Verified Faculty
+                  <CheckCircle2 size={11} style={{ color: 'var(--accent)' }} /> {about?.refereesBadge || 'Verified Faculty'}
                 </span>
               </div>
 
               <div className="about-mentors-grid">
-                {[
-                  {
-                    name: 'Dr. Md. Tariqul Islam',
-                    role: 'Director, Center for Multidisciplinary Research',
-                    institution: 'Gono Bishwabidyalay · Savar, Dhaka',
-                  },
-                  {
-                    name: 'Dr. Subrina Rahman',
-                    role: 'Senior Lecturer, Dept. of Sociology & Social Work',
-                    institution: 'Gono Bishwabidyalay · Savar, Dhaka',
-                  },
-                ].map((mentor) => (
+                {referees.map((mentor, idx) => (
                   <div
-                    key={mentor.name}
+                    key={idx}
                     style={{
                       padding: '1.1rem 1.25rem',
                       borderRadius: '14px',
@@ -329,7 +336,7 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
                         {mentor.name}
                       </p>
                       <p style={{ fontSize: '0.8rem', color: 'var(--accent)', fontWeight: 600, marginBottom: '0.15rem' }}>
-                        {mentor.role}
+                        {mentor.title}
                       </p>
                       <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)' }}>
                         {mentor.institution}
