@@ -11,7 +11,15 @@ interface HeroSectionProps {
   isLoading: boolean;
 }
 
-function Portrait3DCard({ avatarSrc, name }: { avatarSrc: string; name?: string }) {
+function Portrait3DCard({
+  avatarSrc,
+  name,
+  isLoading,
+}: {
+  avatarSrc?: string;
+  name?: string;
+  isLoading?: boolean;
+}) {
   const cardRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -73,19 +81,24 @@ function Portrait3DCard({ avatarSrc, name }: { avatarSrc: string; name?: string 
                 borderRadius: '14px',
                 overflow: 'hidden',
                 position: 'relative',
+                backgroundColor: 'var(--bg-elevated)',
               }}
             >
-              <img
-                src={avatarSrc}
-                alt={name || 'Shuvo Molla'}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  objectPosition: 'center 20%',
-                  display: 'block',
-                }}
-              />
+              {isLoading || !avatarSrc ? (
+                <div className="skeleton" style={{ width: '100%', height: '100%' }} />
+              ) : (
+                <img
+                  src={avatarSrc}
+                  alt={name || 'Shuvo Molla'}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'center 20%',
+                    display: 'block',
+                  }}
+                />
+              )}
             </div>
           </div>
         </motion.div>
@@ -110,7 +123,7 @@ function Portrait3DCard({ avatarSrc, name }: { avatarSrc: string; name?: string 
 }
 
 export function HeroSection({ profile, isLoading }: HeroSectionProps) {
-  const avatarSrc = profile?.avatarUrl || '/images/shuvo.png';
+  const avatarSrc = profile?.avatarUrl || (!isLoading ? '/images/shuvo.png' : undefined);
 
   const statusBadgeText =
     profile?.statusBadge || 'Open for Research & Community Initiatives';
@@ -300,7 +313,7 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
               </motion.div>
 
               {/* CENTER: Unobstructed 3D Tilt Portrait */}
-              <Portrait3DCard avatarSrc={avatarSrc} name={profile?.name} />
+              <Portrait3DCard avatarSrc={avatarSrc} name={profile?.name} isLoading={isLoading} />
 
               {/* SIDE 2: Right Floating Stat Card */}
               <motion.div

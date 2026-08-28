@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -97,16 +97,16 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 
 function SectionBadgeNumber({ num, title }: { num: string; title: string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.15rem' }}>
       <span
         style={{
-          width: '22px',
-          height: '22px',
+          width: '24px',
+          height: '24px',
           borderRadius: '7px',
           backgroundColor: 'var(--accent-subtle)',
           color: 'var(--accent)',
           border: '1px solid var(--accent-border)',
-          fontSize: '0.7rem',
+          fontSize: '0.725rem',
           fontWeight: 750,
           display: 'flex',
           alignItems: 'center',
@@ -116,7 +116,7 @@ function SectionBadgeNumber({ num, title }: { num: string; title: string }) {
       >
         {num}
       </span>
-      <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--fg)' }}>
+      <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--fg)', letterSpacing: '-0.01em' }}>
         {title}
       </span>
     </div>
@@ -126,7 +126,10 @@ function SectionBadgeNumber({ num, title }: { num: string; title: string }) {
 export default function AdminProfilePage() {
   const qc = useQueryClient();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [previewAvatarUrl, setPreviewAvatarUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const { data: profile, isLoading } = useQuery<ProfileFormValues>({
     queryKey: ['admin-profile'],
@@ -143,7 +146,7 @@ export default function AdminProfilePage() {
     watch,
     setValue,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -160,6 +163,15 @@ export default function AdminProfilePage() {
       references: [],
     },
   });
+
+  const summaryValue = watch('summary');
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.max(textareaRef.current.scrollHeight, 120)}px`;
+    }
+  }, [summaryValue, drawerOpen]);
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -179,29 +191,19 @@ export default function AdminProfilePage() {
         primaryCta: profile.primaryCta || { label: 'Get in Touch', link: '#contact' },
         secondaryCta: profile.secondaryCta || { label: 'Publications', link: '#publications' },
       });
+      setAvatarFile(null);
+      setPreviewAvatarUrl(null);
     }
   }, [profile, reset]);
 
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('altText', 'Profile portrait photo');
-
-    try {
-      setUploading(true);
-      const res = await api.post('/admin/media/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      setValue('avatarUrl', res.data.data.url);
-      toast.success('Avatar uploaded successfully!');
-    } catch {
-      toast.error('Failed to upload image. Please try again.');
-    } finally {
-      setUploading(false);
-    }
+    setAvatarFile(file);
+    const localUrl = URL.createObjectURL(file);
+    setPreviewAvatarUrl(localUrl);
+    setValue('avatarUrl', localUrl, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
   };
 
   const saveMutation = useMutation({
@@ -212,6 +214,8 @@ export default function AdminProfilePage() {
       qc.invalidateQueries({ queryKey: ['admin-profile'] });
       qc.invalidateQueries({ queryKey: ['portfolio'] });
       toast.success('Hero Section & Profile updated successfully!');
+      setAvatarFile(null);
+      setPreviewAvatarUrl(null);
       setDrawerOpen(false);
     },
     onError: () => {
@@ -220,7 +224,32 @@ export default function AdminProfilePage() {
   });
 
   const onSubmit = async (data: ProfileFormValues) => {
-    await saveMutation.mutateAsync(data);
+    let finalAvatarUrl = data.avatarUrl;
+
+    if (avatarFile) {
+      try {
+        setUploading(true);
+        const formData = new FormData();
+        formData.append('file', avatarFile);
+        formData.append('altText', 'Profile portrait photo');
+
+        const res = await api.post('/admin/media/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        finalAvatarUrl = res.data.data.url;
+      } catch {
+        toast.error('Failed to upload image to Cloudinary. Please try again.');
+        setUploading(false);
+        return;
+      } finally {
+        setUploading(false);
+      }
+    }
+
+    await saveMutation.mutateAsync({
+      ...data,
+      avatarUrl: finalAvatarUrl,
+    });
   };
 
   if (isLoading) {
@@ -232,7 +261,7 @@ export default function AdminProfilePage() {
     );
   }
 
-  const currentAvatar = watch('avatarUrl') || profile?.avatarUrl || '/images/shuvo.png';
+  const currentAvatar = previewAvatarUrl || watch('avatarUrl') || profile?.avatarUrl || '/images/shuvo.png';
   const currentStatus = watch('statusBadge') || profile?.statusBadge || 'Open for Research & Community Initiatives';
   const currentName = watch('name') || profile?.name || 'Shuvo Molla';
   const currentHeadline = watch('headline') || profile?.headline || 'Sociology & Social Work Undergraduate';
@@ -242,6 +271,8 @@ export default function AdminProfilePage() {
   const currentReach = watch('heroStats.reach') || profile?.heroStats?.reach;
   const currentPrimaryCta = watch('primaryCta') || profile?.primaryCta;
   const currentSecondaryCta = watch('secondaryCta') || profile?.secondaryCta;
+
+  const { ref: summaryFormRef, ...restSummary } = register('summary');
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -273,7 +304,7 @@ export default function AdminProfilePage() {
           }}
         >
           <SlidersHorizontal size={15} />
-          <span>Customize Hero Section (Drawer)</span>
+          <span>Customize</span>
         </button>
       </div>
 
@@ -376,7 +407,7 @@ export default function AdminProfilePage() {
             <DrawerBody>
               
               {/* SECTION 1: Status & Core Thesis */}
-              <div style={{ padding: '1.25rem 1.35rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '14px', border: '1px solid var(--border)' }}>
+              <div style={{ padding: '1.4rem 1.6rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '16px', border: '1px solid var(--border)' }}>
                 <SectionBadgeNumber num="01" title="Hero Status & Primary Thesis" />
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -414,10 +445,25 @@ export default function AdminProfilePage() {
                   <div>
                     <label className="admin-label">Hero Bio / Abstract *</label>
                     <textarea
-                      {...register('summary')}
-                      rows={4}
+                      {...restSummary}
+                      ref={(el) => {
+                        summaryFormRef(el);
+                        textareaRef.current = el;
+                      }}
+                      onInput={(e) => {
+                        const target = e.currentTarget;
+                        target.style.height = 'auto';
+                        target.style.height = `${Math.max(target.scrollHeight, 120)}px`;
+                      }}
                       className="admin-input"
-                      style={{ height: 'auto', minHeight: '100px', resize: 'vertical', padding: '0.65rem 0.85rem', lineHeight: '1.6' }}
+                      style={{
+                        height: 'auto',
+                        minHeight: '120px',
+                        overflow: 'hidden',
+                        resize: 'none',
+                        padding: '0.75rem 0.95rem',
+                        lineHeight: 1.65,
+                      }}
                       placeholder="Undergraduate researcher with hands-on experience in quantitative social methods..."
                     />
                     {errors.summary && <span className="text-xs text-red-500 mt-1 block">{errors.summary.message}</span>}
@@ -426,12 +472,12 @@ export default function AdminProfilePage() {
               </div>
 
               {/* SECTION 2: Portrait & Media */}
-              <div style={{ padding: '1.25rem 1.35rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '14px', border: '1px solid var(--border)' }}>
+              <div style={{ padding: '1.4rem 1.6rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '16px', border: '1px solid var(--border)' }}>
                 <SectionBadgeNumber num="02" title="Hero Portrait Photo" />
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
                   <img
-                    src={watch('avatarUrl') || '/images/shuvo.png'}
+                    src={currentAvatar}
                     alt="Preview"
                     style={{ width: '80px', height: '80px', borderRadius: '18px', objectFit: 'cover', border: '2px solid var(--border)' }}
                   />
@@ -454,14 +500,13 @@ export default function AdminProfilePage() {
                         cursor: 'pointer',
                       }}
                     >
-                      {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-                      <span>{uploading ? 'Uploading Photo...' : 'Upload New Photo'}</span>
+                      <Upload size={14} />
+                      <span>{avatarFile ? `Selected: ${avatarFile.name}` : 'Upload New Photo'}</span>
                       <input
                         type="file"
                         accept="image/*"
-                        onChange={handleAvatarUpload}
+                        onChange={handleAvatarSelect}
                         style={{ display: 'none' }}
-                        disabled={uploading}
                       />
                     </label>
                   </div>
@@ -469,12 +514,12 @@ export default function AdminProfilePage() {
               </div>
 
               {/* SECTION 3: 3-Side Floating Stats */}
-              <div style={{ padding: '1.25rem 1.35rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '14px', border: '1px solid var(--border)' }}>
+              <div style={{ padding: '1.4rem 1.6rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '16px', border: '1px solid var(--border)' }}>
                 <SectionBadgeNumber num="03" title="Floating Highlight Stat Badges" />
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                   {/* Stat 1: Events */}
-                  <div style={{ padding: '0.85rem 1rem', backgroundColor: 'var(--bg-surface)', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                  <div style={{ padding: '0.85rem 1rem', backgroundColor: 'var(--bg-surface)', borderRadius: '12px', border: '1px solid var(--border)' }}>
                     <p style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--fg)', marginBottom: '0.5rem' }}>
                       Left Badge: Events / Initiatives
                     </p>
@@ -495,7 +540,7 @@ export default function AdminProfilePage() {
                   </div>
 
                   {/* Stat 2: Papers */}
-                  <div style={{ padding: '0.85rem 1rem', backgroundColor: 'var(--bg-surface)', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                  <div style={{ padding: '0.85rem 1rem', backgroundColor: 'var(--bg-surface)', borderRadius: '12px', border: '1px solid var(--border)' }}>
                     <p style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--fg)', marginBottom: '0.5rem' }}>
                       Right Badge: Academic Papers
                     </p>
@@ -516,7 +561,7 @@ export default function AdminProfilePage() {
                   </div>
 
                   {/* Stat 3: Fieldwork Reach */}
-                  <div style={{ padding: '0.85rem 1rem', backgroundColor: 'var(--bg-surface)', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                  <div style={{ padding: '0.85rem 1rem', backgroundColor: 'var(--bg-surface)', borderRadius: '12px', border: '1px solid var(--border)' }}>
                     <p style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--fg)', marginBottom: '0.5rem' }}>
                       Bottom Badge: Fieldwork Reach
                     </p>
@@ -539,7 +584,7 @@ export default function AdminProfilePage() {
               </div>
 
               {/* SECTION 4: Call-To-Action Buttons */}
-              <div style={{ padding: '1.25rem 1.35rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '14px', border: '1px solid var(--border)' }}>
+              <div style={{ padding: '1.4rem 1.6rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '16px', border: '1px solid var(--border)' }}>
                 <SectionBadgeNumber num="04" title="Action CTA Buttons" />
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem' }}>
@@ -563,7 +608,7 @@ export default function AdminProfilePage() {
               </div>
 
               {/* SECTION 5: Social & Academic Networks */}
-              <div style={{ padding: '1.25rem 1.35rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '14px', border: '1px solid var(--border)' }}>
+              <div style={{ padding: '1.4rem 1.6rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '16px', border: '1px solid var(--border)' }}>
                 <SectionBadgeNumber num="05" title="Social & Academic Profiles" />
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
@@ -595,7 +640,7 @@ export default function AdminProfilePage() {
               </div>
 
               {/* SECTION 6: References List */}
-              <div style={{ padding: '1.25rem 1.35rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '14px', border: '1px solid var(--border)' }}>
+              <div style={{ padding: '1.4rem 1.6rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '16px', border: '1px solid var(--border)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                   <SectionBadgeNumber num="06" title={`References (${fields.length})`} />
                   <button
@@ -635,7 +680,11 @@ export default function AdminProfilePage() {
             <DrawerFooter>
               <button
                 type="button"
-                onClick={() => setDrawerOpen(false)}
+                onClick={() => {
+                  setAvatarFile(null);
+                  setPreviewAvatarUrl(null);
+                  setDrawerOpen(false);
+                }}
                 className="btn btn-outline"
                 style={{ padding: '0.55rem 1.25rem', fontSize: '0.85rem', borderRadius: '10px' }}
               >
@@ -643,14 +692,24 @@ export default function AdminProfilePage() {
               </button>
               <button
                 type="submit"
-                disabled={isSubmitting || saveMutation.isPending}
+                disabled={!isDirty || isSubmitting || saveMutation.isPending || uploading}
                 className="btn btn-primary"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 1.5rem', fontSize: '0.85rem', borderRadius: '10px' }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.55rem 1.5rem',
+                  fontSize: '0.85rem',
+                  borderRadius: '10px',
+                  opacity: !isDirty ? 0.45 : 1,
+                  cursor: !isDirty ? 'not-allowed' : 'pointer',
+                  transition: 'opacity 0.15s ease',
+                }}
               >
-                {isSubmitting || saveMutation.isPending ? (
+                {isSubmitting || saveMutation.isPending || uploading ? (
                   <>
                     <Loader2 size={14} className="animate-spin" />
-                    <span>Saving...</span>
+                    <span>{uploading ? 'Uploading Photo...' : 'Saving Changes...'}</span>
                   </>
                 ) : (
                   <>

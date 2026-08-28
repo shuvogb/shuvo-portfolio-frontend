@@ -63,6 +63,7 @@ export function AdminCrudPage<T extends FieldValues>({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editItem, setEditItem] = useState<(T & { _id: string }) | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [pendingFiles, setPendingFiles] = useState<Record<string, File>>({});
   const [uploadingField, setUploadingField] = useState<string | null>(null);
   const qc = useQueryClient();
 
@@ -80,17 +81,19 @@ export function AdminCrudPage<T extends FieldValues>({
     reset,
     setValue,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<T>({ resolver: zodResolver(schema) });
 
   const openCreate = () => {
     setEditItem(null);
+    setPendingFiles({});
     reset({} as T);
     setDrawerOpen(true);
   };
 
   const openEdit = (item: T & { _id: string }) => {
     setEditItem(item);
+    setPendingFiles({});
     reset(item as unknown as T);
     setDrawerOpen(true);
   };
@@ -98,33 +101,25 @@ export function AdminCrudPage<T extends FieldValues>({
   const closeDrawer = () => {
     setDrawerOpen(false);
     setEditItem(null);
+    setPendingFiles({});
     reset({} as T);
   };
 
-  const handleImageUpload = async (
+  const handleImageSelect = (
     e: React.ChangeEvent<HTMLInputElement>,
     fieldName: string
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('altText', `${title} asset`);
-
-    try {
-      setUploadingField(fieldName);
-      const res = await api.post('/admin/media/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      const url = res.data.data.url;
-      setValue(fieldName as Path<T>, url);
-      toast.success('Image uploaded to Cloudinary successfully!');
-    } catch {
-      toast.error('Failed to upload image. Please try again.');
-    } finally {
-      setUploadingField(null);
-    }
+    setPendingFiles((prev) => ({ ...prev, [fieldName]: file }));
+    const localUrl = URL.createObjectURL(file);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setValue(fieldName as Path<T>, localUrl as any, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
   };
 
   const saveMutation = useMutation({
@@ -159,7 +154,30 @@ export function AdminCrudPage<T extends FieldValues>({
   });
 
   const onSubmit = async (data: T) => {
-    await saveMutation.mutateAsync(data);
+    const updatedData = { ...data };
+
+    for (const [fieldName, file] of Object.entries(pendingFiles)) {
+      try {
+        setUploadingField(fieldName);
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('altText', `${title} asset`);
+
+        const res = await api.post('/admin/media/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        (updatedData as Record<string, unknown>)[fieldName] = res.data.data.url;
+      } catch {
+        toast.error(`Failed to upload ${fieldName} to Cloudinary.`);
+        setUploadingField(null);
+        return;
+      } finally {
+        setUploadingField(null);
+      }
+    }
+
+    await saveMutation.mutateAsync(updatedData);
+    setPendingFiles({});
   };
 
   return (
@@ -269,6 +287,7 @@ export function AdminCrudPage<T extends FieldValues>({
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                 {fields.map((field) => {
                   const currentValue = watch(field.name as Path<T>);
+                  const pendingFile = pendingFiles[field.name];
 
                   return (
                     <div key={field.name} style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
@@ -284,10 +303,21 @@ export function AdminCrudPage<T extends FieldValues>({
                         <textarea
                           id={`field-${field.name}`}
                           {...register(field.name as Path<T>)}
-                          rows={field.rows || 3}
+                          onInput={(e) => {
+                            const target = e.currentTarget;
+                            target.style.height = 'auto';
+                            target.style.height = `${Math.max(target.scrollHeight, 100)}px`;
+                          }}
                           placeholder={field.placeholder}
                           className="admin-input"
-                          style={{ height: 'auto', minHeight: '90px', resize: 'vertical', padding: '0.65rem 0.85rem' }}
+                          style={{
+                            height: 'auto',
+                            minHeight: '100px',
+                            overflow: 'hidden',
+                            resize: 'none',
+                            padding: '0.75rem 0.95rem',
+                            lineHeight: 1.6,
+                          }}
                         />
                       ) : field.type === 'select' ? (
                         <select
@@ -347,18 +377,13 @@ export function AdminCrudPage<T extends FieldValues>({
                                   cursor: 'pointer',
                                 }}
                               >
-                                {uploadingField === field.name ? (
-                                  <Loader2 size={13} className="animate-spin" />
-                                ) : (
-                                  <Upload size={13} />
-                                )}
-                                <span>{uploadingField === field.name ? 'Uploading to Cloudinary...' : 'Upload Image'}</span>
+                                <Upload size={13} />
+                                <span>{pendingFile ? `Selected: ${pendingFile.name}` : 'Choose Image'}</span>
                                 <input
                                   type="file"
                                   accept="image/*"
-                                  onChange={(e) => handleImageUpload(e, field.name)}
+                                  onChange={(e) => handleImageSelect(e, field.name)}
                                   style={{ display: 'none' }}
-                                  disabled={uploadingField === field.name}
                                 />
                               </label>
                             </div>
@@ -396,14 +421,24 @@ export function AdminCrudPage<T extends FieldValues>({
               </button>
               <button
                 type="submit"
-                disabled={isSubmitting || saveMutation.isPending}
+                disabled={!isDirty || isSubmitting || saveMutation.isPending || !!uploadingField}
                 className="btn btn-primary"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 1.5rem', fontSize: '0.85rem', borderRadius: '10px' }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.55rem 1.5rem',
+                  fontSize: '0.85rem',
+                  borderRadius: '10px',
+                  opacity: !isDirty ? 0.45 : 1,
+                  cursor: !isDirty ? 'not-allowed' : 'pointer',
+                  transition: 'opacity 0.15s ease',
+                }}
               >
-                {isSubmitting || saveMutation.isPending ? (
+                {isSubmitting || saveMutation.isPending || !!uploadingField ? (
                   <>
                     <Loader2 size={14} className="animate-spin" />
-                    <span>Saving...</span>
+                    <span>{uploadingField ? 'Uploading Image...' : 'Saving...'}</span>
                   </>
                 ) : (
                   <>

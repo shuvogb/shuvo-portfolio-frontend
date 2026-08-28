@@ -173,14 +173,14 @@ export function DrawerHeader({
         className
       )}
       style={{
-        padding: '1.75rem 2.25rem 1.35rem 2.25rem',
+        padding: '1rem 1.5rem',
       }}
     >
-      <div className="flex flex-col gap-1.5 pr-6 min-w-0">{children}</div>
+      <div className="flex flex-col gap-1 pr-4 min-w-0">{children}</div>
       <button
         type="button"
         onClick={() => setOpen(false)}
-        className="inline-flex size-9 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--accent)] hover:bg-[var(--accent-subtle)] active:scale-95 transition-all duration-150 cursor-pointer shrink-0 shadow-xs"
+        className="inline-flex size-8.5 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--accent)] hover:bg-[var(--accent-subtle)] active:scale-95 transition-all duration-150 cursor-pointer shrink-0 shadow-xs"
         aria-label="Close drawer"
       >
         <X className="size-4" />
@@ -196,7 +196,7 @@ export function DrawerTitle({
   return (
     <h2
       className={cn(
-        'text-lg font-bold text-[var(--fg)] tracking-[-0.02em] m-0',
+        'text-base font-bold text-[var(--fg)] tracking-[-0.02em] m-0',
         className
       )}
     >
@@ -225,11 +225,14 @@ export function DrawerBody({
   return (
     <div
       className={cn(
-        'flex-1 overflow-y-auto space-y-5 bg-[var(--bg)]',
+        'flex-1 overflow-y-auto bg-[var(--bg)]',
         className
       )}
       style={{
-        padding: '1.75rem 2.25rem',
+        padding: '1.25rem 1.5rem',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1.25rem',
       }}
     >
       {children}
@@ -248,7 +251,7 @@ export function DrawerFooter({
         className
       )}
       style={{
-        padding: '1.35rem 2.25rem 1.75rem 2.25rem',
+        padding: '0.85rem 1.5rem',
       }}
     >
       {children}

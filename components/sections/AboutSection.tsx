@@ -12,7 +12,7 @@ interface AboutSectionProps {
 }
 
 export function AboutSection({ profile, isLoading }: AboutSectionProps) {
-  const avatarSrc = profile?.avatarUrl || '/images/shuvo.png';
+  const avatarSrc = profile?.avatarUrl || (!isLoading ? '/images/shuvo.png' : undefined);
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -54,13 +54,18 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
                         border: '1px solid var(--border)',
                         overflow: 'hidden',
                         flexShrink: 0,
+                        backgroundColor: 'var(--bg-elevated)',
                       }}
                     >
-                      <img
-                        src={avatarSrc}
-                        alt={profile?.name || 'Shuvo Molla'}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
+                      {isLoading || !avatarSrc ? (
+                        <div className="skeleton" style={{ width: '100%', height: '100%' }} />
+                      ) : (
+                        <img
+                          src={avatarSrc}
+                          alt={profile?.name || 'Shuvo Molla'}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      )}
                     </div>
 
                     <div style={{ minWidth: 0, flex: 1 }}>
