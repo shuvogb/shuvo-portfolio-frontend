@@ -17,63 +17,51 @@ function EducationItem({ edu }: { edu: Education }) {
   const isHighlighted = isInView || edu.isCurrent;
 
   return (
-    <div ref={itemRef} style={{ position: 'relative' }}>
-      {/* Concentric Double Circle Milestone Node (24px outer, 10px inner) */}
+    <div ref={itemRef} className="timeline-item-wrapper">
+      {/* Concentric Double Circle Milestone Node */}
       <div
+        className={`timeline-node ${isHighlighted ? 'timeline-node-active' : ''}`}
         style={{
-          position: 'absolute',
-          left: '-2.75rem',
-          top: '24px',
-          width: '24px',
-          height: '24px',
-          borderRadius: '50%',
-          backgroundColor: 'var(--bg)',
           border: isHighlighted ? '2px solid var(--accent)' : '2px solid var(--border-strong)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 2,
-          transition: 'border-color 0.25s ease',
         }}
       >
         <div
+          className="timeline-node-inner"
           style={{
-            width: '10px',
-            height: '10px',
-            borderRadius: '50%',
             backgroundColor: isHighlighted ? 'var(--accent)' : 'var(--border-strong)',
-            transition: 'background-color 0.25s ease',
           }}
         />
       </div>
 
       {/* Education Card */}
-      <div className="bezel-card bezel-card-interactive">
+      <div className="bezel-card bezel-card-interactive" style={{ width: '100%', minWidth: 0 }}>
         <div className="bezel-core">
           
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.75rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+          <div className="education-card-header">
+            {edu.isCurrent && (
+              <div className="education-header-meta">
+                <span className="badge badge-primary" style={{ fontSize: '0.7rem' }}>
+                  Currently Enrolled
+                </span>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', minWidth: 0, flex: 1 }}>
               <GraduationCap size={18} strokeWidth={1.75} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--fg)', letterSpacing: '-0.015em' }}>
+              <h3 style={{ fontSize: 'clamp(1.05rem, 2.5vw, 1.2rem)', fontWeight: 700, color: 'var(--fg)', letterSpacing: '-0.015em', lineHeight: 1.3 }}>
                 {edu.degree}
               </h3>
             </div>
-
-            {edu.isCurrent && (
-              <span className="badge badge-primary" style={{ fontSize: '0.725rem' }}>
-                Currently Enrolled
-              </span>
-            )}
           </div>
 
-          <p style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: 'var(--accent)', fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.85rem' }}>
-            <Building2 size={14} strokeWidth={1.75} />
+          <p style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: 'var(--accent)', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.85rem', flexWrap: 'wrap', lineHeight: 1.4 }}>
+            <Building2 size={14} strokeWidth={1.75} style={{ flexShrink: 0 }} />
             <span>{edu.institution}</span>
           </p>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap', paddingTop: '0.75rem', borderTop: '1px solid var(--border)' }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--fg-muted)', fontWeight: 500 }}>
-              <Calendar size={13} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', paddingTop: '0.75rem', borderTop: '1px solid var(--border)' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.785rem', color: 'var(--fg-muted)', fontWeight: 500 }}>
+              <Calendar size={12} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />
               <span>{edu.startDate}{edu.isCurrent ? ' – Present' : edu.endDate ? ` – ${edu.endDate}` : ''}</span>
             </span>
 
@@ -82,7 +70,7 @@ function EducationItem({ edu }: { edu: Education }) {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.4rem',
-                fontSize: '0.8rem',
+                fontSize: '0.785rem',
                 color: 'var(--accent)',
                 fontWeight: 600,
                 padding: '0.2rem 0.65rem',
@@ -91,7 +79,7 @@ function EducationItem({ edu }: { edu: Education }) {
                 border: '1px solid var(--accent-border)',
               }}
             >
-              <Award size={13} strokeWidth={1.75} />
+              <Award size={12} strokeWidth={1.75} />
               <span>{edu.result}</span>
             </span>
           </div>
@@ -125,38 +113,16 @@ export function EducationSection({ education = [], isLoading }: EducationSection
           </p>
         </div>
 
-        {/* Lag-Free Scroll-Follow Timeline */}
-        <div
-          ref={containerRef}
-          style={{
-            position: 'relative',
-            paddingLeft: '2.75rem',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1.75rem',
-          }}
-        >
+        {/* Lag-Free Responsive Scroll-Follow Timeline */}
+        <div ref={containerRef} className="timeline-container">
+          
           {/* Static Background Vertical Track Line */}
-          <div
-            style={{
-              position: 'absolute',
-              left: '11px',
-              top: '36px',
-              bottom: '40px',
-              width: '2px',
-              backgroundColor: 'var(--border)',
-            }}
-          />
+          <div className="timeline-track-static" />
 
           {/* Crisp Scroll-Follow Progress Line (No Glow) */}
           <motion.div
+            className="timeline-track-progress"
             style={{
-              position: 'absolute',
-              left: '11px',
-              top: '36px',
-              bottom: '40px',
-              width: '2px',
-              backgroundColor: 'var(--accent)',
               scaleY: scrollYProgress,
               transformOrigin: 'top',
               willChange: 'transform',
@@ -165,8 +131,8 @@ export function EducationSection({ education = [], isLoading }: EducationSection
 
           {isLoading ? (
             Array.from({ length: 2 }).map((_, i) => (
-              <div key={i} style={{ position: 'relative' }}>
-                <div className="skeleton" style={{ height: '120px', borderRadius: 'var(--radius-outer)' }} />
+              <div key={i} className="timeline-item-wrapper">
+                <div className="skeleton" style={{ height: '120px', borderRadius: 'var(--radius-outer)', width: '100%' }} />
               </div>
             ))
           ) : (
@@ -179,21 +145,112 @@ export function EducationSection({ education = [], isLoading }: EducationSection
       </div>
 
       <style>{`
+        .timeline-container {
+          position: relative;
+          padding-left: 2.75rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.75rem;
+          width: 100%;
+        }
+
+        .timeline-item-wrapper {
+          position: relative;
+          width: 100%;
+        }
+
+        .timeline-track-static {
+          position: absolute;
+          left: 9px;
+          top: 34px;
+          bottom: 40px;
+          width: 2px;
+          background-color: var(--border);
+          border-radius: 2px;
+        }
+
+        .timeline-track-progress {
+          position: absolute;
+          left: 9px;
+          top: 34px;
+          bottom: 40px;
+          width: 2px;
+          background-color: var(--accent);
+          border-radius: 2px;
+        }
+
+        .timeline-node {
+          position: absolute;
+          left: -2.75rem;
+          top: 24px;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background-color: var(--bg);
+          display: flex;
+          align-items: center;
+          justifyContent: center;
+          z-index: 2;
+          transition: border-color 0.25s ease;
+        }
+
+        .timeline-node-inner {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          transition: background-color 0.25s ease;
+        }
+
+        .education-card-header {
+          display: flex;
+          flex-direction: column-reverse;
+          gap: 0.5rem;
+          margin-bottom: 0.65rem;
+        }
+
+        .education-header-meta {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        @media (min-width: 640px) {
+          .education-card-header {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-start;
+          }
+          .education-card-header > div:last-child {
+            order: 1;
+          }
+          .education-header-meta {
+            order: 2;
+          }
+        }
+
         @media (max-width: 640px) {
-          div[style*="padding-left: 2.75rem"] {
-            padding-left: 2rem !important;
+          .timeline-container {
+            padding-left: 2rem;
+            gap: 1.25rem;
           }
-          div[style*="left: 11px"] {
-            left: 8px !important;
+
+          .timeline-track-static,
+          .timeline-track-progress {
+            left: 7px;
+            top: 28px;
+            bottom: 30px;
           }
-          div[style*="left: -2.75rem"] {
-            left: -2rem !important;
-            width: 18px !important;
-            height: 18px !important;
+
+          .timeline-node {
+            left: -2rem;
+            top: 20px;
+            width: 16px;
+            height: 16px;
           }
-          div[style*="left: -2.75rem"] > div {
-            width: 8px !important;
-            height: 8px !important;
+
+          .timeline-node-inner {
+            width: 6px;
+            height: 6px;
           }
         }
       `}</style>

@@ -1,6 +1,6 @@
 'use client';
 
-import { MapPin, Mail, Phone, ExternalLink, ShieldCheck, User, FlaskConical, Users, Award, BookOpen, Compass, BarChart3, Globe, FileText, CheckCircle2, ArrowUpRight } from 'lucide-react';
+import { MapPin, Mail, Phone, ShieldCheck, User, Compass, BarChart3, Globe, CheckCircle2 } from 'lucide-react';
 import { FiLinkedin, FiFacebook } from 'react-icons/fi';
 import { SectionBadge } from '@/components/ui/SectionBadge';
 import type { Profile } from '@/types/portfolio';
@@ -34,18 +34,18 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
           </p>
         </div>
 
-        {/* Uncombined Clean Section Blocks */}
+        {/* Responsive Section Layout */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
           
           {/* Top Row: Identity Card (Left) & Research Philosophy (Right) */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '1.5rem', alignItems: 'stretch' }}>
+          <div className="about-top-grid">
             
             {/* Identity & Direct Contact Card */}
-            <div className="bezel-card" style={{ gridColumn: 'span 5' }}>
-              <div className="bezel-core" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '1.5rem' }}>
+            <div className="bezel-card about-identity-card">
+              <div className="bezel-core" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '1.5rem', height: '100%' }}>
                 <div>
                   {/* Avatar & Title */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
                     <div
                       style={{
                         width: '64px',
@@ -63,7 +63,7 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
                       />
                     </div>
 
-                    <div>
+                    <div style={{ minWidth: 0, flex: 1 }}>
                       <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--fg)', marginBottom: '0.15rem' }}>
                         {profile?.name || 'Shuvo Molla'}
                       </h3>
@@ -91,13 +91,14 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
                           padding: '0.65rem 0.85rem',
                           borderRadius: '12px',
                           fontSize: '0.825rem',
+                          gap: '0.5rem',
                         }}
                       >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                          <Mail size={14} style={{ color: 'var(--accent)' }} />
-                          <span className="mono">{profile.email}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', minWidth: 0, overflow: 'hidden' }}>
+                          <Mail size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '0.8rem' }}>{profile.email}</span>
                         </div>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--fg-muted)' }}>Copy</span>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--fg-muted)', flexShrink: 0 }}>Copy</span>
                       </button>
                     )}
 
@@ -114,13 +115,14 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
                           padding: '0.65rem 0.85rem',
                           borderRadius: '12px',
                           fontSize: '0.825rem',
+                          gap: '0.5rem',
                         }}
                       >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                          <Phone size={14} style={{ color: 'var(--accent)' }} />
-                          <span className="mono">{profile.phone}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', minWidth: 0 }}>
+                          <Phone size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+                          <span style={{ fontSize: '0.8rem' }}>{profile.phone}</span>
                         </div>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--fg-muted)' }}>Copy</span>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--fg-muted)', flexShrink: 0 }}>Copy</span>
                       </button>
                     )}
 
@@ -138,115 +140,131 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
                           color: 'var(--fg-muted)',
                         }}
                       >
-                        <MapPin size={14} style={{ color: 'var(--accent)' }} />
-                        <span>{profile.presentAddress}</span>
+                        <MapPin size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+                        <span style={{ fontSize: '0.8rem' }}>{profile.presentAddress}</span>
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* Social Network Links with Clean Outline Icons */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
-                  <a
-                    href={profile?.socialLinks?.linkedin || 'https://linkedin.com/in/shuvomolla'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-secondary"
-                    style={{ flex: 1, minWidth: '110px', padding: '0.5rem 0.75rem', fontSize: '0.8rem', gap: '0.45rem', justifyContent: 'center' }}
-                  >
-                    <FiLinkedin size={15} style={{ color: 'var(--accent)' }} />
-                    <span>LinkedIn</span>
-                    <ArrowUpRight size={12} style={{ color: 'var(--fg-muted)' }} />
-                  </a>
+                {/* Social Channels Row */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', paddingTop: '1rem', borderTop: '1px solid var(--border)', flexWrap: 'wrap' }}>
+                  {profile?.socialLinks?.linkedin && (
+                    <a
+                      href={profile.socialLinks.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-secondary"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.8rem', padding: '0.45rem 0.85rem', flex: 1, justifyContent: 'center' }}
+                    >
+                      <FiLinkedin size={14} />
+                      <span>LinkedIn</span>
+                    </a>
+                  )}
 
-                  <a
-                    href={profile?.socialLinks?.facebook || 'https://facebook.com/shuvomolla'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-secondary"
-                    style={{ flex: 1, minWidth: '110px', padding: '0.5rem 0.75rem', fontSize: '0.8rem', gap: '0.45rem', justifyContent: 'center' }}
-                  >
-                    <FiFacebook size={15} style={{ color: 'var(--accent)' }} />
-                    <span>Facebook</span>
-                    <ArrowUpRight size={12} style={{ color: 'var(--fg-muted)' }} />
-                  </a>
+                  {profile?.socialLinks?.facebook && (
+                    <a
+                      href={profile.socialLinks.facebook}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-secondary"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.8rem', padding: '0.45rem 0.85rem', flex: 1, justifyContent: 'center' }}
+                    >
+                      <FiFacebook size={14} />
+                      <span>Facebook</span>
+                    </a>
+                  )}
                 </div>
+
               </div>
             </div>
 
             {/* Research Philosophy Card */}
-            <div className="bezel-card" style={{ gridColumn: 'span 7' }}>
-              <div className="bezel-core" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '1.5rem' }}>
+            <div className="bezel-card about-philosophy-card">
+              <div className="bezel-core" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '1.5rem', height: '100%' }}>
+                
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <FlaskConical size={16} style={{ color: 'var(--accent)' }} />
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+                      <Compass size={18} style={{ color: 'var(--accent)' }} />
                       <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--fg)' }}>
                         Research Philosophy & Focus
                       </h3>
                     </div>
+
                     <span className="badge badge-primary" style={{ fontSize: '0.725rem' }}>
                       <CheckCircle2 size={11} /> Empirical Inquiry
                     </span>
                   </div>
 
-                  <p style={{ fontSize: '0.975rem', lineHeight: 1.85, color: 'var(--fg-muted)', marginBottom: '1.5rem' }}>
-                    {profile?.summary ||
-                      'Sociology and Social Work undergraduate with hands-on experience in empirical social research, data collection, and community development. Skilled in quantitative research methods and SPSS analysis, with a track record of co-authoring published research and leading youth organizations.'}
+                  <p style={{ fontSize: '0.925rem', lineHeight: 1.7, color: 'var(--fg-muted)', marginBottom: '1.5rem' }}>
+                    Sociology and Social Work undergraduate with hands-on experience in social research, data collection, and community development. Skilled in quantitative research methods and SPSS, with a demonstrated ability to coordinate events and engage in social advocacy.
                   </p>
+                </div>
 
-                  {/* 3 Dedicated Feature Pills with Icons */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
-                    {[
-                      { icon: <BarChart3 size={15} style={{ color: 'var(--accent)' }} />, title: 'Quantitative SPSS', subtitle: 'Statistical Analysis' },
-                      { icon: <Compass size={15} style={{ color: 'var(--accent)' }} />, title: 'Char Communities', subtitle: 'Vulnerability Studies' },
-                      { icon: <Users size={15} style={{ color: 'var(--accent)' }} />, title: 'Youth Advocacy', subtitle: 'Climate Action' },
-                    ].map(({ icon, title, subtitle }) => (
-                      <div
-                        key={title}
-                        style={{
-                          padding: '0.85rem 1rem',
-                          borderRadius: '14px',
-                          backgroundColor: 'var(--bg-elevated)',
-                          border: '1px solid var(--border)',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '0.35rem',
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                          {icon}
-                          <span style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--fg)' }}>{title}</span>
-                        </div>
-                        <span style={{ fontSize: '0.725rem', color: 'var(--fg-muted)' }}>{subtitle}</span>
-                      </div>
-                    ))}
+                {/* 3 Standalone Feature Cards */}
+                <div className="about-features-grid">
+                  <div
+                    style={{
+                      padding: '0.85rem',
+                      borderRadius: '12px',
+                      backgroundColor: 'var(--bg-elevated)',
+                      border: '1px solid var(--border)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.35rem', color: 'var(--accent)' }}>
+                      <BarChart3 size={15} strokeWidth={1.8} />
+                      <span style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--fg)' }}>Quantitative</span>
+                    </div>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', lineHeight: 1.45, margin: 0 }}>
+                      Cross-sectional surveys, SPSS statistical analysis, and demographic modeling.
+                    </p>
+                  </div>
+
+                  <div
+                    style={{
+                      padding: '0.85rem',
+                      borderRadius: '12px',
+                      backgroundColor: 'var(--bg-elevated)',
+                      border: '1px solid var(--border)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.35rem', color: 'var(--accent)' }}>
+                      <Globe size={15} strokeWidth={1.8} />
+                      <span style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--fg)' }}>Char Studies</span>
+                    </div>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', lineHeight: 1.45, margin: 0 }}>
+                      Multidimensional deprivation, climate resilience, and riverine char communities.
+                    </p>
+                  </div>
+
+                  <div
+                    style={{
+                      padding: '0.85rem',
+                      borderRadius: '12px',
+                      backgroundColor: 'var(--bg-elevated)',
+                      border: '1px solid var(--border)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.35rem', color: 'var(--accent)' }}>
+                      <User size={15} strokeWidth={1.8} />
+                      <span style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--fg)' }}>Advocacy</span>
+                    </div>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', lineHeight: 1.45, margin: 0 }}>
+                      Youth mobilization, climate justice with YouthNet, and career mentorship.
+                    </p>
                   </div>
                 </div>
 
-                {/* Institutional Tag */}
-                <div
-                  style={{
-                    paddingTop: '1rem',
-                    borderTop: '1px solid var(--border)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    fontSize: '0.825rem',
-                    color: 'var(--fg-muted)',
-                  }}
-                >
-                  <span>Faculty of Social Sciences</span>
-                  <span className="mono" style={{ color: 'var(--accent)', fontWeight: 600 }}>Gono Bishwabidyalay, Savar</span>
-                </div>
               </div>
             </div>
 
           </div>
 
-          {/* Standalone Distinct Section: Academic Mentors & References */}
+          {/* Bottom Standalone Card: Verified Mentors & Institutional Referees */}
           <div className="bezel-card">
-            <div className="bezel-core">
+            <div className="bezel-core" style={{ padding: '1.5rem' }}>
+              
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
                   <ShieldCheck size={18} style={{ color: 'var(--accent)' }} />
@@ -259,7 +277,7 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
                 </span>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
+              <div className="about-mentors-grid">
                 {[
                   {
                     name: 'Dr. Md. Tariqul Islam',
@@ -301,14 +319,14 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
                       <User size={20} />
                     </div>
 
-                    <div style={{ flex: 1 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--fg)', marginBottom: '0.2rem' }}>
                         {mentor.name}
                       </p>
                       <p style={{ fontSize: '0.8rem', color: 'var(--accent)', fontWeight: 600, marginBottom: '0.15rem' }}>
                         {mentor.role}
                       </p>
-                      <p className="mono" style={{ fontSize: '0.725rem', color: 'var(--fg-muted)' }}>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)' }}>
                         {mentor.institution}
                       </p>
                     </div>
@@ -322,9 +340,37 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
       </div>
 
       <style>{`
-        @media (max-width: 960px) {
-          .section > .container div[style*="grid-template-columns: repeat(12"] > .bezel-card {
-            grid-column: span 12 !important;
+        .about-top-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+          align-items: stretch;
+        }
+
+        .about-features-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 0.75rem;
+        }
+
+        .about-mentors-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+
+        @media (min-width: 640px) {
+          .about-features-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
+          .about-mentors-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+
+        @media (min-width: 1024px) {
+          .about-top-grid {
+            grid-template-columns: 5fr 7fr;
           }
         }
       `}</style>

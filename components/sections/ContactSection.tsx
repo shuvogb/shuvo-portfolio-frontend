@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Send, CheckCircle2, Loader2, Mail, Phone, MapPin, Copy, Check, MessageSquare, ArrowUpRight } from 'lucide-react';
+import { Send, CheckCircle2, Loader2, Mail, Phone, MapPin, Copy, Check, MessageSquare, ArrowUpRight, Calendar, FileText, Users } from 'lucide-react';
 import api from '@/lib/api';
 import { toast } from 'sonner';
 
@@ -185,19 +185,84 @@ export function ContactSection() {
             </div>
 
             {/* Impact Metric Strip */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', paddingTop: '1.75rem', borderTop: '1px solid var(--border)' }}>
+            <div className="contact-stats-grid">
               {[
-                { value: '20+', label: 'Events Organized' },
-                { value: '2', label: 'Academic Papers' },
-                { value: '100+', label: 'Fieldwork Reach' },
-              ].map(({ value, label }) => (
-                <div key={label}>
-                  <p style={{ fontSize: '1.65rem', fontWeight: 800, color: 'var(--fg)', lineHeight: 1, letterSpacing: '-0.03em' }}>
-                    {value}
-                  </p>
-                  <p className="mono" style={{ fontSize: '0.725rem', color: 'var(--fg-muted)', marginTop: '0.35rem' }}>
-                    {label}
-                  </p>
+                { value: '20+', label: 'Events Organized', icon: Calendar, sublabel: 'Youth & Academic' },
+                { value: '2', label: 'Academic Papers', icon: FileText, sublabel: 'Published / Review' },
+                { value: '100+', label: 'Fieldwork Reach', icon: Users, sublabel: 'Char Communities' },
+              ].map(({ value, label, icon: Icon, sublabel }) => (
+                <div
+                  key={label}
+                  className="bezel-card"
+                  style={{
+                    borderRadius: '16px',
+                  }}
+                >
+                  <div
+                    className="bezel-core"
+                    style={{
+                      padding: '0.85rem 1rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.3rem',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.15rem' }}>
+                      <p
+                        style={{
+                          fontSize: '1.65rem',
+                          fontWeight: 800,
+                          color: 'var(--fg)',
+                          lineHeight: 1,
+                          letterSpacing: '-0.035em',
+                          margin: 0,
+                        }}
+                      >
+                        {value}
+                      </p>
+                      <div
+                        style={{
+                          width: '26px',
+                          height: '26px',
+                          borderRadius: '8px',
+                          backgroundColor: 'var(--accent-subtle)',
+                          color: 'var(--accent)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <Icon size={13} strokeWidth={1.8} />
+                      </div>
+                    </div>
+
+                    <div>
+                      <p
+                        style={{
+                          fontSize: '0.825rem',
+                          fontWeight: 700,
+                          color: 'var(--fg)',
+                          letterSpacing: '-0.01em',
+                          margin: 0,
+                          lineHeight: 1.3,
+                        }}
+                      >
+                        {label}
+                      </p>
+
+                      <p
+                        style={{
+                          fontSize: '0.7rem',
+                          fontWeight: 500,
+                          color: 'var(--fg-muted)',
+                          marginTop: '0.15rem',
+                          marginBottom: 0,
+                        }}
+                      >
+                        {sublabel}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -305,7 +370,24 @@ export function ContactSection() {
         </div>
 
       </div>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .contact-stats-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 0.75rem;
+          padding-top: 1.75rem;
+          border-top: 1px solid var(--border);
+        }
+
+        @media (min-width: 540px) {
+          .contact-stats-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.85rem;
+          }
+        }
+      `}</style>
     </section>
   );
 }

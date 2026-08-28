@@ -3,7 +3,7 @@ import {
   Users, 
   HeartHandshake, 
   FileText, 
-  Sparkles, 
+  GraduationCap, 
   Sun, 
   Award, 
   Building, 
@@ -112,7 +112,7 @@ export function getAchievementDetails(text: string, index: number): AchievementD
         'Coordinated keynote industry experts and corporate trainers',
         'Managed student engagement, registration pipelines, and venue operations'
       ],
-      icon: Sparkles,
+      icon: GraduationCap,
     };
   }
 

@@ -14,7 +14,7 @@ import {
   CheckCircle2, 
   Share2, 
   Check, 
-  Sparkles,
+  Compass,
   ArrowUpRight
 } from 'lucide-react';
 import { SectionBadge } from '@/components/ui/SectionBadge';
@@ -93,44 +93,65 @@ export default function AchievementDetailPage({ params }: PageProps) {
       
       {/* Top Breadcrumbs & Action Bar */}
       <header className="border-b border-[var(--border)] bg-[var(--bg-card)]/80 backdrop-blur-md sticky top-0 z-40">
-        <div className="container" style={{ padding: '0.85rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+        <div className="container" style={{ padding: '0.65rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'nowrap', gap: '0.5rem' }}>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          {/* Left Navigation & Counter */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0 }}>
             <Link
               href="/#achievements"
               className="btn btn-secondary"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.825rem', padding: '0.4rem 0.85rem', height: '36px' }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                fontSize: '0.8rem',
+                padding: '0.35rem 0.65rem',
+                height: '34px',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+              }}
             >
-              <ChevronLeft size={16} strokeWidth={2} />
-              <span>Back to Portfolio</span>
+              <ChevronLeft size={15} strokeWidth={2} />
+              <span>Back<span className="hidden sm:inline"> to Portfolio</span></span>
             </Link>
 
             <span
               style={{
-                fontSize: '0.785rem',
+                fontSize: '0.75rem',
                 fontWeight: 600,
                 color: 'var(--fg-muted)',
-                padding: '0.3rem 0.75rem',
+                padding: '0.25rem 0.6rem',
                 borderRadius: 'var(--radius-pill)',
                 backgroundColor: 'var(--bg-elevated)',
                 border: '1px solid var(--border)',
                 display: 'inline-flex',
                 alignItems: 'center',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
               }}
             >
-              Milestone {currentIndex + 1} of {achievements.length || 1}
+              <span className="hidden md:inline">Milestone </span>
+              <span>{currentIndex + 1} of {achievements.length || 1}</span>
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          {/* Right Action Controls */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
             <button
               onClick={handleShare}
               className="btn btn-secondary"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', padding: '0.4rem 0.75rem', height: '36px' }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                fontSize: '0.785rem',
+                padding: '0.35rem 0.6rem',
+                height: '34px',
+              }}
               title="Copy share link"
             >
-              {copied ? <Check size={14} className="text-emerald-500" /> : <Share2 size={14} />}
-              <span>{copied ? 'Link Copied' : 'Share'}</span>
+              {copied ? <Check size={13} className="text-emerald-500" /> : <Share2 size={13} />}
+              <span className="hidden sm:inline">{copied ? 'Copied' : 'Share'}</span>
             </button>
 
             <button
@@ -138,9 +159,9 @@ export default function AchievementDetailPage({ params }: PageProps) {
               disabled={achievements.length <= 1}
               aria-label="Previous Milestone"
               className="btn btn-secondary"
-              style={{ padding: '0.4rem', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              style={{ padding: '0.35rem', width: '34px', height: '34px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              <ChevronLeft size={16} />
+              <ChevronLeft size={15} strokeWidth={2} />
             </button>
 
             <button
@@ -148,9 +169,9 @@ export default function AchievementDetailPage({ params }: PageProps) {
               disabled={achievements.length <= 1}
               aria-label="Next Milestone"
               className="btn btn-secondary"
-              style={{ padding: '0.4rem', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              style={{ padding: '0.35rem', width: '34px', height: '34px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              <ChevronRight size={16} />
+              <ChevronRight size={15} strokeWidth={2} />
             </button>
           </div>
 
@@ -459,7 +480,7 @@ export default function AchievementDetailPage({ params }: PageProps) {
               <div className="bezel-card">
                 <div className="bezel-core" style={{ padding: '1.75rem' }}>
                   <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--fg)', marginBottom: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Sparkles size={16} className="text-[var(--accent)]" />
+                    <Compass size={16} className="text-[var(--accent)]" />
                     <span>Field Overview & Context</span>
                   </h2>
                   <p style={{ fontSize: '0.95rem', lineHeight: 1.75, color: 'var(--fg-muted)', margin: 0 }}>
@@ -521,35 +542,28 @@ export default function AchievementDetailPage({ params }: PageProps) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                flexWrap: 'wrap',
+                width: '100%',
                 gap: '1rem',
               }}
             >
               <button
                 onClick={handlePrev}
                 className="btn btn-secondary"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.65rem 1.25rem' }}
+                aria-label="Previous Milestone"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', padding: '0.55rem 1.1rem', fontSize: '0.85rem' }}
               >
-                <ChevronLeft size={16} />
-                <span>Previous Milestone</span>
+                <ChevronLeft size={16} strokeWidth={2} />
+                <span>Previous</span>
               </button>
-
-              <Link
-                href="/#achievements"
-                className="btn btn-primary"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.65rem 1.5rem' }}
-              >
-                <span>View All Achievements</span>
-                <ArrowUpRight size={15} />
-              </Link>
 
               <button
                 onClick={handleNext}
                 className="btn btn-secondary"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.65rem 1.25rem' }}
+                aria-label="Next Milestone"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', padding: '0.55rem 1.1rem', fontSize: '0.85rem' }}
               >
-                <span>Next Milestone</span>
-                <ChevronRight size={16} />
+                <span>Next</span>
+                <ChevronRight size={16} strokeWidth={2} />
               </button>
             </div>
 

@@ -17,61 +17,63 @@ function ExperienceItem({ exp }: { exp: Experience }) {
   const isHighlighted = isInView || exp.isCurrent;
 
   return (
-    <div ref={itemRef} style={{ position: 'relative' }}>
-      {/* Concentric Double Circle Milestone Node (24px outer, 10px inner) */}
+    <div ref={itemRef} className="timeline-item-wrapper">
+      {/* Concentric Double Circle Milestone Node */}
       <div
+        className={`timeline-node ${isHighlighted ? 'timeline-node-active' : ''}`}
         style={{
-          position: 'absolute',
-          left: '-2.75rem',
-          top: '24px',
-          width: '24px',
-          height: '24px',
-          borderRadius: '50%',
-          backgroundColor: 'var(--bg)',
           border: isHighlighted ? '2px solid var(--accent)' : '2px solid var(--border-strong)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 2,
-          transition: 'border-color 0.25s ease',
         }}
       >
         <div
+          className="timeline-node-inner"
           style={{
-            width: '10px',
-            height: '10px',
-            borderRadius: '50%',
             backgroundColor: isHighlighted ? 'var(--accent)' : 'var(--border-strong)',
-            transition: 'background-color 0.25s ease',
           }}
         />
       </div>
 
       {/* Experience Card */}
-      <div className="bezel-card bezel-card-interactive">
+      <div className="bezel-card bezel-card-interactive" style={{ width: '100%', minWidth: 0 }}>
         <div className="bezel-core">
           
-          {/* Role Header */}
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              flexWrap: 'wrap',
-              gap: '0.85rem',
-              marginBottom: '1.25rem',
-              paddingBottom: '0.85rem',
-              borderBottom: '1px solid var(--border)',
-            }}
-          >
-            <div>
+          {/* Responsive Role Header */}
+          <div className="experience-card-header">
+            <div className="experience-header-meta">
+              {exp.isCurrent && (
+                <span className="badge badge-primary" style={{ fontSize: '0.7rem' }}>
+                  <CheckCircle2 size={11} strokeWidth={2} /> Current Role
+                </span>
+              )}
+              <span
+                style={{
+                  fontSize: '0.75rem',
+                  fontWeight: 500,
+                  color: 'var(--fg-muted)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  padding: '0.25rem 0.6rem',
+                  borderRadius: 'var(--radius-pill)',
+                  backgroundColor: 'var(--bg-elevated)',
+                  border: '1px solid var(--border)',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <Calendar size={11} strokeWidth={1.8} style={{ color: 'var(--accent)' }} />
+                <span>{exp.startDate} – {exp.isCurrent ? 'Present' : exp.endDate}</span>
+              </span>
+            </div>
+
+            <div style={{ minWidth: 0, flex: 1 }}>
               <h3
                 style={{
-                  fontSize: '1.15rem',
+                  fontSize: 'clamp(1.05rem, 2.5vw, 1.2rem)',
                   fontWeight: 700,
                   color: 'var(--fg)',
-                  marginBottom: '0.25rem',
+                  marginBottom: '0.35rem',
                   letterSpacing: '-0.015em',
+                  lineHeight: 1.3,
                 }}
               >
                 {exp.title}
@@ -83,37 +85,14 @@ function ExperienceItem({ exp }: { exp: Experience }) {
                   gap: '0.45rem',
                   color: 'var(--accent)',
                   fontWeight: 600,
-                  fontSize: '0.9rem',
+                  fontSize: '0.875rem',
+                  lineHeight: 1.4,
+                  margin: 0,
                 }}
               >
-                <Building size={15} strokeWidth={1.75} />
+                <Building size={14} strokeWidth={1.75} style={{ flexShrink: 0 }} />
                 <span>{exp.organization}</span>
               </p>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
-              {exp.isCurrent && (
-                <span className="badge badge-primary" style={{ fontSize: '0.725rem' }}>
-                  <CheckCircle2 size={11} strokeWidth={2} /> Current Role
-                </span>
-              )}
-              <span
-                style={{
-                  fontSize: '0.785rem',
-                  fontWeight: 500,
-                  color: 'var(--fg-muted)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  padding: '0.25rem 0.65rem',
-                  borderRadius: 'var(--radius-pill)',
-                  backgroundColor: 'var(--bg-elevated)',
-                  border: '1px solid var(--border)',
-                }}
-              >
-                <Calendar size={12} strokeWidth={1.8} style={{ color: 'var(--accent)' }} />
-                <span>{exp.startDate} – {exp.isCurrent ? 'Present' : exp.endDate}</span>
-              </span>
             </div>
           </div>
 
@@ -135,10 +114,10 @@ function ExperienceItem({ exp }: { exp: Experience }) {
                   style={{
                     display: 'flex',
                     alignItems: 'flex-start',
-                    gap: '0.75rem',
-                    fontSize: '0.885rem',
+                    gap: '0.65rem',
+                    fontSize: '0.875rem',
                     color: 'var(--fg-muted)',
-                    lineHeight: 1.65,
+                    lineHeight: 1.6,
                   }}
                 >
                   <span
@@ -158,7 +137,7 @@ function ExperienceItem({ exp }: { exp: Experience }) {
                   >
                     <ChevronRight size={11} strokeWidth={2.5} />
                   </span>
-                  <span style={{ flex: 1, color: 'var(--fg-muted)' }}>{bullet}</span>
+                  <span style={{ flex: 1 }}>{bullet}</span>
                 </li>
               ))}
             </ul>
@@ -193,38 +172,16 @@ export function ExperienceSection({ experience = [], isLoading }: ExperienceSect
           </p>
         </div>
 
-        {/* Lag-Free Scroll-Follow Timeline */}
-        <div
-          ref={containerRef}
-          style={{
-            position: 'relative',
-            paddingLeft: '2.75rem',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1.75rem',
-          }}
-        >
+        {/* Lag-Free Responsive Scroll-Follow Timeline */}
+        <div ref={containerRef} className="timeline-container">
+          
           {/* Static Background Vertical Track Line */}
-          <div
-            style={{
-              position: 'absolute',
-              left: '11px',
-              top: '36px',
-              bottom: '40px',
-              width: '2px',
-              backgroundColor: 'var(--border)',
-            }}
-          />
+          <div className="timeline-track-static" />
 
           {/* Crisp Scroll-Follow Progress Line (No Glow) */}
           <motion.div
+            className="timeline-track-progress"
             style={{
-              position: 'absolute',
-              left: '11px',
-              top: '36px',
-              bottom: '40px',
-              width: '2px',
-              backgroundColor: 'var(--accent)',
               scaleY: scrollYProgress,
               transformOrigin: 'top',
               willChange: 'transform',
@@ -233,8 +190,8 @@ export function ExperienceSection({ experience = [], isLoading }: ExperienceSect
 
           {isLoading ? (
             Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} style={{ position: 'relative' }}>
-                <div className="skeleton" style={{ height: '150px', borderRadius: 'var(--radius-outer)' }} />
+              <div key={i} className="timeline-item-wrapper">
+                <div className="skeleton" style={{ height: '150px', borderRadius: 'var(--radius-outer)', width: '100%' }} />
               </div>
             ))
           ) : (
@@ -247,21 +204,116 @@ export function ExperienceSection({ experience = [], isLoading }: ExperienceSect
       </div>
 
       <style>{`
+        .timeline-container {
+          position: relative;
+          padding-left: 2.75rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.75rem;
+          width: 100%;
+        }
+
+        .timeline-item-wrapper {
+          position: relative;
+          width: 100%;
+        }
+
+        .timeline-track-static {
+          position: absolute;
+          left: 9px;
+          top: 34px;
+          bottom: 40px;
+          width: 2px;
+          background-color: var(--border);
+          border-radius: 2px;
+        }
+
+        .timeline-track-progress {
+          position: absolute;
+          left: 9px;
+          top: 34px;
+          bottom: 40px;
+          width: 2px;
+          background-color: var(--accent);
+          border-radius: 2px;
+        }
+
+        .timeline-node {
+          position: absolute;
+          left: -2.75rem;
+          top: 24px;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background-color: var(--bg);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 2;
+          transition: border-color 0.25s ease;
+        }
+
+        .timeline-node-inner {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          transition: background-color 0.25s ease;
+        }
+
+        .experience-card-header {
+          display: flex;
+          flex-direction: column-reverse;
+          gap: 0.65rem;
+          margin-bottom: 1rem;
+          padding-bottom: 0.85rem;
+          border-bottom: 1px solid var(--border);
+        }
+
+        .experience-header-meta {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+        }
+
+        @media (min-width: 640px) {
+          .experience-card-header {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+          }
+          .experience-card-header > div:last-child {
+            order: 1;
+          }
+          .experience-header-meta {
+            order: 2;
+          }
+        }
+
         @media (max-width: 640px) {
-          div[style*="padding-left: 2.75rem"] {
-            padding-left: 2rem !important;
+          .timeline-container {
+            padding-left: 2rem;
+            gap: 1.25rem;
           }
-          div[style*="left: 11px"] {
-            left: 8px !important;
+
+          .timeline-track-static,
+          .timeline-track-progress {
+            left: 7px;
+            top: 28px;
+            bottom: 30px;
           }
-          div[style*="left: -2.75rem"] {
-            left: -2rem !important;
-            width: 18px !important;
-            height: 18px !important;
+
+          .timeline-node {
+            left: -2rem;
+            top: 20px;
+            width: 16px;
+            height: 16px;
           }
-          div[style*="left: -2.75rem"] > div {
-            width: 8px !important;
-            height: 8px !important;
+
+          .timeline-node-inner {
+            width: 6px;
+            height: 6px;
           }
         }
       `}</style>

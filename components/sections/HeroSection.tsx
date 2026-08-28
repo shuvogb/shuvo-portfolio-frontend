@@ -19,8 +19,8 @@ function Portrait3DCard({ avatarSrc, name }: { avatarSrc: string; name?: string 
   const mouseXSpring = useSpring(x, { stiffness: 240, damping: 22 });
   const mouseYSpring = useSpring(y, { stiffness: 240, damping: 22 });
 
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ['10deg', '-10deg']);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ['-10deg', '10deg']);
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ['8deg', '-8deg']);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ['-8deg', '8deg']);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
@@ -37,50 +37,169 @@ function Portrait3DCard({ avatarSrc, name }: { avatarSrc: string; name?: string 
   };
 
   return (
-    <div style={{ perspective: '1200px', width: '100%', maxWidth: '320px' }}>
+    <div style={{ perspective: '1200px', width: '100%', maxWidth: '360px', position: 'relative' }}>
+      
+      {/* Floating Stat Badge 1 - Top Left */}
       <motion.div
-        ref={cardRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
+        animate={{ y: [0, -10, 0] }}
+        transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut' }}
         style={{
-          rotateX,
-          rotateY,
-          transformStyle: 'preserve-3d',
+          position: 'absolute',
+          top: '-18px',
+          left: '-20px',
+          zIndex: 10,
         }}
-        whileHover={{ scale: 1.03 }}
-        transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-        className="bezel-card portrait-3d-card"
+        className="hidden sm:block"
       >
         <div
-          className="bezel-core"
+          className="bezel-card"
           style={{
-            padding: '6px',
-            borderRadius: '18px',
-            overflow: 'hidden',
-            position: 'relative',
-            transform: 'translateZ(20px)',
+            borderRadius: '16px',
+            boxShadow: '0 12px 30px -8px rgba(0, 0, 0, 0.18)',
           }}
         >
           <div
+            className="bezel-core"
             style={{
-              width: '100%',
-              aspectRatio: '1 / 1.15',
-              borderRadius: '14px',
-              overflow: 'hidden',
-              position: 'relative',
+              padding: '0.65rem 0.95rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.65rem',
+              backgroundColor: 'var(--bg-card)',
             }}
           >
-            <img
-              src={avatarSrc}
-              alt={name || 'Shuvo Molla'}
+            <div
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '9px',
+                backgroundColor: 'var(--accent-subtle)',
+                color: 'var(--accent)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <FileText size={15} strokeWidth={1.8} />
+            </div>
+            <div>
+              <p style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--fg)', lineHeight: 1, margin: 0 }}>
+                2 Papers
+              </p>
+              <p style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--fg-muted)', margin: 0, marginTop: '2px' }}>
+                Published & Indexed
+              </p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Main 3D Tilt Portrait Card with subtle floating motion */}
+      <motion.div
+        animate={{ y: [0, -6, 0] }}
+        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        <motion.div
+          ref={cardRef}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          style={{
+            rotateX,
+            rotateY,
+            transformStyle: 'preserve-3d',
+          }}
+          whileHover={{ scale: 1.02 }}
+          transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+          className="bezel-card portrait-3d-card"
+        >
+          <div
+            className="bezel-core"
+            style={{
+              padding: '6px',
+              borderRadius: '18px',
+              overflow: 'hidden',
+              position: 'relative',
+              transform: 'translateZ(20px)',
+            }}
+          >
+            <div
               style={{
                 width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                objectPosition: 'center 20%',
-                display: 'block',
+                aspectRatio: '1 / 1.15',
+                borderRadius: '14px',
+                overflow: 'hidden',
+                position: 'relative',
               }}
-            />
+            >
+              <img
+                src={avatarSrc}
+                alt={name || 'Shuvo Molla'}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: 'center 20%',
+                  display: 'block',
+                }}
+              />
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+
+      {/* Floating Stat Badge 2 - Bottom Right */}
+      <motion.div
+        animate={{ y: [0, 10, 0] }}
+        transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
+        style={{
+          position: 'absolute',
+          bottom: '-16px',
+          right: '-20px',
+          zIndex: 10,
+        }}
+        className="hidden sm:block"
+      >
+        <div
+          className="bezel-card"
+          style={{
+            borderRadius: '16px',
+            boxShadow: '0 12px 30px -8px rgba(0, 0, 0, 0.18)',
+          }}
+        >
+          <div
+            className="bezel-core"
+            style={{
+              padding: '0.65rem 0.95rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.65rem',
+              backgroundColor: 'var(--bg-card)',
+            }}
+          >
+            <div
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '9px',
+                backgroundColor: 'var(--accent-subtle)',
+                color: 'var(--accent)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <Calendar size={15} strokeWidth={1.8} />
+            </div>
+            <div>
+              <p style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--fg)', lineHeight: 1, margin: 0 }}>
+                20+ Events
+              </p>
+              <p style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--fg-muted)', margin: 0, marginTop: '2px' }}>
+                Organized & Coordinated
+              </p>
+            </div>
           </div>
         </div>
       </motion.div>
@@ -112,6 +231,12 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
   };
 
   const avatarSrc = profile?.avatarUrl || '/images/shuvo.png';
+
+  const statsList = [
+    { value: '20+', label: 'Events Organized', icon: Calendar, sublabel: 'Youth & Academic', duration: 4.2, delay: 0 },
+    { value: '2', label: 'Academic Papers', icon: FileText, sublabel: 'Published / Review', duration: 3.8, delay: 0.4 },
+    { value: '100+', label: 'Fieldwork Reach', icon: Users, sublabel: 'Char Communities', duration: 4.6, delay: 0.8 },
+  ];
 
   return (
     <section
@@ -161,24 +286,31 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
               )}
             </h1>
 
-            {/* Sub-Headline */}
-            <p
+            {/* Subtitle / Focus */}
+            <h2
               style={{
-                fontSize: 'clamp(1.1rem, 2vw, 1.25rem)',
-                fontWeight: 600,
+                fontSize: 'clamp(1.15rem, 2.2vw, 1.35rem)',
+                fontWeight: 700,
                 color: 'var(--accent)',
-                lineHeight: 1.4,
+                letterSpacing: '-0.015em',
                 marginBottom: '1.25rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.65rem',
               }}
             >
-              Sociology & Social Work Researcher
-            </p>
+              {isLoading ? (
+                <span className="skeleton" style={{ display: 'block', height: '24px', width: '280px' }} />
+              ) : (
+                profile?.headline || 'Sociology & Social Work Researcher'
+              )}
+            </h2>
 
-            {/* Concise Summary */}
+            {/* Bio summary */}
             <p
               style={{
                 fontSize: '1rem',
-                lineHeight: 1.8,
+                lineHeight: 1.7,
                 color: 'var(--fg-muted)',
                 marginBottom: '2rem',
                 maxWidth: '520px',
@@ -186,7 +318,7 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
             >
               {isLoading ? (
                 <>
-                  <span className="skeleton" style={{ display: 'block', height: '16px', marginBottom: '8px' }} />
+                  <span className="skeleton" style={{ display: 'block', height: '16px', width: '100%', marginBottom: '0.5rem' }} />
                   <span className="skeleton" style={{ display: 'block', height: '16px', width: '75%' }} />
                 </>
               ) : (
@@ -219,24 +351,13 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
               </button>
             </div>
 
-            {/* Structured Metric Badges */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '1rem',
-                marginTop: '2.5rem',
-                paddingTop: '1.75rem',
-                borderTop: '1px solid var(--border)',
-              }}
-            >
-              {[
-                { value: '20+', label: 'Events Organized', icon: Calendar, sublabel: 'Youth & Academic' },
-                { value: '2', label: 'Academic Papers', icon: FileText, sublabel: 'Published / Review' },
-                { value: '100+', label: 'Fieldwork Reach', icon: Users, sublabel: 'Char Communities' },
-              ].map(({ value, label, icon: Icon, sublabel }) => (
-                <div
+            {/* Structured Metric Badges with Smooth Floating Motion */}
+            <div className="hero-stats-grid">
+              {statsList.map(({ value, label, icon: Icon, sublabel, duration, delay }) => (
+                <motion.div
                   key={label}
+                  animate={{ y: [0, -6, 0] }}
+                  transition={{ duration, repeat: Infinity, ease: 'easeInOut', delay }}
                   className="bezel-card"
                   style={{
                     borderRadius: '16px',
@@ -244,12 +365,9 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
                   }}
                 >
                   <div
-                    className="bezel-core"
+                    className="bezel-core stat-card-inner"
                     style={{
                       padding: '1rem 1.15rem',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '0.35rem',
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
@@ -281,36 +399,39 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
                       </div>
                     </div>
 
-                    <p
-                      style={{
-                        fontSize: '0.825rem',
-                        fontWeight: 700,
-                        color: 'var(--fg)',
-                        letterSpacing: '-0.01em',
-                        margin: 0,
-                        lineHeight: 1.25,
-                      }}
-                    >
-                      {label}
-                    </p>
+                    <div>
+                      <p
+                        style={{
+                          fontSize: '0.85rem',
+                          fontWeight: 700,
+                          color: 'var(--fg)',
+                          letterSpacing: '-0.01em',
+                          margin: 0,
+                          lineHeight: 1.3,
+                        }}
+                      >
+                        {label}
+                      </p>
 
-                    <p
-                      style={{
-                        fontSize: '0.725rem',
-                        fontWeight: 500,
-                        color: 'var(--fg-muted)',
-                        margin: 0,
-                      }}
-                    >
-                      {sublabel}
-                    </p>
+                      <p
+                        style={{
+                          fontSize: '0.725rem',
+                          fontWeight: 500,
+                          color: 'var(--fg-muted)',
+                          marginTop: '0.15rem',
+                          marginBottom: 0,
+                        }}
+                      >
+                        {sublabel}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </motion.div>
 
-          {/* Right Column: Interactive 3D Parallax Tilt Portrait Showcase */}
+          {/* Right Column: Interactive 3D Parallax Tilt Portrait Showcase with Floating Badges */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -322,6 +443,24 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
 
         </div>
       </div>
+
+      <style>{`
+        .hero-stats-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 0.75rem;
+          margin-top: 2.5rem;
+          padding-top: 1.75rem;
+          border-top: 1px solid var(--border);
+        }
+
+        @media (min-width: 540px) {
+          .hero-stats-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+          }
+        }
+      `}</style>
     </section>
   );
 }

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { SectionBadge } from '@/components/ui/SectionBadge';
 import type { Publication } from '@/types/portfolio';
-import { Check, Copy, ExternalLink, FlaskConical } from 'lucide-react';
+import { Check, Copy, ExternalLink, FlaskConical, BookOpen, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ResearchSectionProps {
@@ -42,37 +42,134 @@ export function ResearchSection({ publications = [], isLoading }: ResearchSectio
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {isLoading
             ? Array.from({ length: 2 }).map((_, i) => (
-              <div key={i} className="skeleton" style={{ height: '160px' }} />
-            ))
+                <div key={i} className="bezel-card">
+                  <div className="bezel-core" style={{ padding: '1.5rem' }}>
+                    <div className="skeleton" style={{ height: '24px', width: '35%', marginBottom: '1rem' }} />
+                    <div className="skeleton" style={{ height: '32px', width: '85%', marginBottom: '0.75rem' }} />
+                    <div className="skeleton" style={{ height: '20px', width: '50%' }} />
+                  </div>
+                </div>
+              ))
             : publications.map((pub) => {
-              const isPublished = pub.status === 'published';
-              const isCopied = copiedId === pub._id;
+                const isPublished = pub.status === 'published';
+                const isCopied = copiedId === pub._id;
 
-              return (
-                <article key={pub._id} className="bezel-card">
-                  <div className="bezel-core">
+                return (
+                  <article key={pub._id} className="bezel-card">
+                    <div className="bezel-core" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
-                    {/* Top Meta Bar */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '0.85rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                        <span className={`badge ${isPublished ? 'badge-primary' : ''}`}>
-                          {isPublished ? 'Published & Indexed' : pub.status === 'underReview' ? 'Manuscript Under Review' : 'Research Assistant'}
-                        </span>
-                        <span className="mono" style={{ fontSize: '0.8rem', color: 'var(--fg-muted)' }}>
-                          {pub.year}
-                        </span>
+                      {/* Top Status & Meta Pill Row */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.65rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                          <span className={`badge ${isPublished ? 'badge-primary' : ''}`} style={{ fontSize: '0.725rem' }}>
+                            {isPublished ? 'Published & Indexed' : pub.status === 'underReview' ? 'Manuscript Under Review' : 'Research Assistant'}
+                          </span>
+
+                          <span
+                            style={{
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              color: 'var(--fg-muted)',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.3rem',
+                              padding: '0.2rem 0.55rem',
+                              borderRadius: 'var(--radius-pill)',
+                              backgroundColor: 'var(--bg-elevated)',
+                              border: '1px solid var(--border)',
+                            }}
+                          >
+                            <Calendar size={11} strokeWidth={1.8} style={{ color: 'var(--accent)' }} />
+                            <span>{pub.year}</span>
+                          </span>
+                        </div>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      {/* Paper Title */}
+                      <h3
+                        style={{
+                          fontSize: 'clamp(1.05rem, 2.5vw, 1.25rem)',
+                          lineHeight: 1.4,
+                          fontWeight: 700,
+                          color: 'var(--fg)',
+                          margin: 0,
+                          letterSpacing: '-0.015em',
+                        }}
+                      >
+                        {pub.title}
+                      </h3>
+
+                      {/* Authors & Journal Source */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--fg-muted)', margin: 0 }}>
+                          <span style={{ fontWeight: 600, color: 'var(--fg)' }}>Authors: </span>
+                          {pub.authors.join(', ')}
+                        </p>
+
+                        <p
+                          style={{
+                            fontSize: '0.85rem',
+                            color: 'var(--accent)',
+                            fontWeight: 600,
+                            margin: 0,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.35rem',
+                            flexWrap: 'wrap',
+                          }}
+                        >
+                          <BookOpen size={13} strokeWidth={1.75} style={{ flexShrink: 0 }} />
+                          <span>
+                            {pub.source}
+                            {pub.volume && `, ${pub.volume}`}
+                            {pub.pages && `, pp. ${pub.pages}`}
+                          </span>
+                        </p>
+                      </div>
+
+                      {pub.description && (
+                        <p
+                          style={{
+                            fontSize: '0.875rem',
+                            color: 'var(--fg-muted)',
+                            lineHeight: 1.65,
+                            margin: 0,
+                            paddingTop: '0.75rem',
+                            borderTop: '1px solid var(--border)',
+                          }}
+                        >
+                          {pub.description}
+                        </p>
+                      )}
+
+                      {/* Dedicated Card Footer Action Bar */}
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'flex-start',
+                          flexWrap: 'wrap',
+                          gap: '0.65rem',
+                          paddingTop: '0.85rem',
+                          borderTop: '1px solid var(--border)',
+                        }}
+                      >
                         <button
                           onClick={() => copyCitation(pub)}
                           className="btn btn-secondary"
-                          style={{ padding: '0.35rem 0.75rem', fontSize: '0.775rem' }}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.45rem',
+                            padding: '0.45rem 0.95rem',
+                            fontSize: '0.8rem',
+                            borderRadius: 'var(--radius-pill)',
+                          }}
                           title="Copy APA Citation"
                           aria-label="Copy APA Citation"
                         >
-                          {isCopied ? <Check size={13} style={{ color: 'var(--accent)' }} /> : <Copy size={13} />}
-                          {isCopied ? 'Copied' : 'Cite APA'}
+                          {isCopied ? <Check size={13} className="text-emerald-500" /> : <Copy size={13} />}
+                          <span>{isCopied ? 'Citation Copied' : 'Cite APA'}</span>
                         </button>
 
                         {pub.link && (
@@ -80,46 +177,26 @@ export function ResearchSection({ publications = [], isLoading }: ResearchSectio
                             href={pub.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="btn btn-island-primary"
-                            style={{ padding: '0.35rem 0.4rem 0.35rem 0.85rem', fontSize: '0.775rem' }}
+                            className="btn btn-primary"
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.45rem',
+                              padding: '0.45rem 1rem',
+                              fontSize: '0.8rem',
+                              borderRadius: 'var(--radius-pill)',
+                            }}
                           >
                             <span>Read Paper</span>
-                            <span className="btn-island-icon" style={{ width: '22px', height: '22px' }}>
-                              <ExternalLink size={11} />
-                            </span>
+                            <ExternalLink size={13} strokeWidth={2} />
                           </a>
                         )}
                       </div>
+
                     </div>
-
-                    {/* Paper Title */}
-                    <h3 style={{ fontSize: '1.2rem', lineHeight: 1.45, marginBottom: '0.5rem', color: 'var(--fg)' }}>
-                      {pub.title}
-                    </h3>
-
-                    {/* Authors */}
-                    <p style={{ fontSize: '0.875rem', color: 'var(--fg-muted)', marginBottom: '0.4rem' }}>
-                      <span style={{ fontWeight: 600, color: 'var(--fg)' }}>Authors: </span>
-                      {pub.authors.join(', ')}
-                    </p>
-
-                    {/* Source */}
-                    <p style={{ fontSize: '0.85rem', color: 'var(--accent)', fontWeight: 600 }}>
-                      {pub.source}
-                      {pub.volume && `, ${pub.volume}`}
-                      {pub.pages && `, pp. ${pub.pages}`}
-                    </p>
-
-                    {pub.description && (
-                      <p style={{ fontSize: '0.875rem', color: 'var(--fg-muted)', marginTop: '0.85rem', lineHeight: 1.75, paddingTop: '0.85rem', borderTop: '1px solid var(--border)' }}>
-                        {pub.description}
-                      </p>
-                    )}
-
-                  </div>
-                </article>
-              );
-            })}
+                  </article>
+                );
+              })}
         </div>
 
       </div>

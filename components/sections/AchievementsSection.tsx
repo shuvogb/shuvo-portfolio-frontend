@@ -86,16 +86,7 @@ export function AchievementsSection({ achievements = [], isLoading }: Achievemen
                           <img
                             src={details.images[0]}
                             alt={details.category}
-                            style={{
-                              width: '100%',
-                              height: '100%',
-                              objectFit: 'cover',
-                              transition: 'transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)',
-                              willChange: 'transform',
-                              transform: 'translateZ(0)',
-                              backfaceVisibility: 'hidden',
-                            }}
-                            className="group-hover:scale-105"
+                            className="achievement-card-img"
                             loading="lazy"
                           />
 
@@ -207,6 +198,22 @@ export function AchievementsSection({ achievements = [], isLoading }: Achievemen
         </div>
 
       </div>
+
+      <style>{`
+        .achievement-card-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+          transform: scale(1) translateZ(0);
+          will-change: transform;
+          backface-visibility: hidden;
+        }
+
+        .bezel-card-interactive:hover .achievement-card-img {
+          transform: scale(1.06) translateZ(0);
+        }
+      `}</style>
     </section>
   );
 }
