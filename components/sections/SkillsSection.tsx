@@ -2,7 +2,25 @@
 
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Terminal, Users, Layers, BarChart3, FileSpreadsheet, Camera, Palette, Award, MessageSquare, Brain, CalendarCheck, Lightbulb, Compass, FileText, Presentation, Database, ClipboardList } from 'lucide-react';
+import {
+  Layers,
+  BarChart3,
+  FileSpreadsheet,
+  FileText,
+  Presentation,
+  Camera,
+  Palette,
+  Award,
+  MessageSquare,
+  Brain,
+  CalendarCheck,
+  Users,
+  Lightbulb,
+  Compass,
+  Database,
+  ClipboardList,
+  Terminal,
+} from 'lucide-react';
 import { SectionBadge } from '@/components/ui/SectionBadge';
 import type { Skill } from '@/types/portfolio';
 
@@ -13,30 +31,77 @@ interface SkillsSectionProps {
 
 function getSkillIcon(name: string, category: string) {
   const lower = name.toLowerCase();
-  if (lower.includes('excel')) return <FileSpreadsheet size={18} style={{ color: '#107c41' }} />;
-  if (lower.includes('word')) return <FileText size={18} style={{ color: '#2b579a' }} />;
-  if (lower.includes('powerpoint')) return <Presentation size={18} style={{ color: '#d24726' }} />;
-  if (lower.includes('canva') || lower.includes('design')) return <Palette size={18} style={{ color: '#00c4cc' }} />;
-  if (lower.includes('spss') || lower.includes('quantitative')) return <BarChart3 size={18} style={{ color: 'var(--accent)' }} />;
-  if (lower.includes('data collection') || lower.includes('survey')) return <ClipboardList size={18} style={{ color: 'var(--accent)' }} />;
-  if (lower.includes('research method') || lower.includes('social research')) return <Database size={18} style={{ color: 'var(--accent)' }} />;
-  if (lower.includes('photo') || lower.includes('media')) return <Camera size={18} />;
-  if (lower.includes('leader')) return <Award size={18} style={{ color: 'var(--accent)' }} />;
-  if (lower.includes('communicat')) return <MessageSquare size={18} />;
-  if (lower.includes('analytic') || lower.includes('think') || lower.includes('critical')) return <Brain size={18} />;
-  if (lower.includes('event') || lower.includes('planning')) return <CalendarCheck size={18} />;
-  if (lower.includes('creativ') || lower.includes('problem')) return <Lightbulb size={18} />;
-  if (lower.includes('team') || lower.includes('collab') || lower.includes('mentor')) return <Users size={18} />;
-  if (lower.includes('climate') || lower.includes('advocacy')) return <Compass size={18} style={{ color: 'var(--accent)' }} />;
-  return category === 'technical' ? <Terminal size={18} /> : <Compass size={18} />;
+
+  // Technical Skills (Outline icons)
+  if (lower.includes('spss') || lower.includes('quantitative')) {
+    return <BarChart3 size={19} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
+  }
+  if (lower.includes('excel')) {
+    return <FileSpreadsheet size={19} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
+  }
+  if (lower.includes('word')) {
+    return <FileText size={19} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
+  }
+  if (lower.includes('powerpoint')) {
+    return <Presentation size={19} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
+  }
+  if (lower.includes('canva') || lower.includes('visual design')) {
+    return <Palette size={19} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
+  }
+  if (lower.includes('research method') || lower.includes('social research')) {
+    return <Database size={19} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
+  }
+  if (lower.includes('data collection') || lower.includes('survey')) {
+    return <ClipboardList size={19} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
+  }
+  if (lower.includes('photo') || lower.includes('media')) {
+    return <Camera size={19} strokeWidth={1.75} style={{ color: 'var(--fg)' }} />;
+  }
+
+  // Professional Skills (Outline icons)
+  if (lower.includes('leader')) {
+    return <Award size={19} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
+  }
+  if (lower.includes('communicat')) {
+    return <MessageSquare size={19} strokeWidth={1.75} style={{ color: 'var(--fg)' }} />;
+  }
+  if (lower.includes('analytic') || lower.includes('think') || lower.includes('critical')) {
+    return <Brain size={19} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
+  }
+  if (lower.includes('event') || lower.includes('planning')) {
+    return <CalendarCheck size={19} strokeWidth={1.75} style={{ color: 'var(--fg)' }} />;
+  }
+  if (lower.includes('team') || lower.includes('collab') || lower.includes('mentor')) {
+    return <Users size={19} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
+  }
+  if (lower.includes('creativ') || lower.includes('problem')) {
+    return <Lightbulb size={19} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
+  }
+  if (lower.includes('climate') || lower.includes('advocacy') || lower.includes('youth')) {
+    return <Compass size={19} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />;
+  }
+
+  return category === 'technical' ? (
+    <Terminal size={19} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />
+  ) : (
+    <Compass size={19} strokeWidth={1.75} style={{ color: 'var(--accent)' }} />
+  );
 }
 
 export function SkillsSection({ skills = [], isLoading }: SkillsSectionProps) {
   const [activeTab, setActiveTab] = useState<'all' | 'technical' | 'professional'>('all');
 
   const filteredSkills = useMemo(() => {
-    return skills.filter((skill) => {
+    const list = skills.filter((skill) => {
       return activeTab === 'all' || skill.category === activeTab;
+    });
+
+    // Group Technical skills first, then Professional skills
+    return [...list].sort((a, b) => {
+      if (a.category !== b.category) {
+        return a.category === 'technical' ? -1 : 1;
+      }
+      return (a.order || 0) - (b.order || 0);
     });
   }, [skills, activeTab]);
 
@@ -46,11 +111,11 @@ export function SkillsSection({ skills = [], isLoading }: SkillsSectionProps) {
   return (
     <section id="skills" className="section" aria-label="Skills & Competencies">
       <div className="container">
-
+        
         {/* Header */}
         <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1.5rem' }}>
           <div>
-            <SectionBadge icon={<Layers size={13} />}>
+            <SectionBadge icon={<Layers size={13} strokeWidth={1.75} />}>
               Competencies & Methodologies
             </SectionBadge>
             <h2 className="section-title">Skills & Capabilities</h2>
@@ -59,7 +124,7 @@ export function SkillsSection({ skills = [], isLoading }: SkillsSectionProps) {
             </p>
           </div>
 
-          {/* Category Tabs */}
+          {/* Clean Tab Switcher */}
           <div
             style={{
               display: 'flex',
@@ -67,7 +132,7 @@ export function SkillsSection({ skills = [], isLoading }: SkillsSectionProps) {
               backgroundColor: 'var(--bg-elevated)',
               borderRadius: 'var(--radius-pill)',
               border: '1px solid var(--border)',
-              gap: '2px',
+              gap: '3px',
             }}
             role="tablist"
           >
@@ -75,56 +140,58 @@ export function SkillsSection({ skills = [], isLoading }: SkillsSectionProps) {
               { id: 'all', label: `All (${skills.length})` },
               { id: 'technical', label: `Technical (${technicalCount})` },
               { id: 'professional', label: `Professional (${professionalCount})` },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                role="tab"
-                aria-selected={activeTab === tab.id}
-                onClick={() => setActiveTab(tab.id as 'all' | 'technical' | 'professional')}
-                style={{
-                  padding: '0.45rem 0.95rem',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  borderRadius: 'var(--radius-pill)',
-                  border: 'none',
-                  cursor: 'pointer',
-                  backgroundColor: activeTab === tab.id ? 'var(--bg-surface)' : 'transparent',
-                  color: activeTab === tab.id ? 'var(--fg)' : 'var(--fg-muted)',
-                  boxShadow: activeTab === tab.id ? 'var(--shadow-sm)' : 'none',
-                  transition: 'all 0.2s var(--ease-spring)',
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
+            ].map((tab) => {
+              const isSelected = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  role="tab"
+                  aria-selected={isSelected}
+                  onClick={() => setActiveTab(tab.id as 'all' | 'technical' | 'professional')}
+                  style={{
+                    padding: '0.45rem 1rem',
+                    fontSize: '0.825rem',
+                    fontWeight: 600,
+                    borderRadius: 'var(--radius-pill)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    backgroundColor: isSelected ? 'var(--bg-surface)' : 'transparent',
+                    color: isSelected ? 'var(--fg)' : 'var(--fg-muted)',
+                    boxShadow: isSelected ? 'var(--shadow-sm)' : 'none',
+                    transition: 'background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease',
+                  }}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Skills Cards Grid */}
+        {/* 3-in-a-row Skills Grid with Bottom-to-Top Translation & Opacity Animation */}
         {isLoading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="skeleton" style={{ height: '76px' }} />
+          <div className="skills-grid-3">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <div key={i} className="skeleton" style={{ height: '80px' }} />
             ))}
           </div>
         ) : (
-          <motion.div
-            layout
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}
-          >
-            <AnimatePresence mode="popLayout">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+              className="skills-grid-3"
+            >
               {filteredSkills.map((skill) => {
                 const isTech = skill.category === 'technical';
                 const icon = getSkillIcon(skill.name, skill.category);
 
                 return (
-                  <motion.div
+                  <div
                     key={skill._id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.96 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.96 }}
-                    transition={{ duration: 0.2 }}
                     className="bezel-card bezel-card-interactive"
                   >
                     <div
@@ -132,44 +199,93 @@ export function SkillsSection({ skills = [], isLoading }: SkillsSectionProps) {
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '0.85rem',
-                        padding: '1rem 1.15rem',
+                        gap: '0.95rem',
+                        padding: '1.05rem 1.2rem',
                       }}
                     >
                       <div
                         style={{
                           width: '40px',
                           height: '40px',
-                          borderRadius: '10px',
+                          borderRadius: '11px',
                           backgroundColor: isTech ? 'var(--accent-subtle)' : 'var(--bg-elevated)',
-                          color: isTech ? 'var(--accent)' : 'var(--fg)',
                           border: isTech ? '1px solid var(--accent-border)' : '1px solid var(--border)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           flexShrink: 0,
+                          boxShadow: 'var(--shadow-sm)',
                         }}
                       >
                         {icon}
                       </div>
 
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--fg)', marginBottom: '0.15rem' }}>
+                        <p
+                          style={{
+                            fontSize: '0.925rem',
+                            fontWeight: 600,
+                            letterSpacing: '-0.015em',
+                            color: 'var(--fg)',
+                            marginBottom: '0.25rem',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            lineHeight: 1.3,
+                          }}
+                        >
                           {skill.name}
                         </p>
-                        <span className="mono" style={{ fontSize: '0.7rem', color: 'var(--fg-muted)', textTransform: 'capitalize' }}>
+                        <span
+                          style={{
+                            fontSize: '0.725rem',
+                            fontWeight: 600,
+                            letterSpacing: '0.01em',
+                            color: isTech ? 'var(--accent)' : 'var(--fg-muted)',
+                            textTransform: 'capitalize',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.35rem',
+                          }}
+                        >
+                          <span
+                            style={{
+                              width: '5px',
+                              height: '5px',
+                              borderRadius: '50%',
+                              backgroundColor: isTech ? 'var(--accent)' : 'var(--border-strong)',
+                            }}
+                          />
                           {skill.category}
                         </span>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 );
               })}
-            </AnimatePresence>
-          </motion.div>
+            </motion.div>
+          </AnimatePresence>
         )}
 
       </div>
+
+      <style>{`
+        .skills-grid-3 {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.25rem;
+        }
+        @media (max-width: 992px) {
+          .skills-grid-3 {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+        @media (max-width: 640px) {
+          .skills-grid-3 {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
     </section>
   );
 }

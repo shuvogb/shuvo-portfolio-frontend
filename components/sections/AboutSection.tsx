@@ -1,8 +1,7 @@
 'use client';
 
 import { MapPin, Mail, Phone, ExternalLink, ShieldCheck, User, FlaskConical, Users, Award, BookOpen, Compass, BarChart3, Globe, FileText, CheckCircle2, ArrowUpRight } from 'lucide-react';
-import { FaLinkedinIn, FaFacebookF } from 'react-icons/fa6';
-import { SiResearchgate, SiOrcid } from 'react-icons/si';
+import { FiLinkedin, FiFacebook } from 'react-icons/fi';
 import { SectionBadge } from '@/components/ui/SectionBadge';
 import type { Profile } from '@/types/portfolio';
 import { toast } from 'sonner';
@@ -146,7 +145,7 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
                   </div>
                 </div>
 
-                {/* Social Network Links with React Icons */}
+                {/* Social Network Links with Clean Outline Icons */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
                   <a
                     href={profile?.socialLinks?.linkedin || 'https://linkedin.com/in/shuvomolla'}
@@ -155,9 +154,9 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
                     className="btn btn-secondary"
                     style={{ flex: 1, minWidth: '110px', padding: '0.5rem 0.75rem', fontSize: '0.8rem', gap: '0.45rem', justifyContent: 'center' }}
                   >
-                    <FaLinkedinIn size={14} style={{ color: '#0a66c2' }} />
+                    <FiLinkedin size={15} style={{ color: 'var(--accent)' }} />
                     <span>LinkedIn</span>
-                    <ArrowUpRight size={11} style={{ color: 'var(--fg-muted)' }} />
+                    <ArrowUpRight size={12} style={{ color: 'var(--fg-muted)' }} />
                   </a>
 
                   <a
@@ -167,9 +166,9 @@ export function AboutSection({ profile, isLoading }: AboutSectionProps) {
                     className="btn btn-secondary"
                     style={{ flex: 1, minWidth: '110px', padding: '0.5rem 0.75rem', fontSize: '0.8rem', gap: '0.45rem', justifyContent: 'center' }}
                   >
-                    <FaFacebookF size={13} style={{ color: '#1877f2' }} />
+                    <FiFacebook size={15} style={{ color: 'var(--accent)' }} />
                     <span>Facebook</span>
-                    <ArrowUpRight size={11} style={{ color: 'var(--fg-muted)' }} />
+                    <ArrowUpRight size={12} style={{ color: 'var(--fg-muted)' }} />
                   </a>
                 </div>
               </div>
