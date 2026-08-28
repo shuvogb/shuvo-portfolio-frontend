@@ -446,20 +446,50 @@ export default function AdminWorkshopsPage() {
                   {/* Certificate Photo Thumbnail */}
                   <div
                     style={{
-                      width: '90px',
-                      height: '72px',
-                      borderRadius: '10px',
+                      width: '124px',
+                      height: '86px',
+                      borderRadius: '12px',
                       overflow: 'hidden',
                       flexShrink: 0,
                       backgroundColor: 'var(--bg-elevated)',
                       border: '1px solid var(--border)',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                      boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
+                      position: 'relative',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                     }}
                   >
+                    {ws.imageFit === 'contain' && (
+                      <img
+                        src={wsImg}
+                        alt=""
+                        aria-hidden="true"
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          filter: 'blur(12px)',
+                          opacity: 0.25,
+                          transform: 'scale(1.2)',
+                          pointerEvents: 'none',
+                        }}
+                      />
+                    )}
                     <img
                       src={wsImg}
                       alt={ws.title}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      style={{
+                        position: 'relative',
+                        zIndex: 1,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: (ws.imageFit === 'contain' ? 'contain' : 'cover') as 'contain' | 'cover',
+                        objectPosition: 'center',
+                        padding: ws.imageFit === 'contain' ? '4px' : '0',
+                      }}
                     />
                   </div>
 
