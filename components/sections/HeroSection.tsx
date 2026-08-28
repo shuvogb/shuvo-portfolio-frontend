@@ -110,19 +110,49 @@ function Portrait3DCard({ avatarSrc, name }: { avatarSrc: string; name?: string 
 }
 
 export function HeroSection({ profile, isLoading }: HeroSectionProps) {
-  const scrollToContact = () => {
-    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-  };
-  const scrollToResearch = () => {
-    document.getElementById('research')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   const avatarSrc = profile?.avatarUrl || '/images/shuvo.png';
 
+  const statusBadgeText =
+    profile?.statusBadge || 'Open for Research & Community Initiatives';
+
   const stats = {
-    events: { value: '20+', label: 'Events Organized', icon: Calendar, sublabel: 'Youth & Academic' },
-    papers: { value: '2', label: 'Academic Papers', icon: FileText, sublabel: 'Published / Review' },
-    reach: { value: '100+', label: 'Fieldwork Reach', icon: Users, sublabel: 'Char Communities' },
+    events: {
+      value: profile?.heroStats?.events?.value || '20+',
+      label: profile?.heroStats?.events?.label || 'Events Organized',
+      sublabel: profile?.heroStats?.events?.sublabel || 'Youth & Academic',
+      icon: Calendar,
+    },
+    papers: {
+      value: profile?.heroStats?.papers?.value || '2',
+      label: profile?.heroStats?.papers?.label || 'Academic Papers',
+      sublabel: profile?.heroStats?.papers?.sublabel || 'Published / Review',
+      icon: FileText,
+    },
+    reach: {
+      value: profile?.heroStats?.reach?.value || '100+',
+      label: profile?.heroStats?.reach?.label || 'Fieldwork Reach',
+      sublabel: profile?.heroStats?.reach?.sublabel || 'Char Communities',
+      icon: Users,
+    },
+  };
+
+  const primaryCta = profile?.primaryCta || {
+    label: 'Get in Touch',
+    link: '#contact',
+  };
+
+  const secondaryCta = profile?.secondaryCta || {
+    label: 'Publications',
+    link: '#publications',
+  };
+
+  const handleCtaClick = (link: string) => {
+    if (link.startsWith('#')) {
+      const targetId = link.replace('#', '');
+      document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.open(link, '_blank', 'noopener,noreferrer');
+    }
   };
 
   return (
@@ -151,7 +181,7 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
             {/* Reusable SectionBadge */}
             <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center' }}>
               <SectionBadge icon={<FlaskConical size={13} />} style={{ marginBottom: 0 }}>
-                Open for Research & Community Initiatives
+                {statusBadgeText}
               </SectionBadge>
             </div>
 
@@ -189,7 +219,7 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
               {isLoading ? (
                 <span className="skeleton" style={{ display: 'block', height: '24px', width: '280px' }} />
               ) : (
-                profile?.headline || 'Sociology & Social Work Researcher'
+                profile?.headline || 'Sociology & Social Work Undergraduate — Social Research · Community Development'
               )}
             </h2>
 
@@ -209,6 +239,7 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
                   <span className="skeleton" style={{ display: 'block', height: '16px', width: '75%' }} />
                 </>
               ) : (
+                profile?.summary ||
                 'Undergraduate researcher with hands-on experience in quantitative social methods (SPSS), char community studies, and youth development initiatives.'
               )}
             </p>
@@ -216,22 +247,22 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
             {/* Action Buttons */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', alignItems: 'center' }}>
               <button
-                onClick={scrollToContact}
+                onClick={() => handleCtaClick(primaryCta.link)}
                 className="btn-island btn-island-primary"
-                aria-label="Connect with Shuvo Molla"
+                aria-label={`Action: ${primaryCta.label}`}
               >
-                <span>Get in Touch</span>
+                <span>{primaryCta.label}</span>
                 <span className="btn-island-icon">
                   <ArrowUpRight size={14} />
                 </span>
               </button>
 
               <button
-                onClick={scrollToResearch}
+                onClick={() => handleCtaClick(secondaryCta.link)}
                 className="btn-island btn-island-secondary"
-                aria-label="View Research Publications"
+                aria-label={`Action: ${secondaryCta.label}`}
               >
-                <span>Publications</span>
+                <span>{secondaryCta.label}</span>
                 <span className="btn-island-icon">
                   <BookOpen size={14} />
                 </span>
@@ -257,7 +288,7 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
                 <div className="stat-pill-card">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                     <div className="stat-pill-icon">
-                      <Calendar size={14} strokeWidth={1.8} />
+                      <stats.events.icon size={14} strokeWidth={1.8} />
                     </div>
                     <div>
                       <p className="stat-pill-value">{stats.events.value}</p>
@@ -280,7 +311,7 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
                 <div className="stat-pill-card">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                     <div className="stat-pill-icon">
-                      <FileText size={14} strokeWidth={1.8} />
+                      <stats.papers.icon size={14} strokeWidth={1.8} />
                     </div>
                     <div>
                       <p className="stat-pill-value">{stats.papers.value}</p>
@@ -300,7 +331,7 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
                 <div className="stat-pill-card stat-pill-bottom">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                     <div className="stat-pill-icon">
-                      <Users size={14} strokeWidth={1.8} />
+                      <stats.reach.icon size={14} strokeWidth={1.8} />
                     </div>
                     <div>
                       <p className="stat-pill-value">{stats.reach.value}</p>
@@ -379,42 +410,52 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
         }
 
         .stat-pill-value {
-          font-size: 1.15rem;
+          font-size: 1.05rem;
           font-weight: 800;
           color: var(--fg);
-          line-height: 1;
+          line-height: 1.1;
           letter-spacing: -0.02em;
           margin: 0;
         }
 
         .stat-pill-label {
-          font-size: 0.75rem;
+          font-size: 0.72rem;
           font-weight: 700;
           color: var(--fg);
-          margin: 2px 0 0 0;
           line-height: 1.2;
-          white-space: nowrap;
+          margin: 0.15rem 0 0 0;
         }
 
         .stat-pill-sublabel {
-          font-size: 0.675rem;
-          font-weight: 500;
+          font-size: 0.65rem;
           color: var(--fg-muted);
-          margin: 1px 0 0 0;
-          white-space: nowrap;
+          line-height: 1.1;
+          margin: 0.1rem 0 0 0;
+        }
+
+        @media (max-width: 900px) {
+          .stat-side-left {
+            left: -30px;
+            top: 25%;
+          }
+          .stat-side-right {
+            right: -30px;
+            top: 15%;
+          }
+          .stat-side-bottom {
+            bottom: -20px;
+          }
         }
 
         @media (max-width: 640px) {
-          .stat-side-left {
-            left: -20px;
-            top: 20%;
+          .stat-side-left, .stat-side-right, .stat-side-bottom {
+            position: static;
+            transform: none;
+            margin: 0.5rem 0;
           }
-          .stat-side-right {
-            right: -20px;
-            top: 45%;
-          }
-          .stat-side-bottom {
-            bottom: -24px;
+          .hero-portrait-stage {
+            flex-direction: column;
+            gap: 1rem;
           }
         }
       `}</style>

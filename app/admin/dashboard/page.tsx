@@ -8,7 +8,7 @@ import {
   MessageSquare,
   TrendingUp,
   ExternalLink,
-  ArrowRight,
+  ChevronRight,
   Sparkles,
   Layers,
   BookOpen,
@@ -61,11 +61,11 @@ function StatCard({
       </div>
 
       <div>
-        <p style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--fg)', lineHeight: 1.1, letterSpacing: '-0.03em', margin: 0 }}>
+        <p style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--fg)', letterSpacing: '-0.03em', margin: 0, lineHeight: 1 }}>
           {value}
         </p>
         {subtitle && (
-          <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', margin: 0, marginTop: '0.35rem' }}>
+          <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', marginTop: '0.45rem', marginBottom: 0 }}>
             {subtitle}
           </p>
         )}
@@ -181,7 +181,7 @@ export default function AdminDashboard() {
                 textDecoration: 'none',
                 transition: 'all 0.2s ease',
               }}
-              className="hover:border-[var(--accent)] hover:shadow-sm"
+              className="group hover:border-[var(--accent)] hover:bg-[var(--accent-subtle)] hover:shadow-xs"
             >
               <div
                 style={{
@@ -204,7 +204,11 @@ export default function AdminDashboard() {
                   <p style={{ fontSize: '0.875rem', fontWeight: 650, color: 'var(--fg)', margin: 0 }}>
                     {label}
                   </p>
-                  <ArrowRight size={13} style={{ color: 'var(--fg-muted)' }} />
+                  <ChevronRight
+                    size={16}
+                    strokeWidth={2}
+                    className="text-[var(--fg-muted)] group-hover:text-[var(--accent)] group-hover:translate-x-0.5 transition-all"
+                  />
                 </div>
                 <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', margin: '0.25rem 0 0 0', lineHeight: 1.35 }}>
                   {desc}

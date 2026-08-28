@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Moon, Sun } from 'lucide-react';
 import api from '@/lib/api';
 import { useAuthStore } from '@/stores/authStore';
+import { useThemeStore } from '@/stores/themeStore';
 import { AppSidebar } from '@/components/app-sidebar';
 import {
   Breadcrumb,
@@ -26,6 +27,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const pathname = usePathname();
   const { setUser } = useAuthStore();
+  const { theme, toggleTheme } = useThemeStore();
 
   const isLoginPage = pathname === '/admin/login';
   const [loading, setLoading] = useState(!isLoginPage);
@@ -88,8 +90,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        {/* Sticky Header with SidebarTrigger & Breadcrumbs */}
-        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-[var(--border)] px-4 bg-[var(--bg-surface)]/80 backdrop-blur-md sticky top-0 z-40 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+        {/* Sticky Header with SidebarTrigger, Breadcrumbs & Elevated Action Suite */}
+        <header className="admin-header">
           <div className="flex items-center gap-2">
             <SidebarTrigger className="-ml-1" />
             <Separator
@@ -111,21 +113,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </Breadcrumb>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Right Header Action Suite */}
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={toggleTheme}
+              title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} mode`}
+              aria-label="Toggle theme mode"
+              className="inline-flex size-8 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--accent)] transition-all cursor-pointer shadow-xs"
+            >
+              {theme === 'dark' ? <Sun size={14} className="text-amber-400" /> : <Moon size={14} />}
+            </button>
+
             <Link
               href="/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full bg-[var(--bg-elevated)] border border-[var(--border)] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--accent)] transition-all"
+              className="inline-flex items-center gap-2.5 h-9 px-5 text-xs font-semibold rounded-lg bg-[var(--bg-elevated)] border border-[var(--border)] text-[var(--fg)] hover:text-[var(--accent)] hover:border-[var(--accent-border)] hover:bg-[var(--accent-subtle)] transition-all shadow-xs"
+              style={{ paddingLeft: '1.25rem', paddingRight: '1.25rem' }}
             >
-              <span>View Site</span>
-              <ExternalLink size={12} />
+              <span>Live Site</span>
+              <ExternalLink size={13} strokeWidth={2} />
             </Link>
           </div>
         </header>
 
-        {/* Dashboard Main Viewport */}
-        <div className="flex flex-1 flex-col gap-6 p-6">
+        {/* Dashboard Main Viewport Container with Generous Padding */}
+        <div className="admin-viewport">
           {children}
         </div>
       </SidebarInset>

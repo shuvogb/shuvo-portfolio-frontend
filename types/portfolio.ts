@@ -3,7 +3,15 @@ export interface Profile {
   name: string;
   headline: string;
   summary: string;
+  statusBadge?: string;
   avatarUrl?: string;
+  heroStats?: {
+    events?: { value: string; label: string; sublabel: string };
+    papers?: { value: string; label: string; sublabel: string };
+    reach?: { value: string; label: string; sublabel: string };
+  };
+  primaryCta?: { label: string; link: string };
+  secondaryCta?: { label: string; link: string };
   presentAddress?: string;
   permanentAddress?: string;
   phone?: string;
@@ -15,6 +23,17 @@ export interface Profile {
     researchGate?: string;
     github?: string;
     twitter?: string;
+  };
+  privateInfo?: {
+    fathersName?: string;
+    mothersName?: string;
+    dateOfBirth?: string;
+    religion?: string;
+    maritalStatus?: string;
+    nationality?: string;
+    gender?: string;
+    bloodGroup?: string;
+    isPublic: boolean;
   };
   references?: Array<{
     name: string;

@@ -713,14 +713,28 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0 auto !important;
 }
 
-[data-state="collapsed"] [data-slot="sidebar-menu-button"] > span,
-[data-state="collapsed"] [data-slot="sidebar-menu-button"] > div.grid,
+[data-state="collapsed"] [data-slot="sidebar-menu-button"] span,
+[data-state="collapsed"] [data-slot="sidebar-menu-button"] div.grid,
 [data-state="collapsed"] [data-slot="sidebar-menu-button"] .lucide-chevron-right,
 [data-state="collapsed"] [data-slot="sidebar-menu-button"] .lucide-chevrons-up-down,
-[data-slot="sidebar-root"][data-state="collapsed"] [data-slot="sidebar-menu-button"] > span,
-[data-slot="sidebar-root"][data-state="collapsed"] [data-slot="sidebar-menu-button"] > div.grid,
+[data-state="collapsed"] [data-slot="sidebar-menu-button"] .external-link-icon,
+[data-slot="sidebar-root"][data-state="collapsed"] [data-slot="sidebar-menu-button"] span,
+[data-slot="sidebar-root"][data-state="collapsed"] [data-slot="sidebar-menu-button"] div.grid,
 [data-slot="sidebar-root"][data-state="collapsed"] [data-slot="sidebar-menu-button"] .lucide-chevron-right,
-[data-slot="sidebar-root"][data-state="collapsed"] [data-slot="sidebar-menu-button"] .lucide-chevrons-up-down {
+[data-slot="sidebar-root"][data-state="collapsed"] [data-slot="sidebar-menu-button"] .lucide-chevrons-up-down,
+[data-slot="sidebar-root"][data-state="collapsed"] [data-slot="sidebar-menu-button"] .external-link-icon {
+  display: none !important;
+}
+
+[data-state="collapsed"] [data-slot="sidebar-menu-button"] a,
+[data-slot="sidebar-root"][data-state="collapsed"] [data-slot="sidebar-menu-button"] a {
+  justify-content: center !important;
+  width: 100% !important;
+  padding: 0 !important;
+}
+
+[data-state="collapsed"] [data-slot="sidebar-menu-button"] a span,
+[data-slot="sidebar-root"][data-state="collapsed"] [data-slot="sidebar-menu-button"] a span {
   display: none !important;
 }
 
@@ -788,4 +802,78 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600 !important;
   color: var(--fg-muted) !important;
   letter-spacing: 0.05em !important;
+}
+
+/* ─── Radix Tooltip High-Contrast Styling ─────────────────────────────────── */
+[data-slot="tooltip-content"] {
+  background-color: #090d16 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 8px !important;
+  padding: 0.35rem 0.75rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4) !important;
+  z-index: 999999 !important;
+  letter-spacing: 0.01em !important;
+  user-select: none !important;
+}
+
+.dark [data-slot="tooltip-content"] {
+  background-color: #151b28 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ─── Admin Main Viewport Container ───────────────────────────────────────── */
+.admin-header {
+  height: 4rem;
+  width: 100%;
+  padding: 0 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background-color: var(--bg-surface);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .admin-header {
+    padding: 0 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-header {
+    padding: 0 1.25rem;
+  }
+}
+
+.admin-viewport {
+  flex: 1;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 2.5rem 3rem 4rem 3rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 1024px) {
+  .admin-viewport {
+    padding: 2rem 2rem 3rem 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-viewport {
+    padding: 1.5rem 1.25rem 2.5rem 1.25rem;
+  }
 }

@@ -3,17 +3,37 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Pencil, Trash2, X, Loader2, GripVertical, AlertTriangle } from 'lucide-react';
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  X,
+  Loader2,
+  GripVertical,
+  AlertTriangle,
+  Upload,
+  Save,
+  ImageIcon,
+} from 'lucide-react';
 import { useForm, FieldValues, Path } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ZodType } from 'zod';
 import api from '@/lib/api';
 import { toast } from 'sonner';
+import {
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from '@/components/ui/drawer';
 
 export interface FieldConfig {
   name: string;
   label: string;
-  type: 'text' | 'textarea' | 'select' | 'number' | 'url' | 'checkbox';
+  type: 'text' | 'textarea' | 'select' | 'number' | 'url' | 'checkbox' | 'image';
   placeholder?: string;
   options?: { value: string; label: string }[];
   required?: boolean;
@@ -40,9 +60,10 @@ export function AdminCrudPage<T extends FieldValues>({
   renderRow,
   emptyMessage = 'No records found.',
 }: AdminCrudPageProps<T>) {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [editItem, setEditItem] = useState<(T & { _id: string }) | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [uploadingField, setUploadingField] = useState<string | null>(null);
   const qc = useQueryClient();
 
   const { data: items = [], isLoading } = useQuery<(T & { _id: string })[]>({
@@ -57,25 +78,53 @@ export function AdminCrudPage<T extends FieldValues>({
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<T>({ resolver: zodResolver(schema) });
 
   const openCreate = () => {
     setEditItem(null);
     reset({} as T);
-    setDialogOpen(true);
+    setDrawerOpen(true);
   };
 
   const openEdit = (item: T & { _id: string }) => {
     setEditItem(item);
     reset(item as unknown as T);
-    setDialogOpen(true);
+    setDrawerOpen(true);
   };
 
-  const closeDialog = () => {
-    setDialogOpen(false);
+  const closeDrawer = () => {
+    setDrawerOpen(false);
     setEditItem(null);
     reset({} as T);
+  };
+
+  const handleImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    fieldName: string
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('altText', `${title} asset`);
+
+    try {
+      setUploadingField(fieldName);
+      const res = await api.post('/admin/media/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      const url = res.data.data.url;
+      setValue(fieldName as Path<T>, url);
+      toast.success('Image uploaded to Cloudinary successfully!');
+    } catch {
+      toast.error('Failed to upload image. Please try again.');
+    } finally {
+      setUploadingField(null);
+    }
   };
 
   const saveMutation = useMutation({
@@ -89,7 +138,7 @@ export function AdminCrudPage<T extends FieldValues>({
       qc.invalidateQueries({ queryKey: [queryKey] });
       qc.invalidateQueries({ queryKey: ['portfolio'] });
       toast.success(editItem ? 'Updated successfully' : 'Created successfully');
-      closeDialog();
+      closeDrawer();
     },
     onError: () => {
       toast.error('Operation failed. Please try again.');
@@ -114,68 +163,89 @@ export function AdminCrudPage<T extends FieldValues>({
   };
 
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+      
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.5rem', marginBottom: '0.15rem' }}>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--fg)', letterSpacing: '-0.03em', marginBottom: '0.35rem' }}>
             {title}
           </h1>
-          <p style={{ fontSize: '0.85rem', color: 'var(--muted-foreground)' }}>
-            Manage and reorder {title.toLowerCase()}
+          <p style={{ color: 'var(--fg-muted)', fontSize: '0.9rem', margin: 0 }}>
+            Manage and customize {title.toLowerCase()} displayed on the live portfolio.
           </p>
         </div>
         <button
           onClick={openCreate}
           className="btn btn-primary"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.6rem 1.35rem',
+            borderRadius: '10px',
+            fontWeight: 650,
+            fontSize: '0.85rem',
+            cursor: 'pointer',
+          }}
           aria-label={`Add new ${title}`}
         >
-          <Plus size={16} /> Add Item
+          <Plus size={16} /> Add {title.replace(/s$/, '')}
         </button>
       </div>
 
-      {/* List */}
+      {/* Items List */}
       {isLoading ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="skeleton" style={{ height: '64px' }} />
+            <div key={i} className="skeleton" style={{ height: '64px', borderRadius: '12px' }} />
           ))}
         </div>
       ) : items.length === 0 ? (
-        <div className="card" style={{ textAlign: 'center', padding: '3rem 2rem', color: 'var(--muted-foreground)' }}>
-          <p style={{ marginBottom: '1rem' }}>{emptyMessage}</p>
-          <button onClick={openCreate} className="btn btn-secondary">
+        <div className="card bezel-card" style={{ textAlign: 'center', padding: '3.5rem 2rem', color: 'var(--fg-muted)' }}>
+          <p style={{ marginBottom: '1.25rem', fontSize: '0.95rem' }}>{emptyMessage}</p>
+          <button onClick={openCreate} className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', margin: '0 auto' }}>
             <Plus size={16} /> Create First Entry
           </button>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {items.map((item) => (
             <div
               key={item._id}
-              className="card"
-              style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.875rem 1rem' }}
+              className="card bezel-card"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
+                padding: '1.1rem 1.35rem',
+                backgroundColor: 'var(--bg-surface)',
+                transition: 'all 0.2s ease',
+              }}
             >
-              <GripVertical size={16} style={{ color: 'var(--muted-foreground)', flexShrink: 0, opacity: 0.5 }} aria-hidden="true" />
+              <GripVertical size={16} style={{ color: 'var(--fg-muted)', opacity: 0.45, flexShrink: 0 }} />
+              
               <div style={{ flex: 1, minWidth: 0 }}>
                 {renderRow(item)}
               </div>
-              <div style={{ display: 'flex', gap: '0.35rem', flexShrink: 0 }}>
+
+              <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
                 <button
                   onClick={() => openEdit(item)}
+                  className="btn btn-outline"
+                  style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
                   aria-label="Edit item"
-                  className="btn btn-secondary"
-                  style={{ padding: '0.4rem 0.6rem' }}
                 >
                   <Pencil size={13} />
+                  <span>Edit</span>
                 </button>
                 <button
                   onClick={() => setDeleteId(item._id)}
+                  className="btn btn-outline"
+                  style={{ padding: '0.4rem 0.65rem', color: '#ef4444', borderColor: 'var(--border)' }}
                   aria-label="Delete item"
-                  className="btn btn-secondary"
-                  style={{ padding: '0.4rem 0.6rem', color: '#ef4444' }}
                 >
-                  <Trash2 size={13} />
+                  <Trash2 size={14} />
                 </button>
               </div>
             </div>
@@ -183,67 +253,31 @@ export function AdminCrudPage<T extends FieldValues>({
         </div>
       )}
 
-      {/* Create/Edit Dialog */}
-      <AnimatePresence>
-        {dialogOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={closeDialog}
-              style={{
-                position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)',
-                zIndex: 200,
-              }}
-              aria-hidden="true"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96, y: 12 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: 12 }}
-              transition={{ duration: 0.15 }}
-              role="dialog"
-              aria-modal="true"
-              aria-label={editItem ? 'Edit item' : 'Create item'}
-              style={{
-                position: 'fixed',
-                top: '50%', left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: '100%', maxWidth: '520px',
-                maxHeight: '90vh', overflowY: 'auto',
-                zIndex: 201,
-                backgroundColor: 'var(--card)',
-                color: 'var(--card-foreground)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius)',
-                padding: '1.75rem',
-                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                <h2 style={{ fontSize: '1.15rem' }}>
-                  {editItem ? 'Edit' : 'Add'} {title.replace(/s$/, '')}
-                </h2>
-                <button
-                  onClick={closeDialog}
-                  aria-label="Close dialog"
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-foreground)', display: 'flex' }}
-                >
-                  <X size={18} />
-                </button>
-              </div>
+      {/* ─── Custom Slide-Over Edit Drawer ─────────────────────────────────── */}
+      <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+        <DrawerContent width="max-w-2xl">
+          <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', height: '100%' }} noValidate>
+            
+            <DrawerHeader>
+              <DrawerTitle>{editItem ? 'Edit' : 'Create'} {title.replace(/s$/, '')}</DrawerTitle>
+              <DrawerDescription>
+                Fill in the details below to update this section on the portfolio.
+              </DrawerDescription>
+            </DrawerHeader>
 
-              <form onSubmit={handleSubmit(onSubmit)} noValidate>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  {fields.map((field) => (
-                    <div key={field.name}>
+            <DrawerBody>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                {fields.map((field) => {
+                  const currentValue = watch(field.name as Path<T>);
+
+                  return (
+                    <div key={field.name} style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                       <label
                         htmlFor={`field-${field.name}`}
-                        style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}
+                        className="admin-label"
                       >
                         {field.label}
-                        {field.required && <span style={{ color: 'var(--primary)', fontSize: '0.75rem' }}>*</span>}
+                        {field.required && <span style={{ color: 'var(--accent)', marginLeft: '0.25rem' }}>*</span>}
                       </label>
 
                       {field.type === 'textarea' ? (
@@ -252,116 +286,186 @@ export function AdminCrudPage<T extends FieldValues>({
                           {...register(field.name as Path<T>)}
                           rows={field.rows || 3}
                           placeholder={field.placeholder}
-                          className="input"
-                          style={{ resize: 'vertical' }}
+                          className="admin-input"
+                          style={{ height: 'auto', minHeight: '90px', resize: 'vertical', padding: '0.65rem 0.85rem' }}
                         />
                       ) : field.type === 'select' ? (
                         <select
                           id={`field-${field.name}`}
                           {...register(field.name as Path<T>)}
-                          className="input"
+                          className="admin-input"
                         >
                           {field.options?.map((opt) => (
-                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
                           ))}
                         </select>
                       ) : field.type === 'checkbox' ? (
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', cursor: 'pointer', padding: '0.5rem 0' }}>
                           <input
                             id={`field-${field.name}`}
                             type="checkbox"
                             {...register(field.name as Path<T>)}
-                            style={{ width: '16px', height: '16px', accentColor: 'var(--primary)' }}
+                            style={{ width: '18px', height: '18px', accentColor: 'var(--accent)' }}
                           />
-                          <span style={{ fontSize: '0.875rem', color: 'var(--muted-foreground)' }}>Yes</span>
+                          <span style={{ fontSize: '0.875rem', color: 'var(--fg)' }}>Active / Enabled</span>
                         </label>
+                      ) : field.type === 'image' ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            {currentValue ? (
+                              <img
+                                src={String(currentValue)}
+                                alt="Preview"
+                                style={{ width: '60px', height: '60px', borderRadius: '12px', objectFit: 'cover', border: '1px solid var(--border)' }}
+                              />
+                            ) : (
+                              <div style={{ width: '60px', height: '60px', borderRadius: '12px', backgroundColor: 'var(--bg-elevated)', border: '1px dashed var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fg-muted)' }}>
+                                <ImageIcon size={20} />
+                              </div>
+                            )}
+
+                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+                              <input
+                                id={`field-${field.name}`}
+                                type="text"
+                                {...register(field.name as Path<T>)}
+                                placeholder={field.placeholder || 'https://res.cloudinary.com/...'}
+                                className="admin-input"
+                              />
+
+                              <label
+                                className="btn btn-outline"
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.4rem',
+                                  padding: '0.35rem 0.75rem',
+                                  fontSize: '0.75rem',
+                                  width: 'fit-content',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                {uploadingField === field.name ? (
+                                  <Loader2 size={13} className="animate-spin" />
+                                ) : (
+                                  <Upload size={13} />
+                                )}
+                                <span>{uploadingField === field.name ? 'Uploading to Cloudinary...' : 'Upload Image'}</span>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => handleImageUpload(e, field.name)}
+                                  style={{ display: 'none' }}
+                                  disabled={uploadingField === field.name}
+                                />
+                              </label>
+                            </div>
+                          </div>
+                        </div>
                       ) : (
                         <input
                           id={`field-${field.name}`}
                           type={field.type}
                           {...register(field.name as Path<T>)}
                           placeholder={field.placeholder}
-                          className="input"
+                          className="admin-input"
                         />
                       )}
 
                       {errors[field.name as keyof typeof errors] && (
-                        <p role="alert" style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '0.25rem' }}>
-                          {String((errors[field.name as keyof typeof errors] as { message?: string })?.message || 'Invalid')}
+                        <p role="alert" style={{ color: '#ef4444', fontSize: '0.75rem', margin: '0.15rem 0 0' }}>
+                          {String((errors[field.name as keyof typeof errors] as { message?: string })?.message || 'Invalid value')}
                         </p>
                       )}
                     </div>
-                  ))}
-                </div>
+                  );
+                })}
+              </div>
+            </DrawerBody>
 
-                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
-                  <button type="button" onClick={closeDialog} className="btn btn-secondary">
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="btn btn-primary"
-                    style={{ opacity: isSubmitting ? 0.75 : 1 }}
-                  >
-                    {isSubmitting ? (
-                      <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} /> Saving...</>
-                    ) : (
-                      'Save Record'
-                    )}
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+            <DrawerFooter>
+              <button
+                type="button"
+                onClick={closeDrawer}
+                className="btn btn-outline"
+                style={{ padding: '0.55rem 1.25rem', fontSize: '0.85rem', borderRadius: '10px' }}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting || saveMutation.isPending}
+                className="btn btn-primary"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 1.5rem', fontSize: '0.85rem', borderRadius: '10px' }}
+              >
+                {isSubmitting || saveMutation.isPending ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save size={14} />
+                    <span>Save {title.replace(/s$/, '')}</span>
+                  </>
+                )}
+              </button>
+            </DrawerFooter>
 
-      {/* Delete confirm */}
+          </form>
+        </DrawerContent>
+      </Drawer>
+
+      {/* ─── Delete Confirmation Modal ────────────────────────────────────── */}
       <AnimatePresence>
         {deleteId && (
           <>
             <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               onClick={() => setDeleteId(null)}
-              style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 200 }}
-              aria-hidden="true"
+              className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }}
-              role="alertdialog" aria-modal="true" aria-label="Confirm deletion"
-              style={{
-                position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-                width: '100%', maxWidth: '360px', zIndex: 201,
-                backgroundColor: 'var(--card)', color: 'var(--card-foreground)',
-                border: '1px solid var(--border)', borderRadius: 'var(--radius)',
-                padding: '1.5rem', textAlign: 'center',
-              }}
+              initial={{ opacity: 0, scale: 0.95, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 12 }}
+              role="alertdialog"
+              aria-modal="true"
+              aria-label="Confirm deletion"
+              className="card fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm z-50 p-6 text-center shadow-2xl bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl"
             >
-              <AlertTriangle size={36} style={{ color: '#ef4444', margin: '0 auto 0.75rem' }} />
-              <h3 style={{ fontSize: '1.1rem', marginBottom: '0.35rem' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
+                <AlertTriangle size={24} />
+              </div>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--fg)', marginBottom: '0.35rem' }}>
                 Confirm Deletion
               </h3>
-              <p style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
-                Are you sure you want to permanently delete this item?
+              <p style={{ color: 'var(--fg-muted)', fontSize: '0.85rem', marginBottom: '1.5rem', lineHeight: 1.4 }}>
+                Are you sure you want to delete this record? This action cannot be undone.
               </p>
-              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                <button onClick={() => setDeleteId(null)} className="btn btn-secondary">Cancel</button>
+              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
+                <button onClick={() => setDeleteId(null)} className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
+                  Cancel
+                </button>
                 <button
                   onClick={() => deleteMutation.mutate(deleteId!)}
                   disabled={deleteMutation.isPending}
                   className="btn btn-primary"
-                  style={{ backgroundColor: '#ef4444' }}
+                  style={{ backgroundColor: '#ef4444', borderColor: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1rem', fontSize: '0.85rem' }}
                 >
-                  {deleteMutation.isPending ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> : <Trash2 size={14} />}
-                  Delete
+                  {deleteMutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                  <span>Delete Record</span>
                 </button>
               </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+
     </div>
   );
 }

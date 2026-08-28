@@ -24,26 +24,27 @@ export function NavProjects({
   const pathname = usePathname();
 
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+    <SidebarGroup>
       <SidebarGroupLabel>Quick Access</SidebarGroupLabel>
       <SidebarMenu>
         {projects.map((item) => {
           const isActive = pathname === item.url;
           return (
             <SidebarMenuItem key={item.name}>
-              <SidebarMenuButton asChild isActive={isActive} tooltip={item.name}>
+              <SidebarMenuButton asChild isActive={isActive} tooltip={item.name} className="w-full">
                 <Link
                   href={item.url}
                   target={item.target}
                   rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
-                  className="flex items-center justify-between w-full"
+                  className="flex items-center w-full"
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <item.icon className="size-4 shrink-0" />
-                    <span className="truncate">{item.name}</span>
-                  </div>
+                  <item.icon className="size-4 shrink-0" />
+                  <span className="flex-1 text-left truncate">{item.name}</span>
                   {item.target === '_blank' && (
-                    <ExternalLink className="size-3 text-[var(--fg-muted)] shrink-0 ml-auto" />
+                    <ExternalLink
+                      className="size-3.5 text-[var(--fg-muted)] shrink-0 external-link-icon"
+                      style={{ marginLeft: 'auto' }}
+                    />
                   )}
                 </Link>
               </SidebarMenuButton>

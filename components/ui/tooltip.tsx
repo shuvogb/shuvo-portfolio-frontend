@@ -10,7 +10,7 @@ const TooltipTrigger = TooltipPrimitive.Trigger;
 
 function TooltipContent({
   className,
-  sideOffset = 4,
+  sideOffset = 10,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Content>) {
   return (
@@ -19,9 +19,18 @@ function TooltipContent({
         data-slot="tooltip-content"
         sideOffset={sideOffset}
         className={cn(
-          'z-50 overflow-hidden rounded-md border border-[var(--border)] bg-[var(--bg-surface)] px-3 py-1.5 text-xs text-[var(--fg)] shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+          'z-50 overflow-hidden rounded-lg px-3 py-1.5 text-xs font-semibold shadow-xl select-none',
+          'animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
+          'data-[side=bottom]:slide-in-from-top-1.5 data-[side=left]:slide-in-from-right-1.5 data-[side=right]:slide-in-from-left-1.5 data-[side=top]:slide-in-from-bottom-1.5',
           className
         )}
+        style={{
+          backgroundColor: '#090d16',
+          color: '#ffffff',
+          border: '1px solid rgba(255, 255, 255, 0.15)',
+          boxShadow: '0 8px 24px -4px rgba(0, 0, 0, 0.35)',
+          zIndex: 99999,
+        }}
         {...props}
       />
     </TooltipPrimitive.Portal>
