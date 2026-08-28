@@ -32,12 +32,25 @@ export default function AdminLoginPage() {
 
   const onSubmit = async (data: LoginData) => {
     try {
-      await api.post('/auth/login', {
+      const res = await api.post('/auth/login', {
         email: data.email.trim().toLowerCase(),
         password: data.password,
       });
-      const meRes = await api.get('/auth/me');
-      setUser(meRes.data.data);
+
+      if (res.data?.data?.accessToken && typeof window !== 'undefined') {
+        localStorage.setItem('access_token', res.data.data.accessToken);
+        if (res.data.data.refreshToken) {
+          localStorage.setItem('refresh_token', res.data.data.refreshToken);
+        }
+      }
+
+      if (res.data?.data?.user) {
+        setUser(res.data.data.user);
+      } else {
+        const meRes = await api.get('/auth/me');
+        setUser(meRes.data.data);
+      }
+
       toast.success('Welcome back!');
       router.push('/admin/dashboard');
     } catch (err: unknown) {
