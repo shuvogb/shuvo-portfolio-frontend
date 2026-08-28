@@ -4,10 +4,11 @@ import { useRef } from 'react';
 import { motion, useScroll, useInView } from 'motion/react';
 import { Briefcase, Calendar, CheckCircle2, Building, ChevronRight } from 'lucide-react';
 import { SectionBadge } from '@/components/ui/SectionBadge';
-import type { Experience } from '@/types/portfolio';
+import type { Experience, Profile } from '@/types/portfolio';
 
 interface ExperienceSectionProps {
   experience?: Experience[];
+  profile?: Profile;
   isLoading: boolean;
 }
 
@@ -149,8 +150,15 @@ function ExperienceItem({ exp }: { exp: Experience }) {
   );
 }
 
-export function ExperienceSection({ experience = [], isLoading }: ExperienceSectionProps) {
+export function ExperienceSection({ experience = [], profile, isLoading }: ExperienceSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const expConfig = profile?.experienceSection;
+  const sectionBadge = expConfig?.badge || 'Leadership & Career';
+  const sectionTitle = expConfig?.title || 'Work & Leadership Experience';
+  const sectionDesc =
+    expConfig?.description ||
+    'Hands-on track record in social research, event operations, student organization administration, and youth empowerment.';
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -164,11 +172,11 @@ export function ExperienceSection({ experience = [], isLoading }: ExperienceSect
         {/* Header */}
         <div className="section-header">
           <SectionBadge icon={<Briefcase size={13} strokeWidth={1.75} />}>
-            Leadership & Career
+            {sectionBadge}
           </SectionBadge>
-          <h2 className="section-title">Work & Leadership Experience</h2>
+          <h2 className="section-title">{sectionTitle}</h2>
           <p className="section-description">
-            Hands-on track record in social research, event operations, student organization administration, and youth empowerment.
+            {sectionDesc}
           </p>
         </div>
 

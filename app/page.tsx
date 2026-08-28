@@ -25,10 +25,10 @@ export default function HomePage() {
         <HeroSection profile={data?.profile} isLoading={isLoading} />
         <AboutSection profile={data?.profile} isLoading={isLoading} />
         <SkillsSection skills={data?.skills} profile={data?.profile} isLoading={isLoading} />
-        <ExperienceSection experience={data?.experience} isLoading={isLoading} />
+        <ExperienceSection experience={data?.experience} profile={data?.profile} isLoading={isLoading} />
         <ResearchSection publications={data?.publications} isLoading={isLoading} />
         <AchievementsSection achievements={data?.achievements} isLoading={isLoading} />
-        <EducationSection education={data?.education} isLoading={isLoading} />
+        <EducationSection education={data?.education} profile={data?.profile} isLoading={isLoading} />
         <WorkshopsSection workshops={data?.workshops} isLoading={isLoading} />
         <ContactSection />
       </main>

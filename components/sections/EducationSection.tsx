@@ -4,10 +4,11 @@ import { useRef } from 'react';
 import { motion, useScroll, useInView } from 'motion/react';
 import { GraduationCap, Calendar, Award, Building2 } from 'lucide-react';
 import { SectionBadge } from '@/components/ui/SectionBadge';
-import type { Education } from '@/types/portfolio';
+import type { Education, Profile } from '@/types/portfolio';
 
 interface EducationSectionProps {
   education?: Education[];
+  profile?: Profile;
   isLoading: boolean;
 }
 
@@ -90,8 +91,15 @@ function EducationItem({ edu }: { edu: Education }) {
   );
 }
 
-export function EducationSection({ education = [], isLoading }: EducationSectionProps) {
+export function EducationSection({ education = [], profile, isLoading }: EducationSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const eduConfig = profile?.educationSection;
+  const sectionBadge = eduConfig?.badge || 'Academic Foundation';
+  const sectionTitle = eduConfig?.title || 'Education & Credentials';
+  const sectionDesc =
+    eduConfig?.description ||
+    'Formal degrees in sociology and social work, foundational academic performance, and institutional credentials.';
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -105,11 +113,11 @@ export function EducationSection({ education = [], isLoading }: EducationSection
         {/* Header */}
         <div className="section-header">
           <SectionBadge icon={<GraduationCap size={13} strokeWidth={1.75} />}>
-            Academic Foundation
+            {sectionBadge}
           </SectionBadge>
-          <h2 className="section-title">Education & Credentials</h2>
+          <h2 className="section-title">{sectionTitle}</h2>
           <p className="section-description">
-            Formal degrees in sociology and social work, foundational academic performance, and institutional credentials.
+            {sectionDesc}
           </p>
         </div>
 

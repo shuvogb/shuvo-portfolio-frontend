@@ -57,6 +57,16 @@ export interface Profile {
     title?: string;
     description?: string;
   };
+  experienceSection?: {
+    badge?: string;
+    title?: string;
+    description?: string;
+  };
+  educationSection?: {
+    badge?: string;
+    title?: string;
+    description?: string;
+  };
   references?: Array<{
     name: string;
     title: string;
