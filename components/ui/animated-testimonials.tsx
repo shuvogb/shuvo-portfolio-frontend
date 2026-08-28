@@ -54,17 +54,17 @@ export const AnimatedTestimonials = ({
 
   const currentItem = testimonials[active];
   const activeHeight = currentItem?.imageHeight || cardHeight || 340;
-  const activeFit = currentItem?.imageFit || imageFit || 'cover';
+  const activeFit = currentItem?.imageFit || imageFit || 'contain';
 
   return (
     <div className="w-full px-2 py-4 font-sans antialiased md:px-6">
-      <div className="relative grid grid-cols-1 gap-10 md:grid-cols-[1.1fr_1.2fr] lg:gap-14 items-center">
+      <div className="relative grid grid-cols-1 gap-10 md:grid-cols-[1.15fr_1.2fr] lg:gap-14 items-center">
         
         {/* 3D Rotating Stack on Left with Resizable Certificate Frame */}
         <div>
           <div
             className="relative w-full transition-all duration-300"
-            style={{ height: `${Math.max(260, Math.min(activeHeight, 480))}px` }}
+            style={{ height: `${activeHeight}px`, minHeight: '260px' }}
           >
             <AnimatePresence>
               {testimonials.map((testimonial, index) => {
@@ -100,14 +100,14 @@ export const AnimatedTestimonials = ({
                     }}
                     className="absolute inset-0 origin-bottom"
                   >
-                    <div className="h-full w-full rounded-2xl overflow-hidden border border-[var(--border)] shadow-xl bg-[var(--bg-elevated)] p-2.5 sm:p-3 relative flex items-center justify-center">
-                      <div className="w-full h-full rounded-xl overflow-hidden relative border border-[var(--border)] bg-[var(--bg-surface)] flex items-center justify-center">
+                    <div className="h-full w-full rounded-2xl overflow-hidden border border-[var(--border)] shadow-xl bg-[var(--bg-elevated)] p-2 sm:p-2.5 relative flex items-center justify-center">
+                      <div className="w-full h-full rounded-xl overflow-hidden relative border border-[var(--border)] bg-[var(--bg-surface)] flex items-center justify-center p-2">
                         {itemFit === 'contain' && (
                           <img
                             src={testimonial.src}
                             alt=""
                             aria-hidden="true"
-                            className="absolute inset-0 w-full h-full object-cover blur-xl opacity-25 scale-110 pointer-events-none"
+                            className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-20 scale-110 pointer-events-none"
                           />
                         )}
                         <img
@@ -118,8 +118,8 @@ export const AnimatedTestimonials = ({
                           draggable={false}
                           className={`h-full w-full relative z-10 transition-all duration-300 ${
                             itemFit === 'contain'
-                              ? 'object-contain object-center p-3 drop-shadow-md'
-                              : 'object-cover object-center p-1'
+                              ? 'object-contain object-center drop-shadow-sm'
+                              : 'object-cover object-center'
                           }`}
                         />
                       </div>

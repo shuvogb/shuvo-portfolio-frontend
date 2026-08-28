@@ -137,7 +137,7 @@ export default function AdminWorkshopsPage() {
       description: '',
       imageUrl: '',
       imageHeight: 260,
-      imageFit: 'cover',
+      imageFit: 'contain',
       order: 0,
     },
   });
@@ -158,7 +158,7 @@ export default function AdminWorkshopsPage() {
       description:
         'Specialized training programs in quantitative social methodology, field research ethics, climate negotiations, and leadership.',
       certificateHeight: 340,
-      certificateFit: 'cover',
+      certificateFit: 'contain',
     },
   });
 
@@ -181,7 +181,7 @@ export default function AdminWorkshopsPage() {
       description: '',
       imageUrl: '',
       imageHeight: 260,
-      imageFit: 'cover',
+      imageFit: 'contain',
       order: workshops.length > 0 ? Math.max(...workshops.map((w) => w.order || 0)) + 1 : 1,
     });
     setWsDrawerOpen(true);
@@ -198,7 +198,7 @@ export default function AdminWorkshopsPage() {
       description: ws.description || '',
       imageUrl: ws.imageUrl || wsImg,
       imageHeight: ws.imageHeight || 260,
-      imageFit: ws.imageFit || 'cover',
+      imageFit: ws.imageFit || 'contain',
       order: ws.order || 0,
     });
     setWsDrawerOpen(true);
@@ -212,7 +212,7 @@ export default function AdminWorkshopsPage() {
         profile?.workshopsSection?.description ||
         'Specialized training programs in quantitative social methodology, field research ethics, climate negotiations, and leadership.',
       certificateHeight: profile?.workshopsSection?.certificateHeight || 340,
-      certificateFit: profile?.workshopsSection?.certificateFit || 'cover',
+      certificateFit: profile?.workshopsSection?.certificateFit || 'contain',
     });
     setHeaderDrawerOpen(true);
   };

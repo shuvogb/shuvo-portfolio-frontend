@@ -61,7 +61,7 @@ export function WorkshopsSection({ workshops = [], profile, isLoading }: Worksho
       src: img,
       year: ws.year,
       imageHeight: ws.imageHeight || wsConfig?.certificateHeight || 340,
-      imageFit: ws.imageFit || wsConfig?.certificateFit || 'cover',
+      imageFit: ws.imageFit || wsConfig?.certificateFit || 'contain',
     };
   });
 
@@ -125,7 +125,7 @@ export function WorkshopsSection({ workshops = [], profile, isLoading }: Worksho
                 testimonials={formattedWorkshops}
                 autoplay={false}
                 cardHeight={wsConfig?.certificateHeight || 340}
-                imageFit={wsConfig?.certificateFit || 'cover'}
+                imageFit={wsConfig?.certificateFit || 'contain'}
               />
             </div>
           </div>
