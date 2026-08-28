@@ -1,7 +1,10 @@
 'use client';
 
+import Link from 'next/link';
 import { motion } from 'motion/react';
-import { Trophy, CheckCircle } from 'lucide-react';
+import { Trophy, ArrowUpRight } from 'lucide-react';
+import { SectionBadge } from '@/components/ui/SectionBadge';
+import { getAchievementDetails } from '@/lib/achievementsData';
 import type { Achievement } from '@/types/portfolio';
 
 interface AchievementsSectionProps {
@@ -11,54 +14,196 @@ interface AchievementsSectionProps {
 
 export function AchievementsSection({ achievements = [], isLoading }: AchievementsSectionProps) {
   return (
-    <section id="achievements" className="section" aria-label="Key Achievements & Milestones">
+    <section id="achievements" className="section bg-grid-pattern" aria-label="Key Achievements & Milestones">
       <div className="container">
         
         {/* Header */}
         <div className="section-header">
-          <span className="section-eyebrow">
-            <Trophy size={12} /> Impact & Milestones
-          </span>
+          <SectionBadge icon={<Trophy size={13} strokeWidth={1.75} />}>
+            Impact & Milestones
+          </SectionBadge>
           <h2 className="section-title">Key Achievements</h2>
           <p className="section-description">
-            Quantifiable leadership results, event management track record, and student organization stewardship.
+            Quantifiable leadership results, community development initiatives, and student organization stewardship. Click any card to view the dedicated field story.
           </p>
         </div>
 
-        {/* Bento Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' }}>
+        {/* Image & Card Based Grid with Framed Padding */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+            gap: '1.5rem',
+          }}
+        >
           {isLoading
             ? Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="skeleton" style={{ height: '90px' }} />
-              ))
-            : achievements.map((ach, idx) => (
-                <div key={ach._id} className="bezel-card bezel-card-interactive">
-                  <div
-                    className="bezel-core"
-                    style={{ display: 'flex', gap: '0.85rem', alignItems: 'flex-start', padding: '1.25rem' }}
-                  >
-                    <div
-                      style={{
-                        width: '28px',
-                        height: '28px',
-                        borderRadius: '50%',
-                        backgroundColor: 'var(--accent-subtle)',
-                        color: 'var(--accent)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                        marginTop: '2px',
-                      }}
-                    >
-                      <CheckCircle size={15} />
-                    </div>
-                    <p style={{ fontSize: '0.9rem', lineHeight: 1.65, color: 'var(--fg)', fontWeight: 500 }}>
-                      {ach.description}
-                    </p>
+                <div key={i} className="bezel-card">
+                  <div className="bezel-core" style={{ padding: '0.85rem' }}>
+                    <div className="skeleton" style={{ height: '160px', borderRadius: 'var(--radius-inner)', marginBottom: '0.85rem' }} />
+                    <div className="skeleton" style={{ height: '20px', width: '60%', marginBottom: '0.5rem' }} />
+                    <div className="skeleton" style={{ height: '50px' }} />
                   </div>
                 </div>
-              ))}
+              ))
+            : achievements.map((ach, idx) => {
+                const details = getAchievementDetails(ach.description, idx);
+                const IconComponent = details.icon;
+
+                return (
+                  <motion.div
+                    key={ach._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-40px' }}
+                    transition={{ duration: 0.35, delay: (idx % 3) * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <Link
+                      href={`/achievements/${ach._id}`}
+                      className="bezel-card bezel-card-interactive group cursor-pointer block h-full text-inherit no-underline"
+                      style={{ textDecoration: 'none', color: 'inherit' }}
+                    >
+                      <div
+                        className="bezel-core"
+                        style={{
+                          padding: '0.85rem',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          height: '100%',
+                        }}
+                      >
+                        {/* Framed Visual Image Header with Padding & Rounded Inner Corners */}
+                        <div
+                          style={{
+                            position: 'relative',
+                            height: '165px',
+                            width: '100%',
+                            overflow: 'hidden',
+                            borderRadius: 'var(--radius-inner)',
+                            backgroundColor: 'var(--bg-elevated)',
+                          }}
+                        >
+                          <img
+                            src={details.images[0]}
+                            alt={details.category}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              transition: 'transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)',
+                              willChange: 'transform',
+                              transform: 'translateZ(0)',
+                              backfaceVisibility: 'hidden',
+                            }}
+                            className="group-hover:scale-105"
+                            loading="lazy"
+                          />
+
+                          {/* Dark Gradient Overlay */}
+                          <div
+                            style={{
+                              position: 'absolute',
+                              inset: 0,
+                              background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.15) 55%, rgba(0,0,0,0.3) 100%)',
+                            }}
+                          />
+
+                          {/* Floating Category Badge */}
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: '10px',
+                              left: '10px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.4rem',
+                              padding: '0.25rem 0.6rem',
+                              borderRadius: 'var(--radius-pill)',
+                              backgroundColor: 'rgba(15, 23, 42, 0.8)',
+                              backdropFilter: 'blur(8px)',
+                              border: '1px solid rgba(255, 255, 255, 0.15)',
+                              color: '#fff',
+                              fontSize: '0.725rem',
+                              fontWeight: 600,
+                            }}
+                          >
+                            <IconComponent size={12} strokeWidth={2} style={{ color: 'var(--accent)' }} />
+                            <span>{details.category}</span>
+                          </div>
+                        </div>
+
+                        {/* Card Content Body */}
+                        <div
+                          style={{
+                            padding: '0.85rem 0.35rem 0.35rem',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            flex: 1,
+                            justifyContent: 'space-between',
+                            gap: '0.85rem',
+                          }}
+                        >
+                          <div>
+                            {/* Header Placed Outside/Below Image */}
+                            <h3
+                              style={{
+                                fontSize: '1.05rem',
+                                fontWeight: 700,
+                                color: 'var(--fg)',
+                                letterSpacing: '-0.015em',
+                                lineHeight: 1.35,
+                                marginBottom: '0.45rem',
+                              }}
+                            >
+                              {details.highlight}
+                            </h3>
+
+                            <p
+                              style={{
+                                fontSize: '0.885rem',
+                                lineHeight: 1.6,
+                                color: 'var(--fg-muted)',
+                                margin: 0,
+                              }}
+                            >
+                              {ach.description}
+                            </p>
+                          </div>
+
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              paddingTop: '0.65rem',
+                              borderTop: '1px solid var(--border)',
+                            }}
+                          >
+                            <span
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem',
+                                fontSize: '0.8rem',
+                                fontWeight: 600,
+                                color: 'var(--accent)',
+                              }}
+                            >
+                              <span>Explore Field Story</span>
+                              <ArrowUpRight size={14} strokeWidth={2} className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                            </span>
+
+                            <span style={{ fontSize: '0.75rem', color: 'var(--fg-muted)' }}>
+                              {details.images.length} {details.images.length === 1 ? 'Photo' : 'Photos'}
+                            </span>
+                          </div>
+                        </div>
+
+                      </div>
+                    </Link>
+                  </motion.div>
+                );
+              })}
         </div>
 
       </div>

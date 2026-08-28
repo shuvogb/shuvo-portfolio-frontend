@@ -87,6 +87,7 @@ export interface Workshop {
   title: string;
   organizer: string;
   year: number;
+  description?: string;
   order: number;
 }
 

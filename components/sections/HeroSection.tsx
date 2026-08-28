@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
-import { ArrowUpRight, BookOpen, FlaskConical } from 'lucide-react';
+import { ArrowUpRight, BookOpen, FlaskConical, Calendar, FileText, Users } from 'lucide-react';
 import { SectionBadge } from '@/components/ui/SectionBadge';
 import type { Profile } from '@/types/portfolio';
 
@@ -219,38 +219,92 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
               </button>
             </div>
 
-            {/* Structured Bento Metrics */}
+            {/* Structured Metric Badges */}
             <div
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '0.85rem',
+                gap: '1rem',
                 marginTop: '2.5rem',
                 paddingTop: '1.75rem',
                 borderTop: '1px solid var(--border)',
               }}
             >
               {[
-                { value: '20+', label: 'Events Organized' },
-                { value: '2', label: 'Peer-Reviewed Papers' },
-                { value: '100+', label: 'Fieldwork Reach' },
-              ].map(({ value, label }) => (
+                { value: '20+', label: 'Events Organized', icon: Calendar, sublabel: 'Youth & Academic' },
+                { value: '2', label: 'Academic Papers', icon: FileText, sublabel: 'Published / Review' },
+                { value: '100+', label: 'Fieldwork Reach', icon: Users, sublabel: 'Char Communities' },
+              ].map(({ value, label, icon: Icon, sublabel }) => (
                 <div
                   key={label}
+                  className="bezel-card"
                   style={{
-                    padding: '0.85rem 1rem',
-                    borderRadius: '14px',
-                    backgroundColor: 'var(--bg-surface)',
-                    border: '1px solid var(--border)',
-                    boxShadow: 'var(--shadow-sm)',
+                    borderRadius: '16px',
+                    transition: 'transform 0.25s ease, border-color 0.25s ease',
                   }}
                 >
-                  <p style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--fg)', lineHeight: 1, letterSpacing: '-0.03em' }}>
-                    {value}
-                  </p>
-                  <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--fg-muted)', marginTop: '0.35rem', lineHeight: 1.25 }}>
-                    {label}
-                  </p>
+                  <div
+                    className="bezel-core"
+                    style={{
+                      padding: '1rem 1.15rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.35rem',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
+                      <p
+                        style={{
+                          fontSize: '1.85rem',
+                          fontWeight: 800,
+                          color: 'var(--fg)',
+                          lineHeight: 1,
+                          letterSpacing: '-0.035em',
+                          margin: 0,
+                        }}
+                      >
+                        {value}
+                      </p>
+                      <div
+                        style={{
+                          width: '28px',
+                          height: '28px',
+                          borderRadius: '8px',
+                          backgroundColor: 'var(--accent-subtle)',
+                          color: 'var(--accent)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <Icon size={14} strokeWidth={1.8} />
+                      </div>
+                    </div>
+
+                    <p
+                      style={{
+                        fontSize: '0.825rem',
+                        fontWeight: 700,
+                        color: 'var(--fg)',
+                        letterSpacing: '-0.01em',
+                        margin: 0,
+                        lineHeight: 1.25,
+                      }}
+                    >
+                      {label}
+                    </p>
+
+                    <p
+                      style={{
+                        fontSize: '0.725rem',
+                        fontWeight: 500,
+                        color: 'var(--fg-muted)',
+                        margin: 0,
+                      }}
+                    >
+                      {sublabel}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
