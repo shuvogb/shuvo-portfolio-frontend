@@ -8,6 +8,8 @@ import { Send, CheckCircle2, Loader2, Mail, Phone, MapPin, Copy, Check, MessageS
 import api from '@/lib/api';
 import { toast } from 'sonner';
 
+import type { Profile } from '@/types/portfolio';
+
 const contactSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
   email: z.string().email('Please enter a valid email address'),
@@ -16,9 +18,34 @@ const contactSchema = z.object({
 
 type ContactFormData = z.infer<typeof contactSchema>;
 
-export function ContactSection() {
+interface ContactSectionProps {
+  profile?: Profile;
+  isLoading?: boolean;
+}
+
+export function ContactSection({ profile, isLoading }: ContactSectionProps) {
   const [submitted, setSubmitted] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  const contactConfig = profile?.contactSection;
+  const sectionBadge = contactConfig?.badge || 'Direct Connection';
+  const sectionTitle = contactConfig?.title || 'Get in Touch';
+  const sectionDesc =
+    contactConfig?.description ||
+    'Open to academic research collaborations, fieldwork consultations, and community initiatives. Send a note below.';
+  const collabTitle = contactConfig?.collabTitle || "Let's Discuss Collaborations & Research";
+  const collabDesc =
+    contactConfig?.collabDescription ||
+    'Feel free to reach out directly via email, phone, or by submitting this message form. I typically respond within 24–48 hours.';
+
+  const contactEmail = profile?.email || 'shuvomolla7374@gmail.com';
+  const contactPhone = profile?.phone || '+880 1607-065888';
+  const contactLocation = profile?.presentAddress || 'Ashulia, Savar, Dhaka, Bangladesh';
+
+  const heroStats = profile?.heroStats;
+  const eventsStat = heroStats?.events || { value: '20+', label: 'Events Organized', sublabel: 'Youth & Academic' };
+  const papersStat = heroStats?.papers || { value: '2', label: 'Academic Papers', sublabel: 'Published / Review' };
+  const reachStat = heroStats?.reach || { value: '100+', label: 'Fieldwork Reach', sublabel: 'Char Communities' };
 
   const {
     register,
@@ -54,11 +81,11 @@ export function ContactSection() {
         {/* Header */}
         <div className="section-header">
           <span className="section-eyebrow">
-            <MessageSquare size={12} /> Direct Connection
+            <MessageSquare size={12} /> {sectionBadge}
           </span>
-          <h2 className="section-title">Get in Touch</h2>
+          <h2 className="section-title">{sectionTitle}</h2>
           <p className="section-description">
-            Open to academic research collaborations, fieldwork consultations, and community initiatives. Send a note below.
+            {sectionDesc}
           </p>
         </div>
 
@@ -67,10 +94,10 @@ export function ContactSection() {
           {/* Left Column: Direct Communication Channels */}
           <div>
             <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem' }}>
-              Let's Discuss Collaborations & Research
+              {collabTitle}
             </h3>
             <p style={{ fontSize: '0.95rem', lineHeight: 1.85, color: 'var(--fg-muted)', marginBottom: '2rem' }}>
-              Feel free to reach out directly via email, phone, or by submitting this message form. I typically respond within 24–48 hours.
+              {collabDesc}
             </p>
 
             {/* Direct Cards */}
@@ -79,7 +106,7 @@ export function ContactSection() {
               {/* Email Card */}
               <div
                 className="bezel-card bezel-card-interactive"
-                onClick={() => copyToClipboard('shuvomolla7374@gmail.com', 'Email')}
+                onClick={() => copyToClipboard(contactEmail, 'Email')}
               >
                 <div
                   className="bezel-core"
@@ -104,7 +131,7 @@ export function ContactSection() {
                     <div>
                       <p style={{ fontSize: '0.725rem', color: 'var(--fg-muted)', fontWeight: 600 }}>EMAIL ADDRESS</p>
                       <p className="mono" style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--fg)' }}>
-                        shuvomolla7374@gmail.com
+                        {contactEmail}
                       </p>
                     </div>
                   </div>
@@ -117,7 +144,7 @@ export function ContactSection() {
               {/* Phone Card */}
               <div
                 className="bezel-card bezel-card-interactive"
-                onClick={() => copyToClipboard('+880 1607-065888', 'Phone')}
+                onClick={() => copyToClipboard(contactPhone, 'Phone')}
               >
                 <div
                   className="bezel-core"
@@ -142,7 +169,7 @@ export function ContactSection() {
                     <div>
                       <p style={{ fontSize: '0.725rem', color: 'var(--fg-muted)', fontWeight: 600 }}>PHONE / WHATSAPP</p>
                       <p className="mono" style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--fg)' }}>
-                        +880 1607-065888
+                        {contactPhone}
                       </p>
                     </div>
                   </div>
@@ -176,7 +203,7 @@ export function ContactSection() {
                   <div>
                     <p style={{ fontSize: '0.725rem', color: 'var(--fg-muted)', fontWeight: 600 }}>PRIMARY LOCATION</p>
                     <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--fg)' }}>
-                      Ashulia, Savar, Dhaka, Bangladesh
+                      {contactLocation}
                     </p>
                   </div>
                 </div>
@@ -187,9 +214,9 @@ export function ContactSection() {
             {/* Impact Metric Strip */}
             <div className="contact-stats-grid">
               {[
-                { value: '20+', label: 'Events Organized', icon: Calendar, sublabel: 'Youth & Academic' },
-                { value: '2', label: 'Academic Papers', icon: FileText, sublabel: 'Published / Review' },
-                { value: '100+', label: 'Fieldwork Reach', icon: Users, sublabel: 'Char Communities' },
+                { value: eventsStat.value, label: eventsStat.label, icon: Calendar, sublabel: eventsStat.sublabel },
+                { value: papersStat.value, label: papersStat.label, icon: FileText, sublabel: papersStat.sublabel },
+                { value: reachStat.value, label: reachStat.label, icon: Users, sublabel: reachStat.sublabel },
               ].map(({ value, label, icon: Icon, sublabel }) => (
                 <div
                   key={label}

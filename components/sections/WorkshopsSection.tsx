@@ -3,10 +3,11 @@
 import { BookCheck } from 'lucide-react';
 import { SectionBadge } from '@/components/ui/SectionBadge';
 import { AnimatedTestimonials, type Testimonial } from '@/components/ui/animated-testimonials';
-import type { Workshop } from '@/types/portfolio';
+import type { Workshop, Profile } from '@/types/portfolio';
 
 interface WorkshopsSectionProps {
   workshops?: Workshop[];
+  profile?: Profile;
   isLoading: boolean;
 }
 
@@ -26,22 +27,31 @@ const DEFAULT_IMAGES = [
   'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?q=80&w=1200&auto=format&fit=crop',
 ];
 
-export function WorkshopsSection({ workshops = [], isLoading }: WorkshopsSectionProps) {
+export function WorkshopsSection({ workshops = [], profile, isLoading }: WorkshopsSectionProps) {
+  const wsConfig = profile?.workshopsSection;
+  const sectionBadge = wsConfig?.badge || 'Professional Development';
+  const sectionTitle = wsConfig?.title || 'Workshops & Certifications';
+  const sectionDesc =
+    wsConfig?.description ||
+    'Specialized training programs in quantitative social methodology, field research ethics, climate negotiations, and leadership.';
+
   // Format workshops into testimonials format with 3D stack cards
   const formattedWorkshops: Testimonial[] = workshops.map((ws, idx) => {
-    let img = DEFAULT_IMAGES[idx % DEFAULT_IMAGES.length];
+    let img = ws.imageUrl || DEFAULT_IMAGES[idx % DEFAULT_IMAGES.length];
     const lowerTitle = (ws.title || '').toLowerCase();
     
-    if (lowerTitle.includes('climate') || lowerTitle.includes('ndc') || lowerTitle.includes('net zero')) {
-      img = WORKSHOP_IMAGES.climate;
-    } else if (lowerTitle.includes('marketing') || lowerTitle.includes('digital')) {
-      img = WORKSHOP_IMAGES.marketing;
-    } else if (lowerTitle.includes('pollution') || lowerTitle.includes('lead') || lowerTitle.includes('youth leaders')) {
-      img = WORKSHOP_IMAGES.pollution;
-    } else if (lowerTitle.includes('photo') || lowerTitle.includes('capture')) {
-      img = WORKSHOP_IMAGES.photo;
-    } else if (lowerTitle.includes('theatre') || lowerTitle.includes('acting') || lowerTitle.includes('drama')) {
-      img = WORKSHOP_IMAGES.theatre;
+    if (!ws.imageUrl) {
+      if (lowerTitle.includes('climate') || lowerTitle.includes('ndc') || lowerTitle.includes('net zero')) {
+        img = WORKSHOP_IMAGES.climate;
+      } else if (lowerTitle.includes('marketing') || lowerTitle.includes('digital')) {
+        img = WORKSHOP_IMAGES.marketing;
+      } else if (lowerTitle.includes('pollution') || lowerTitle.includes('lead') || lowerTitle.includes('youth leaders')) {
+        img = WORKSHOP_IMAGES.pollution;
+      } else if (lowerTitle.includes('photo') || lowerTitle.includes('capture')) {
+        img = WORKSHOP_IMAGES.photo;
+      } else if (lowerTitle.includes('theatre') || lowerTitle.includes('acting') || lowerTitle.includes('drama')) {
+        img = WORKSHOP_IMAGES.theatre;
+      }
     }
 
     return {
@@ -60,11 +70,11 @@ export function WorkshopsSection({ workshops = [], isLoading }: WorkshopsSection
         {/* Header */}
         <div className="section-header">
           <SectionBadge icon={<BookCheck size={13} strokeWidth={1.75} />}>
-            Professional Development
+            {sectionBadge}
           </SectionBadge>
-          <h2 className="section-title">Workshops & Certifications</h2>
+          <h2 className="section-title">{sectionTitle}</h2>
           <p className="section-description">
-            Specialized training programs in quantitative social methodology, field research ethics, climate negotiations, and leadership.
+            {sectionDesc}
           </p>
         </div>
 

@@ -113,6 +113,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               title: 'Workshops & Training',
               url: '/admin/workshops',
             },
+            {
+              title: 'Contact & Inquiries',
+              url: '/admin/contact',
+            },
+            {
+              title: 'Footer & Colophon',
+              url: '/admin/footer',
+            },
           ],
         },
         {

@@ -26,11 +26,11 @@ export default function HomePage() {
         <AboutSection profile={data?.profile} isLoading={isLoading} />
         <SkillsSection skills={data?.skills} profile={data?.profile} isLoading={isLoading} />
         <ExperienceSection experience={data?.experience} profile={data?.profile} isLoading={isLoading} />
-        <ResearchSection publications={data?.publications} isLoading={isLoading} />
-        <AchievementsSection achievements={data?.achievements} isLoading={isLoading} />
+        <ResearchSection publications={data?.publications} profile={data?.profile} isLoading={isLoading} />
+        <AchievementsSection achievements={data?.achievements} profile={data?.profile} isLoading={isLoading} />
         <EducationSection education={data?.education} profile={data?.profile} isLoading={isLoading} />
-        <WorkshopsSection workshops={data?.workshops} isLoading={isLoading} />
-        <ContactSection />
+        <WorkshopsSection workshops={data?.workshops} profile={data?.profile} isLoading={isLoading} />
+        <ContactSection profile={data?.profile} isLoading={isLoading} />
       </main>
       <FooterSection profile={data?.profile} />
     </>

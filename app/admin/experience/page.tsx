@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion, AnimatePresence } from 'motion/react';
@@ -30,6 +30,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer';
+import { CustomCheckbox } from '@/components/ui/custom-checkbox';
 import type { Experience } from '@/types/portfolio';
 
 const experienceItemSchema = z.object({
@@ -545,18 +546,19 @@ export default function AdminExperiencePage() {
                   </div>
                 </div>
 
-                {/* Current Role Checkbox / Switch */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.75rem 1rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '12px', border: '1px solid var(--border)' }}>
-                  <input
-                    type="checkbox"
-                    id="isCurrentExpCheckbox"
-                    {...registerExp('isCurrent')}
-                    style={{ width: '18px', height: '18px', accentColor: 'var(--accent)', cursor: 'pointer' }}
-                  />
-                  <label htmlFor="isCurrentExpCheckbox" style={{ fontSize: '0.85rem', fontWeight: 650, color: 'var(--fg)', cursor: 'pointer' }}>
-                    This is my current ongoing role
-                  </label>
-                </div>
+                {/* Current Role Custom Checkbox */}
+                <Controller
+                  control={expControl}
+                  name="isCurrent"
+                  render={({ field }) => (
+                    <CustomCheckbox
+                      label="This is my current ongoing role"
+                      description="Marks this position as active and in progress"
+                      checked={field.value}
+                      onCheckedChange={(val) => field.onChange(val)}
+                    />
+                  )}
+                />
 
                 {/* Bullet Points Manager */}
                 <div>

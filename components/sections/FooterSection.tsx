@@ -10,11 +10,23 @@ interface FooterSectionProps {
 }
 
 export function FooterSection({ profile }: FooterSectionProps) {
-  const year = new Date().getFullYear();
+  const currentYear = new Date().getFullYear();
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const footerConfig = profile?.footerSection;
+  const name = profile?.name || 'Shuvo Molla';
+  const roleBadge = footerConfig?.roleBadge || 'Social Researcher';
+  const tagline =
+    footerConfig?.tagline ||
+    'Sociology & Social Work undergraduate focused on empirical data modeling, char community studies, and youth development.';
+  const location = footerConfig?.location || 'Gono Bishwabidyalay · Savar, Dhaka';
+  const navTitle = footerConfig?.navTitle || 'Portfolio Navigation';
+  const channelsTitle = footerConfig?.channelsTitle || 'Connect & Channels';
+  const rawCopyright = footerConfig?.copyrightText || '© {year} {name}. Built with Next.js & TypeScript.';
+  const copyrightText = rawCopyright.replace('{year}', String(currentYear)).replace('{name}', name);
 
   const navLinks = [
     { label: 'About', href: '#about' },
@@ -53,39 +65,43 @@ export function FooterSection({ profile }: FooterSectionProps) {
         >
           {/* Brand & Bio Column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--fg)', letterSpacing: '-0.02em' }}>
-                {profile?.name || 'Shuvo Molla'}
+                {name}
               </span>
-              <span
-                style={{
-                  fontSize: '0.7rem',
-                  fontWeight: 600,
-                  color: 'var(--accent)',
-                  padding: '0.15rem 0.5rem',
-                  borderRadius: 'var(--radius-pill)',
-                  backgroundColor: 'var(--accent-subtle)',
-                  border: '1px solid var(--accent-border)',
-                }}
-              >
-                Social Researcher
-              </span>
+              {roleBadge && (
+                <span
+                  style={{
+                    fontSize: '0.7rem',
+                    fontWeight: 600,
+                    color: 'var(--accent)',
+                    padding: '0.15rem 0.5rem',
+                    borderRadius: 'var(--radius-pill)',
+                    backgroundColor: 'var(--accent-subtle)',
+                    border: '1px solid var(--accent-border)',
+                  }}
+                >
+                  {roleBadge}
+                </span>
+              )}
             </div>
 
             <p style={{ fontSize: '0.875rem', color: 'var(--fg-muted)', lineHeight: 1.6, maxWidth: '380px', margin: 0 }}>
-              Sociology & Social Work undergraduate focused on empirical data modeling, char community studies, and youth development.
+              {tagline}
             </p>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.8rem', color: 'var(--fg-muted)' }}>
-              <MapPin size={13} style={{ color: 'var(--accent)' }} />
-              <span>Gono Bishwabidyalay · Savar, Dhaka</span>
-            </div>
+            {location && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.8rem', color: 'var(--fg-muted)' }}>
+                <MapPin size={13} style={{ color: 'var(--accent)' }} />
+                <span>{location}</span>
+              </div>
+            )}
           </div>
 
           {/* Quick Navigation Links */}
           <div>
             <p style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--fg)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.85rem' }}>
-              Portfolio Navigation
+              {navTitle}
             </p>
             <div
               style={{
@@ -116,7 +132,7 @@ export function FooterSection({ profile }: FooterSectionProps) {
           {/* Social Channels & Contact Action */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
             <p style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--fg)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>
-              Connect & Channels
+              {channelsTitle}
             </p>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
@@ -173,7 +189,7 @@ export function FooterSection({ profile }: FooterSectionProps) {
           }}
         >
           <p style={{ fontSize: '0.8rem', color: 'var(--fg-muted)', margin: 0 }}>
-            © {year} {profile?.name || 'Shuvo Molla'}. Built with Next.js & TypeScript.
+            {copyrightText}
           </p>
 
           <button

@@ -10,6 +10,7 @@ import {
   Calendar,
   type LucideIcon
 } from 'lucide-react';
+import type { Achievement } from '@/types/portfolio';
 
 export interface AchievementDetails {
   category: string;
@@ -24,11 +25,18 @@ export interface AchievementDetails {
   icon: LucideIcon;
 }
 
-export function getAchievementDetails(text: string, index: number): AchievementDetails {
+export function getAchievementDetails(
+  achOrText: string | (Partial<Achievement> & { description?: string }),
+  index: number = 0
+): AchievementDetails {
+  const ach = typeof achOrText === 'object' && achOrText !== null ? achOrText : { description: achOrText || '' };
+  const text = ach.description || ach.title || '';
   const lower = (text || '').toLowerCase();
 
+  let base: AchievementDetails;
+
   if (lower.includes('rasulpur') || lower.includes('livestock') || lower.includes('poultry') || lower.includes('survey')) {
-    return {
+    base = {
       category: 'Community Development',
       highlight: '20 Families Supported',
       title: 'Land Survey & Livestock Distribution in Rasulpur Char',
@@ -48,10 +56,8 @@ export function getAchievementDetails(text: string, index: number): AchievementD
       ],
       icon: Users,
     };
-  }
-
-  if (lower.includes('livelihood')) {
-    return {
+  } else if (lower.includes('livelihood')) {
+    base = {
       category: 'Livelihood Initiatives',
       highlight: 'Char Economic Resilience',
       title: 'Community Livelihood Enhancement Program',
@@ -70,10 +76,8 @@ export function getAchievementDetails(text: string, index: number): AchievementD
       ],
       icon: HeartHandshake,
     };
-  }
-
-  if (lower.includes('quantitative') || lower.includes('demo report')) {
-    return {
+  } else if (lower.includes('quantitative') || lower.includes('demo report')) {
+    base = {
       category: 'Academic Research',
       highlight: 'Quantitative Methodology',
       title: 'Quantitative Social Research Methodology Report',
@@ -92,10 +96,8 @@ export function getAchievementDetails(text: string, index: number): AchievementD
       ],
       icon: FileText,
     };
-  }
-
-  if (lower.includes('gbcdc') || lower.includes('career development')) {
-    return {
+  } else if (lower.includes('gbcdc') || lower.includes('career development')) {
+    base = {
       category: 'Career Leadership',
       highlight: '20+ Student Programs',
       title: '20+ University-Wide Career Development Programs',
@@ -114,10 +116,8 @@ export function getAchievementDetails(text: string, index: number): AchievementD
       ],
       icon: GraduationCap,
     };
-  }
-
-  if (lower.includes('climate') || lower.includes('youthnet')) {
-    return {
+  } else if (lower.includes('climate') || lower.includes('youthnet')) {
+    base = {
       category: 'Climate Justice',
       highlight: 'YouthNet Global Advocacy',
       title: 'Youth Climate Advocacy & Mobilization Campaigns',
@@ -136,10 +136,8 @@ export function getAchievementDetails(text: string, index: number): AchievementD
       ],
       icon: Sun,
     };
-  }
-
-  if (lower.includes('excellence bangladesh')) {
-    return {
+  } else if (lower.includes('excellence bangladesh')) {
+    base = {
       category: 'Youth Empowerment',
       highlight: 'Excellence Bangladesh',
       title: 'Student Leadership & Professional Events Portfolio',
@@ -158,10 +156,8 @@ export function getAchievementDetails(text: string, index: number): AchievementD
       ],
       icon: Award,
     };
-  }
-
-  if (lower.includes('table and tales') || lower.includes('hospitality') || lower.includes('guests')) {
-    return {
+  } else if (lower.includes('table and tales') || lower.includes('hospitality') || lower.includes('guests')) {
+    base = {
       category: 'Operations & Management',
       highlight: '100+ Daily Guests',
       title: 'Commercial Operations & Customer Experience Stewardship',
@@ -180,10 +176,8 @@ export function getAchievementDetails(text: string, index: number): AchievementD
       ],
       icon: Building,
     };
-  }
-
-  if (lower.includes('department') || lower.includes('sociology')) {
-    return {
+  } else if (lower.includes('department') || lower.includes('sociology')) {
+    base = {
       category: 'Institutional Leadership',
       highlight: '10+ Academic Seminars',
       title: 'Sociology & Social Work Departmental Academic Events',
@@ -202,25 +196,37 @@ export function getAchievementDetails(text: string, index: number): AchievementD
       ],
       icon: Calendar,
     };
+  } else {
+    base = {
+      category: 'Field Milestone',
+      highlight: 'Key Achievement',
+      title: text || 'Field Milestone',
+      images: [
+        'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1200&auto=format&fit=crop'
+      ],
+      location: 'Bangladesh',
+      organization: 'Professional Endeavors',
+      scope: 'Institutional Leadership',
+      fullStory: text || 'Specialized field achievement and milestone.',
+      keyTakeaways: [
+        'Successfully executed key program milestones',
+        'Collaborated with diverse team members and institutional stakeholders'
+      ],
+      icon: Trophy,
+    };
   }
 
-  // Fallback
   return {
-    category: 'Field Milestone',
-    highlight: 'Key Achievement',
-    title: text || 'Field Milestone',
-    images: [
-      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1200&auto=format&fit=crop'
-    ],
-    location: 'Bangladesh',
-    organization: 'Professional Endeavors',
-    scope: 'Institutional Leadership',
-    fullStory: text || 'Specialized field achievement and milestone.',
-    keyTakeaways: [
-      'Successfully executed key program milestones',
-      'Collaborated with diverse team members and institutional stakeholders'
-    ],
-    icon: Trophy,
+    category: ach.category || base.category,
+    highlight: ach.highlight || ach.title || base.highlight,
+    title: ach.title || base.title,
+    images: (ach.images && ach.images.length > 0) ? ach.images : (ach.imageUrl ? [ach.imageUrl] : base.images),
+    location: ach.location || base.location,
+    organization: ach.organization || base.organization,
+    scope: ach.scope || base.scope,
+    fullStory: ach.fullStory || base.fullStory,
+    keyTakeaways: (ach.keyTakeaways && ach.keyTakeaways.length > 0) ? ach.keyTakeaways : base.keyTakeaways,
+    icon: base.icon,
   };
 }

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion, AnimatePresence } from 'motion/react';
@@ -30,6 +30,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer';
+import { CustomCheckbox } from '@/components/ui/custom-checkbox';
 import type { Education } from '@/types/portfolio';
 
 const educationItemSchema = z.object({
@@ -80,6 +81,7 @@ export default function AdminEducationPage() {
   // Form for Education Item
   const {
     register: registerEdu,
+    control: eduControl,
     handleSubmit: handleEduSubmit,
     reset: resetEduForm,
     watch: watchEdu,
@@ -562,18 +564,19 @@ export default function AdminEducationPage() {
                   </div>
                 </div>
 
-                {/* Currently Enrolled Toggle */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.75rem 1rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '12px', border: '1px solid var(--border)' }}>
-                  <input
-                    type="checkbox"
-                    id="isCurrentEduCheckbox"
-                    {...registerEdu('isCurrent')}
-                    style={{ width: '18px', height: '18px', accentColor: 'var(--accent)', cursor: 'pointer' }}
-                  />
-                  <label htmlFor="isCurrentEduCheckbox" style={{ fontSize: '0.85rem', fontWeight: 650, color: 'var(--fg)', cursor: 'pointer' }}>
-                    Currently enrolled in this academic program
-                  </label>
-                </div>
+                {/* Currently Enrolled Custom Checkbox */}
+                <Controller
+                  control={eduControl}
+                  name="isCurrent"
+                  render={({ field }) => (
+                    <CustomCheckbox
+                      label="Currently enrolled in this academic program"
+                      description="Marks this degree as actively in progress"
+                      checked={field.value}
+                      onCheckedChange={(val) => field.onChange(val)}
+                    />
+                  )}
+                />
 
               </div>
             </DrawerBody>

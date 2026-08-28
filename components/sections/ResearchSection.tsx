@@ -3,17 +3,25 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { SectionBadge } from '@/components/ui/SectionBadge';
-import type { Publication } from '@/types/portfolio';
+import type { Publication, Profile } from '@/types/portfolio';
 import { Check, Copy, ExternalLink, FlaskConical, BookOpen, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ResearchSectionProps {
   publications?: Publication[];
+  profile?: Profile;
   isLoading: boolean;
 }
 
-export function ResearchSection({ publications = [], isLoading }: ResearchSectionProps) {
+export function ResearchSection({ publications = [], profile, isLoading }: ResearchSectionProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const pubConfig = profile?.publicationsSection;
+  const sectionBadge = pubConfig?.badge || 'Academic Scholarship & Papers';
+  const sectionTitle = pubConfig?.title || 'Research & Publications';
+  const sectionDesc =
+    pubConfig?.description ||
+    'Peer-reviewed empirical studies and ongoing manuscripts addressing vulnerable communities, socio-economic dynamics, and char region livelihood deprivations.';
 
   const copyCitation = (pub: Publication) => {
     const citation = `${pub.authors.join(', ')} (${pub.year}). ${pub.title}. ${pub.source}${pub.volume ? `, ${pub.volume}` : ''}${pub.pages ? `, pp. ${pub.pages}` : ''}.${pub.link ? ` ${pub.link}` : ''}`;
@@ -30,11 +38,11 @@ export function ResearchSection({ publications = [], isLoading }: ResearchSectio
         {/* Header */}
         <div className="section-header">
           <SectionBadge icon={<FlaskConical size={13} />}>
-            Academic Scholarship & Papers
+            {sectionBadge}
           </SectionBadge>
-          <h2 className="section-title">Research & Publications</h2>
+          <h2 className="section-title">{sectionTitle}</h2>
           <p className="section-description">
-            Peer-reviewed empirical studies and ongoing manuscripts addressing vulnerable communities, socio-economic dynamics, and char region livelihood deprivations.
+            {sectionDesc}
           </p>
         </div>
 

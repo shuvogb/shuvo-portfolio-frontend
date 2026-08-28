@@ -15,7 +15,7 @@ import {
   Save,
   ImageIcon,
 } from 'lucide-react';
-import { useForm, FieldValues, Path } from 'react-hook-form';
+import { useForm, FieldValues, Path, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ZodType } from 'zod';
 import api from '@/lib/api';
@@ -29,6 +29,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer';
+import { CustomCheckbox } from '@/components/ui/custom-checkbox';
 
 export interface FieldConfig {
   name: string;
@@ -77,6 +78,7 @@ export function AdminCrudPage<T extends FieldValues>({
 
   const {
     register,
+    control,
     handleSubmit,
     reset,
     setValue,
@@ -332,15 +334,18 @@ export function AdminCrudPage<T extends FieldValues>({
                           ))}
                         </select>
                       ) : field.type === 'checkbox' ? (
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', cursor: 'pointer', padding: '0.5rem 0' }}>
-                          <input
-                            id={`field-${field.name}`}
-                            type="checkbox"
-                            {...register(field.name as Path<T>)}
-                            style={{ width: '18px', height: '18px', accentColor: 'var(--accent)' }}
-                          />
-                          <span style={{ fontSize: '0.875rem', color: 'var(--fg)' }}>Active / Enabled</span>
-                        </label>
+                        <Controller
+                          control={control}
+                          name={field.name as Path<T>}
+                          render={({ field: formField }) => (
+                            <CustomCheckbox
+                              id={`field-${field.name}`}
+                              label="Active / Enabled"
+                              checked={!!formField.value}
+                              onCheckedChange={(val) => formField.onChange(val)}
+                            />
+                          )}
+                        />
                       ) : field.type === 'image' ? (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>

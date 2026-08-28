@@ -67,6 +67,36 @@ export interface Profile {
     title?: string;
     description?: string;
   };
+  publicationsSection?: {
+    badge?: string;
+    title?: string;
+    description?: string;
+  };
+  achievementsSection?: {
+    badge?: string;
+    title?: string;
+    description?: string;
+  };
+  workshopsSection?: {
+    badge?: string;
+    title?: string;
+    description?: string;
+  };
+  contactSection?: {
+    badge?: string;
+    title?: string;
+    description?: string;
+    collabTitle?: string;
+    collabDescription?: string;
+  };
+  footerSection?: {
+    roleBadge?: string;
+    tagline?: string;
+    location?: string;
+    navTitle?: string;
+    channelsTitle?: string;
+    copyrightText?: string;
+  };
   references?: Array<{
     name: string;
     title: string;
@@ -112,7 +142,17 @@ export interface Publication {
 
 export interface Achievement {
   _id: string;
+  title?: string;
+  category?: string;
+  highlight?: string;
+  imageUrl?: string;
+  images?: string[];
   description: string;
+  location?: string;
+  organization?: string;
+  scope?: string;
+  fullStory?: string;
+  keyTakeaways?: string[];
   order: number;
 }
 
@@ -140,6 +180,7 @@ export interface Workshop {
   organizer: string;
   year: number;
   description?: string;
+  imageUrl?: string;
   order: number;
 }
 

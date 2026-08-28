@@ -5,14 +5,22 @@ import { motion } from 'motion/react';
 import { Trophy, ArrowUpRight } from 'lucide-react';
 import { SectionBadge } from '@/components/ui/SectionBadge';
 import { getAchievementDetails } from '@/lib/achievementsData';
-import type { Achievement } from '@/types/portfolio';
+import type { Achievement, Profile } from '@/types/portfolio';
 
 interface AchievementsSectionProps {
   achievements?: Achievement[];
+  profile?: Profile;
   isLoading: boolean;
 }
 
-export function AchievementsSection({ achievements = [], isLoading }: AchievementsSectionProps) {
+export function AchievementsSection({ achievements = [], profile, isLoading }: AchievementsSectionProps) {
+  const achConfig = profile?.achievementsSection;
+  const sectionBadge = achConfig?.badge || 'Impact & Milestones';
+  const sectionTitle = achConfig?.title || 'Key Achievements';
+  const sectionDesc =
+    achConfig?.description ||
+    'Quantifiable leadership results, community development initiatives, and student organization stewardship. Click any card to view the dedicated field story.';
+
   return (
     <section id="achievements" className="section bg-grid-pattern" aria-label="Key Achievements & Milestones">
       <div className="container">
@@ -20,11 +28,11 @@ export function AchievementsSection({ achievements = [], isLoading }: Achievemen
         {/* Header */}
         <div className="section-header">
           <SectionBadge icon={<Trophy size={13} strokeWidth={1.75} />}>
-            Impact & Milestones
+            {sectionBadge}
           </SectionBadge>
-          <h2 className="section-title">Key Achievements</h2>
+          <h2 className="section-title">{sectionTitle}</h2>
           <p className="section-description">
-            Quantifiable leadership results, community development initiatives, and student organization stewardship. Click any card to view the dedicated field story.
+            {sectionDesc}
           </p>
         </div>
 
@@ -47,7 +55,7 @@ export function AchievementsSection({ achievements = [], isLoading }: Achievemen
                 </div>
               ))
             : achievements.map((ach, idx) => {
-                const details = getAchievementDetails(ach.description, idx);
+                const details = getAchievementDetails(ach, idx);
                 const IconComponent = details.icon;
 
                 return (

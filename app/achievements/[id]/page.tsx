@@ -63,7 +63,7 @@ export default function AchievementDetailPage({ params }: PageProps) {
 
   const currentAch = achievements[currentIndex];
   const details: AchievementDetails = currentAch 
-    ? getAchievementDetails(currentAch.description, currentIndex)
+    ? getAchievementDetails(currentAch, currentIndex)
     : getAchievementDetails('', 0);
 
   const IconComponent = details.icon;
