@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'motion/react';
-import { Award } from 'lucide-react';
+import { Award, BookCheck } from 'lucide-react';
 import type { Workshop } from '@/types/portfolio';
 
 interface WorkshopsSectionProps {
@@ -9,51 +9,73 @@ interface WorkshopsSectionProps {
   isLoading: boolean;
 }
 
-export function WorkshopsSection({ workshops, isLoading }: WorkshopsSectionProps) {
+export function WorkshopsSection({ workshops = [], isLoading }: WorkshopsSectionProps) {
   return (
-    <section id="workshops" className="section section-alt" aria-label="Workshops and Training">
+    <section id="workshops" className="section" aria-label="Workshops and Professional Training">
       <div className="container">
         
+        {/* Header */}
         <div className="section-header">
-          <span className="section-eyebrow">Professional Development</span>
-          <h2 className="section-title">Workshops & Training</h2>
+          <span className="section-eyebrow">
+            <BookCheck size={12} /> Professional Development
+          </span>
+          <h2 className="section-title">Workshops & Certifications</h2>
+          <p className="section-description">
+            Specialized training programs in quantitative social methodology, field research ethics, and institutional leadership.
+          </p>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        {/* List Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1rem' }}>
           {isLoading
-            ? Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="skeleton" style={{ height: '64px' }} />
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="skeleton" style={{ height: '80px' }} />
               ))
-            : workshops?.map((ws) => (
-                <div
-                  key={ws._id}
-                  className="card"
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 1.25rem', gap: '1rem' }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-                    <div style={{
-                      width: '32px', height: '32px',
-                      borderRadius: 'var(--radius)',
-                      backgroundColor: 'var(--primary-subtle)',
-                      color: 'var(--primary)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      flexShrink: 0,
-                    }}>
-                      <Award size={16} />
+            : workshops.map((ws) => (
+                <div key={ws._id} className="bezel-card bezel-card-interactive">
+                  <div
+                    className="bezel-core"
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      gap: '0.75rem',
+                      padding: '1.25rem',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                      <div
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '8px',
+                          backgroundColor: 'var(--accent-subtle)',
+                          color: 'var(--accent)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                          marginTop: '2px',
+                        }}
+                      >
+                        <Award size={16} />
+                      </div>
+                      <div>
+                        <h3 style={{ fontSize: '0.95rem', fontWeight: 700, lineHeight: 1.4, color: 'var(--fg)', marginBottom: '0.2rem' }}>
+                          {ws.title}
+                        </h3>
+                        <p style={{ fontSize: '0.825rem', color: 'var(--fg-muted)' }}>
+                          {ws.organizer}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--foreground)', marginBottom: '0.15rem' }}>
-                        {ws.title}
-                      </p>
-                      <p style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>
-                        {ws.organizer}
-                      </p>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '0.5rem', borderTop: '1px solid var(--border)' }}>
+                      <span className="mono" style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 700 }}>
+                        {ws.year}
+                      </span>
                     </div>
                   </div>
-
-                  <span className="mono" style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 600, flexShrink: 0 }}>
-                    {ws.year}
-                  </span>
                 </div>
               ))}
         </div>

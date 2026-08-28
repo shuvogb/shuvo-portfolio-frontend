@@ -1,41 +1,40 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type ThemeMode = 'system' | 'light' | 'dark';
+export type ThemeMode = 'light' | 'dark';
 
 interface ThemeStore {
   theme: ThemeMode;
-  resolvedTheme: 'light' | 'dark';
   setTheme: (theme: ThemeMode) => void;
   toggleTheme: () => void;
-  setResolvedTheme: (resolved: 'light' | 'dark') => void;
 }
 
 export const useThemeStore = create<ThemeStore>()(
   persist(
     (set, get) => ({
-      theme: 'system',
-      resolvedTheme: 'light',
-      setTheme: (theme) => {
+      theme: 'dark',
+      setTheme: (theme: ThemeMode) => {
         set({ theme });
+        if (typeof document !== 'undefined') {
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        }
       },
       toggleTheme: () => {
-        const current = get().theme;
-        let next: ThemeMode;
-        if (current === 'system') {
-          const isDark = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
-          next = isDark ? 'light' : 'dark';
-        } else if (current === 'light') {
-          next = 'dark';
-        } else {
-          next = 'system';
-        }
+        const next: ThemeMode = get().theme === 'dark' ? 'light' : 'dark';
         set({ theme: next });
-      },
-      setResolvedTheme: (resolvedTheme) => {
-        set({ resolvedTheme });
+        if (typeof document !== 'undefined') {
+          if (next === 'dark') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        }
       },
     }),
-    { name: 'sm-portfolio-theme-v2' }
+    { name: 'sm-portfolio-theme-v3' }
   )
 );

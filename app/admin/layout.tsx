@@ -149,12 +149,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <button
               onClick={toggleTheme}
-              title={`Switch theme (current: ${theme})`}
-              aria-label="Toggle theme mode"
+              title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} mode`}
+              aria-label={`Toggle theme mode. Current: ${theme}`}
               className="btn btn-secondary"
               style={{ flex: 1, padding: '0.5rem', fontSize: '0.75rem' }}
             >
-              {theme === 'system' ? <Laptop size={14} /> : theme === 'dark' ? <Moon size={14} /> : <Sun size={14} />}
+              {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
               <span style={{ textTransform: 'capitalize' }}>{theme}</span>
             </button>
             <button

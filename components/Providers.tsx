@@ -15,39 +15,15 @@ const queryClient = new QueryClient({
 });
 
 function ThemeInitializer({ children }: { children: React.ReactNode }) {
-  const { theme, resolvedTheme, setResolvedTheme } = useThemeStore();
+  const { theme } = useThemeStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-
-    const applyTheme = () => {
-      let isDark = false;
-      if (theme === 'system') {
-        isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      } else {
-        isDark = theme === 'dark';
-      }
-
-      const activeResolved = isDark ? 'dark' : 'light';
-      setResolvedTheme(activeResolved);
-
-      document.documentElement.classList.toggle('dark', isDark);
-      document.body.classList.toggle('dark', isDark);
-    };
-
-    applyTheme();
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = () => {
-      if (theme === 'system') {
-        applyTheme();
-      }
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [theme, setResolvedTheme]);
+    const isDark = theme === 'dark';
+    document.documentElement.classList.toggle('dark', isDark);
+    document.body.classList.toggle('dark', isDark);
+  }, [theme]);
 
   if (!mounted) {
     return <>{children}</>;
@@ -58,9 +34,15 @@ function ThemeInitializer({ children }: { children: React.ReactNode }) {
       {children}
       <Toaster
         position="bottom-right"
+        theme={theme}
         richColors
         closeButton
-        theme={resolvedTheme}
+        toastOptions={{
+          style: {
+            fontFamily: 'var(--font-display)',
+            borderRadius: '12px',
+          },
+        }}
       />
     </>
   );
