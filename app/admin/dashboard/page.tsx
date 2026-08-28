@@ -2,7 +2,19 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'motion/react';
-import { Users, Eye, MessageSquare, TrendingUp, ExternalLink, ArrowRight } from 'lucide-react';
+import {
+  Users,
+  Eye,
+  MessageSquare,
+  TrendingUp,
+  ExternalLink,
+  ArrowRight,
+  Sparkles,
+  Layers,
+  BookOpen,
+  Briefcase,
+  BarChart3,
+} from 'lucide-react';
 import Link from 'next/link';
 import api from '@/lib/api';
 
@@ -13,38 +25,62 @@ interface OverviewData {
   mostViewedSection: string | null;
 }
 
-function StatCard({ value, label, icon: Icon }: { value: number | string; label: string; icon: React.ElementType }) {
+function StatCard({
+  value,
+  label,
+  icon: Icon,
+  subtitle,
+}: {
+  value: number | string;
+  label: string;
+  icon: React.ElementType;
+  subtitle?: string;
+}) {
   return (
-    <div className="card" style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-      <div style={{
-        width: '40px', height: '40px',
-        borderRadius: 'var(--radius)',
-        backgroundColor: 'var(--primary-subtle)',
-        color: 'var(--primary)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        flexShrink: 0,
-      }}>
-        <Icon size={18} />
+    <div className="card" style={{ padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: '0.825rem', fontWeight: 600, color: 'var(--fg-muted)' }}>
+          {label}
+        </span>
+        <div
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '10px',
+            backgroundColor: 'var(--accent-subtle)',
+            color: 'var(--accent)',
+            border: '1px solid var(--accent-border)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <Icon size={16} strokeWidth={2} />
+        </div>
       </div>
+
       <div>
-        <p style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--foreground)', lineHeight: 1, letterSpacing: '-0.02em' }}>
+        <p style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--fg)', lineHeight: 1.1, letterSpacing: '-0.03em', margin: 0 }}>
           {value}
         </p>
-        <p style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)', marginTop: '0.35rem' }}>
-          {label}
-        </p>
+        {subtitle && (
+          <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', margin: 0, marginTop: '0.35rem' }}>
+            {subtitle}
+          </p>
+        )}
       </div>
     </div>
   );
 }
 
-const QUICK_LINKS = [
-  { href: '/admin/profile', label: 'Edit Profile Information' },
-  { href: '/admin/skills', label: 'Manage Skills' },
-  { href: '/admin/experience', label: 'Update Work Experience' },
-  { href: '/admin/publications', label: 'Manage Publications' },
-  { href: '/admin/messages', label: 'View Inquiries & Messages' },
-  { href: '/admin/analytics', label: 'Visitor Analytics & Dwell Time' },
+const QUICK_ACTIONS = [
+  { href: '/admin/profile', label: 'Edit Profile & Bio', icon: Users, desc: 'Update contact info, headline, and private data' },
+  { href: '/admin/skills', label: 'Manage Skills Matrix', icon: Layers, desc: 'Reorder, add, or edit technical competencies' },
+  { href: '/admin/publications', label: 'Research Papers', icon: BookOpen, desc: 'Manage citations, abstracts, and DOI links' },
+  { href: '/admin/experience', label: 'Work Experience', icon: Briefcase, desc: 'Update organizational leadership roles' },
+  { href: '/admin/messages', label: 'Inquiries & Messages', icon: MessageSquare, desc: 'Read and manage incoming portfolio messages' },
+  { href: '/admin/analytics', label: 'Visitor Analytics', icon: BarChart3, desc: 'Analyze visitor dwell time and section views' },
 ];
 
 export default function AdminDashboard() {
@@ -57,101 +93,128 @@ export default function AdminDashboard() {
   });
 
   return (
-    <div>
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.75rem', marginBottom: '0.25rem' }}>
-          Dashboard
-        </h1>
-        <p style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>
-          Overview of your portfolio activity and content management.
-        </p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+      
+      {/* Welcome Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--fg)', letterSpacing: '-0.03em', marginBottom: '0.35rem' }}>
+            Executive Dashboard
+          </h1>
+          <p style={{ color: 'var(--fg-muted)', fontSize: '0.9rem', margin: 0 }}>
+            Real-time portfolio metrics, content management modules, and inquiry tracking.
+          </p>
+        </div>
+
+        <Link
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-primary"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.45rem',
+            fontSize: '0.825rem',
+            padding: '0.45rem 1rem',
+            borderRadius: 'var(--radius-pill)',
+            height: '38px',
+          }}
+        >
+          <span>Preview Live Site</span>
+          <ExternalLink size={13} strokeWidth={2} />
+        </Link>
       </div>
 
-      {/* Stats Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+      {/* Stats KPI Block Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem' }}>
         <StatCard
           value={isLoading ? '—' : (data?.totalVisitors ?? 0)}
-          label="Total Unique Visitors"
+          label="Unique Visitors"
           icon={Users}
+          subtitle="All-time tracked visitor sessions"
         />
         <StatCard
           value={isLoading ? '—' : (data?.totalPageViews ?? 0)}
-          label="Total Page Views"
+          label="Total Impressions"
           icon={Eye}
+          subtitle="Portfolio interactions and loads"
         />
         <StatCard
           value={isLoading ? '—' : (data?.totalContacts ?? 0)}
-          label="Contact Messages"
+          label="Inquiry Submissions"
           icon={MessageSquare}
+          subtitle="Contact form messages received"
         />
         <StatCard
-          value={isLoading ? '—' : (data?.mostViewedSection ? data.mostViewedSection.charAt(0).toUpperCase() + data.mostViewedSection.slice(1) : 'N/A')}
-          label="Top Viewed Section"
+          value={isLoading ? '—' : (data?.mostViewedSection ? data.mostViewedSection.charAt(0).toUpperCase() + data.mostViewedSection.slice(1) : 'Hero')}
+          label="Most Engaged Section"
           icon={TrendingUp}
+          subtitle="Highest visitor dwell duration"
         />
       </div>
 
-      {/* Links and Public Preview */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
-        
-        <div className="card">
-          <h2 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>
-            Quick Actions
+      {/* Quick Actions & Navigation Grid */}
+      <div className="card" style={{ padding: 0 }}>
+        <div className="card-header" style={{ padding: '1.5rem 1.75rem 1rem' }}>
+          <h2 className="card-title" style={{ fontSize: '1.1rem' }}>
+            Content Management Blocks
           </h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            {QUICK_LINKS.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
+          <p className="card-description">
+            Quickly jump to key sections of your portfolio to manage data and media
+          </p>
+        </div>
+
+        <div style={{ padding: '1.5rem 1.75rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+          {QUICK_ACTIONS.map(({ href, label, icon: Icon, desc }) => (
+            <Link
+              key={href}
+              href={href}
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '0.85rem',
+                padding: '1rem 1.15rem',
+                borderRadius: '12px',
+                backgroundColor: 'var(--bg-elevated)',
+                border: '1px solid var(--border)',
+                textDecoration: 'none',
+                transition: 'all 0.2s ease',
+              }}
+              className="hover:border-[var(--accent)] hover:shadow-sm"
+            >
+              <div
                 style={{
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '8px',
+                  backgroundColor: 'var(--bg-surface)',
+                  color: 'var(--accent)',
+                  border: '1px solid var(--border)',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '0.6rem 0.75rem',
-                  borderRadius: 'var(--radius)',
-                  textDecoration: 'none',
-                  color: 'var(--foreground)',
-                  fontSize: '0.85rem',
-                  backgroundColor: 'var(--muted)',
-                  transition: 'background-color 0.15s ease',
+                  justifyContent: 'center',
+                  flexShrink: 0,
                 }}
               >
-                <span>{label}</span>
-                <ArrowRight size={14} style={{ color: 'var(--muted-foreground)' }} />
-              </Link>
-            ))}
-          </div>
+                <Icon size={16} strokeWidth={1.8} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <p style={{ fontSize: '0.875rem', fontWeight: 650, color: 'var(--fg)', margin: 0 }}>
+                    {label}
+                  </p>
+                  <ArrowRight size={13} style={{ color: 'var(--fg-muted)' }} />
+                </div>
+                <p style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', margin: '0.25rem 0 0 0', lineHeight: 1.35 }}>
+                  {desc}
+                </p>
+              </div>
+            </Link>
+          ))}
         </div>
-
-        <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '2rem', gap: '1rem' }}>
-          <div style={{
-            width: '48px', height: '48px',
-            borderRadius: 'var(--radius)',
-            backgroundColor: 'var(--primary-subtle)',
-            color: 'var(--primary)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <ExternalLink size={20} />
-          </div>
-          <div>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '0.35rem' }}>
-              Public Portfolio
-            </h3>
-            <p style={{ fontSize: '0.85rem', color: 'var(--muted-foreground)', marginBottom: '1.25rem' }}>
-              Preview the live website as seen by visitors
-            </p>
-            <a
-              href="/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-primary"
-            >
-              Open Website <ExternalLink size={14} />
-            </a>
-          </div>
-        </div>
-
       </div>
+
     </div>
   );
 }
