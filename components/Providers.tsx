@@ -33,7 +33,7 @@ function ThemeInitializer({ children }: { children: React.ReactNode }) {
     <>
       {children}
       <Toaster
-        position="bottom-right"
+        position="top-right"
         theme={theme}
         richColors
         closeButton
