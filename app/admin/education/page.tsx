@@ -336,18 +336,9 @@ export default function AdminEducationPage() {
           {educations.map((edu) => (
             <div
               key={edu._id}
-              className="card bezel-card"
-              style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'space-between',
-                padding: '1.25rem 1.5rem',
-                gap: '1.25rem',
-                backgroundColor: 'var(--bg-surface)',
-                transition: 'all 0.2s ease',
-              }}
+              className="card bezel-card admin-card-item"
             >
-              <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ flex: 1, minWidth: 0, width: '100%' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <GraduationCap size={16} style={{ color: 'var(--accent)' }} />
@@ -401,14 +392,14 @@ export default function AdminEducationPage() {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '0.45rem', flexShrink: 0, alignItems: 'center' }}>
+              <div className="admin-card-item-actions">
                 <span style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', opacity: 0.6, marginRight: '0.35rem' }}>
                   #{edu.order}
                 </span>
                 <button
                   onClick={() => openEditEdu(edu)}
                   className="btn btn-outline"
-                  style={{ padding: '0.4rem 0.75rem', fontSize: '0.775rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                  style={{ padding: '0.45rem 0.85rem', fontSize: '0.775rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
                 >
                   <Pencil size={12} />
                   <span>Edit</span>
@@ -416,7 +407,7 @@ export default function AdminEducationPage() {
                 <button
                   onClick={() => setDeleteId(edu._id)}
                   className="btn btn-outline"
-                  style={{ padding: '0.4rem 0.6rem', color: '#ef4444', borderColor: 'var(--border)' }}
+                  style={{ padding: '0.45rem 0.65rem', color: '#ef4444', borderColor: 'var(--border)' }}
                   title="Delete education record"
                 >
                   <Trash2 size={13} />

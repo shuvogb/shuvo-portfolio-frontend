@@ -344,18 +344,9 @@ export default function AdminExperiencePage() {
           {experiences.map((exp) => (
             <div
               key={exp._id}
-              className="card bezel-card"
-              style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'space-between',
-                padding: '1.25rem 1.5rem',
-                gap: '1.25rem',
-                backgroundColor: 'var(--bg-surface)',
-                transition: 'all 0.2s ease',
-              }}
+              className="card bezel-card admin-card-item"
             >
-              <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ flex: 1, minWidth: 0, width: '100%' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
                   <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--fg)', margin: 0 }}>
                     {exp.title}
@@ -400,14 +391,14 @@ export default function AdminExperiencePage() {
                 )}
               </div>
 
-              <div style={{ display: 'flex', gap: '0.45rem', flexShrink: 0, alignItems: 'center' }}>
+              <div className="admin-card-item-actions">
                 <span style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', opacity: 0.6, marginRight: '0.35rem' }}>
                   #{exp.order}
                 </span>
                 <button
                   onClick={() => openEditExp(exp)}
                   className="btn btn-outline"
-                  style={{ padding: '0.4rem 0.75rem', fontSize: '0.775rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                  style={{ padding: '0.45rem 0.85rem', fontSize: '0.775rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
                 >
                   <Pencil size={12} />
                   <span>Edit</span>
@@ -415,7 +406,7 @@ export default function AdminExperiencePage() {
                 <button
                   onClick={() => setDeleteId(exp._id)}
                   className="btn btn-outline"
-                  style={{ padding: '0.4rem 0.6rem', color: '#ef4444', borderColor: 'var(--border)' }}
+                  style={{ padding: '0.45rem 0.65rem', color: '#ef4444', borderColor: 'var(--border)' }}
                   title="Delete experience"
                 >
                   <Trash2 size={13} />

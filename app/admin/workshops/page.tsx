@@ -227,7 +227,7 @@ export default function AdminWorkshopsPage() {
         description: data.description,
         imageUrl: data.imageUrl,
         imageHeight: data.imageHeight || 260,
-        imageFit: data.imageFit || 'cover',
+        imageFit: data.imageFit || 'contain',
         order: data.order,
       };
 
@@ -431,53 +431,27 @@ export default function AdminWorkshopsPage() {
             return (
               <div
                 key={ws._id}
-                className="card bezel-card"
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  justifyContent: 'space-between',
-                  padding: '1.25rem 1.5rem',
-                  gap: '1.25rem',
-                  backgroundColor: 'var(--bg-surface)',
-                  transition: 'all 0.2s ease',
-                }}
+                className="card bezel-card admin-card-item"
               >
-                <div style={{ display: 'flex', gap: '1.25rem', flex: 1, minWidth: 0, alignItems: 'flex-start' }}>
+                <div className="admin-card-item-media-row">
                   {/* Certificate Photo Thumbnail */}
-                  <div
-                    style={{
-                      width: '124px',
-                      height: '86px',
-                      borderRadius: '12px',
-                      overflow: 'hidden',
-                      flexShrink: 0,
-                      backgroundColor: 'var(--bg-elevated)',
-                      border: '1px solid var(--border)',
-                      boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
-                      position: 'relative',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    {ws.imageFit === 'contain' && (
-                      <img
-                        src={wsImg}
-                        alt=""
-                        aria-hidden="true"
-                        style={{
-                          position: 'absolute',
-                          inset: 0,
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          filter: 'blur(12px)',
-                          opacity: 0.25,
-                          transform: 'scale(1.2)',
-                          pointerEvents: 'none',
-                        }}
-                      />
-                    )}
+                  <div className="admin-card-item-media">
+                    <img
+                      src={wsImg}
+                      alt=""
+                      aria-hidden="true"
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        filter: 'blur(16px)',
+                        opacity: 0.15,
+                        transform: 'scale(1.15)',
+                        pointerEvents: 'none',
+                      }}
+                    />
                     <img
                       src={wsImg}
                       alt={ws.title}
@@ -486,15 +460,16 @@ export default function AdminWorkshopsPage() {
                         zIndex: 1,
                         width: '100%',
                         height: '100%',
-                        objectFit: (ws.imageFit === 'contain' ? 'contain' : 'cover') as 'contain' | 'cover',
+                        objectFit: (ws.imageFit === 'cover' ? 'cover' : 'contain') as 'contain' | 'cover',
                         objectPosition: 'center',
-                        padding: ws.imageFit === 'contain' ? '4px' : '0',
+                        padding: ws.imageFit === 'cover' ? '0' : '4px',
+                        borderRadius: '10px',
                       }}
                     />
                   </div>
 
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
+                  <div style={{ flex: 1, minWidth: 0, width: '100%' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap', marginBottom: '0.4rem' }}>
                       <span
                         style={{
                           fontSize: '0.75rem',
@@ -512,10 +487,14 @@ export default function AdminWorkshopsPage() {
                         <Calendar size={11} />
                         <span>{ws.year}</span>
                       </span>
-                      <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--fg)', margin: 0, lineHeight: 1.35 }}>
-                        {ws.title}
-                      </h3>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', opacity: 0.6 }}>
+                        #{ws.order}
+                      </span>
                     </div>
+
+                    <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--fg)', margin: '0 0 0.35rem', lineHeight: 1.35, wordBreak: 'break-word' }}>
+                      {ws.title}
+                    </h3>
 
                     <p style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--accent)', fontWeight: 600, fontSize: '0.85rem', margin: '0 0 0.35rem' }}>
                       <Building size={13} />
@@ -523,21 +502,18 @@ export default function AdminWorkshopsPage() {
                     </p>
 
                     {ws.description && (
-                      <p style={{ fontSize: '0.8rem', color: 'var(--fg-muted)', margin: 0, lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      <p style={{ fontSize: '0.825rem', color: 'var(--fg-muted)', margin: 0, lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                         {ws.description}
                       </p>
                     )}
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '0.45rem', flexShrink: 0, alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', opacity: 0.6, marginRight: '0.35rem' }}>
-                    #{ws.order}
-                  </span>
+                <div className="admin-card-item-actions">
                   <button
                     onClick={() => openEditWs(ws, idx)}
                     className="btn btn-outline"
-                    style={{ padding: '0.4rem 0.75rem', fontSize: '0.775rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                    style={{ padding: '0.45rem 0.85rem', fontSize: '0.775rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
                   >
                     <Pencil size={12} />
                     <span>Edit</span>
@@ -545,7 +521,7 @@ export default function AdminWorkshopsPage() {
                   <button
                     onClick={() => setDeleteId(ws._id)}
                     className="btn btn-outline"
-                    style={{ padding: '0.4rem 0.6rem', color: '#ef4444', borderColor: 'var(--border)' }}
+                    style={{ padding: '0.45rem 0.65rem', color: '#ef4444', borderColor: 'var(--border)' }}
                     title="Delete workshop"
                   >
                     <Trash2 size={13} />
@@ -616,6 +592,8 @@ export default function AdminWorkshopsPage() {
                           position: 'relative',
                           width: '100%',
                           height: `${currentHeight}px`,
+                          maxHeight: '420px',
+                          minHeight: '160px',
                           backgroundColor: 'var(--bg-elevated)',
                           borderRadius: '12px',
                           border: '1px solid var(--border)',

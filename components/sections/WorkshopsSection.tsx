@@ -39,7 +39,7 @@ export function WorkshopsSection({ workshops = [], profile, isLoading }: Worksho
   const formattedWorkshops: Testimonial[] = workshops.map((ws, idx) => {
     let img = ws.imageUrl || DEFAULT_IMAGES[idx % DEFAULT_IMAGES.length];
     const lowerTitle = (ws.title || '').toLowerCase();
-    
+
     if (!ws.imageUrl) {
       if (lowerTitle.includes('climate') || lowerTitle.includes('ndc') || lowerTitle.includes('net zero')) {
         img = WORKSHOP_IMAGES.climate;
@@ -68,7 +68,7 @@ export function WorkshopsSection({ workshops = [], profile, isLoading }: Worksho
   return (
     <section id="workshops" className="section" aria-label="Workshops and Professional Training">
       <div className="container">
-        
+
         {/* Header */}
         <div className="section-header">
           <SectionBadge icon={<BookCheck size={13} strokeWidth={1.75} />}>
@@ -85,7 +85,7 @@ export function WorkshopsSection({ workshops = [], profile, isLoading }: Worksho
           <div className="bezel-card">
             <div className="bezel-core" style={{ padding: '2rem 1.5rem' }}>
               <div className="relative grid grid-cols-1 gap-8 md:grid-cols-[1.25fr_1fr] lg:gap-12 items-center">
-                
+
                 {/* Left Framed Certificate Skeleton */}
                 <div className="skeleton" style={{ width: '100%', aspectRatio: '1.38 / 1', borderRadius: '16px', padding: '0.85rem' }}>
                   <div className="skeleton" style={{ width: '100%', height: '100%', borderRadius: '12px' }} />
@@ -94,7 +94,7 @@ export function WorkshopsSection({ workshops = [], profile, isLoading }: Worksho
                 {/* Right Text Details Skeleton */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', padding: '0.5rem 0' }}>
                   <div className="skeleton-pill" style={{ height: '24px', width: '65px' }} />
-                  
+
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
                     <div className="skeleton" style={{ height: '22px', width: '90%', borderRadius: '6px' }} />
                     <div className="skeleton" style={{ height: '22px', width: '65%', borderRadius: '6px' }} />

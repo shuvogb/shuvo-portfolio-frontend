@@ -53,20 +53,20 @@ export const AnimatedTestimonials = ({
   if (!testimonials || testimonials.length === 0) return null;
 
   const currentItem = testimonials[active];
+  const activeHeight = currentItem?.imageHeight || cardHeight || 340;
   const activeFit = currentItem?.imageFit || imageFit || 'contain';
 
   return (
     <div className="w-full px-2 py-3 font-sans antialiased md:px-4">
       <div className="relative grid grid-cols-1 gap-8 md:grid-cols-[1.25fr_1fr] lg:gap-12 items-center">
-        
-        {/* 3D Rotating Stack on Left with Proportional Certificate Frame */}
+
+        {/* 3D Rotating Stack on Left with Proportional Admin Height */}
         <div className="w-full flex items-center justify-center">
           <div
-            className="certificate-stage-wrapper relative w-full"
+            className="certificate-stage-wrapper relative w-full transition-all duration-300"
             style={{
-              aspectRatio: '1.38 / 1',
-              maxHeight: '390px',
-              minHeight: '210px',
+              height: 'var(--stage-h)',
+              ['--stage-h' as string]: `${activeHeight}px`,
             }}
           >
             <AnimatePresence mode="popLayout">
@@ -135,7 +135,7 @@ export const AnimatedTestimonials = ({
                   >
                     <div className="h-full w-full rounded-2xl overflow-hidden border border-[var(--border)] shadow-xl bg-[var(--bg-elevated)] p-2 sm:p-2.5 relative flex items-center justify-center">
                       <div className="w-full h-full rounded-xl overflow-hidden relative border border-[var(--border)] bg-[var(--bg-surface)] flex items-center justify-center p-1 sm:p-1.5">
-                        {itemFit === 'contain' && (
+                        {itemFit !== 'cover' && (
                           <img
                             src={testimonial.src}
                             alt=""
@@ -149,11 +149,10 @@ export const AnimatedTestimonials = ({
                           width={900}
                           height={650}
                           draggable={false}
-                          className={`h-full w-full relative z-10 transition-all duration-300 rounded-[8px] ${
-                            itemFit === 'cover'
-                              ? 'object-cover object-center'
-                              : 'object-contain object-center'
-                          }`}
+                          className={`h-full w-full relative z-10 transition-all duration-300 rounded-[8px] ${itemFit === 'cover'
+                            ? 'object-cover object-center p-0'
+                            : 'object-contain object-center p-1 sm:p-2'
+                            }`}
                         />
                       </div>
                     </div>
@@ -163,6 +162,22 @@ export const AnimatedTestimonials = ({
             </AnimatePresence>
           </div>
         </div>
+
+        <style>{`
+          .certificate-stage-wrapper {
+            height: var(--stage-h, 340px);
+          }
+          @media (max-width: 768px) {
+            .certificate-stage-wrapper {
+              height: clamp(170px, calc(var(--stage-h, 340px) * 0.72), 320px) !important;
+            }
+          }
+          @media (max-width: 480px) {
+            .certificate-stage-wrapper {
+              height: clamp(155px, calc(var(--stage-h, 340px) * 0.60), 250px) !important;
+            }
+          }
+        `}</style>
 
         {/* Text Details with Controlled Header Hierarchy on Right */}
         <div className="flex flex-col justify-between py-2">
@@ -286,3 +301,4 @@ export const AnimatedTestimonials = ({
     </div>
   );
 };
+
