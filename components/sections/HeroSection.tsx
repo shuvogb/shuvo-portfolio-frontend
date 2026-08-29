@@ -27,8 +27,8 @@ function Portrait3DCard({
   const mouseXSpring = useSpring(x, { stiffness: 240, damping: 22 });
   const mouseYSpring = useSpring(y, { stiffness: 240, damping: 22 });
 
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ['8deg', '-8deg']);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ['-8deg', '8deg']);
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ['6deg', '-6deg']);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ['-6deg', '6deg']);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
@@ -45,11 +45,15 @@ function Portrait3DCard({
   };
 
   return (
-    <div style={{ perspective: '1200px', width: '100%', maxWidth: '300px' }}>
-      {/* Main 3D Tilt Portrait Card with smooth floating motion */}
+    <div className="portrait-frame-wrapper">
+      {/* Outer Blue Accent Halo Outline (Matches Reference) */}
+      <div className="portrait-blue-halo" />
+
+      {/* Main 3D Tilt Portrait Card with subtle floating motion */}
       <motion.div
-        animate={{ y: [0, -6, 0] }}
+        animate={{ y: [0, -5, 0] }}
         transition={{ duration: 4.8, repeat: Infinity, ease: 'easeInOut' }}
+        style={{ width: '100%', display: 'flex', justifyContent: 'center', position: 'relative', zIndex: 5 }}
       >
         <motion.div
           ref={cardRef}
@@ -59,65 +63,31 @@ function Portrait3DCard({
             rotateX,
             rotateY,
             transformStyle: 'preserve-3d',
+            width: '100%',
           }}
-          whileHover={{ scale: 1.02 }}
+          whileHover={{ scale: 1.015 }}
           transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-          className="bezel-card portrait-3d-card"
+          className="portrait-white-card"
         >
-          <div
-            className="bezel-core"
-            style={{
-              padding: '6px',
-              borderRadius: '18px',
-              overflow: 'hidden',
-              position: 'relative',
-              transform: 'translateZ(20px)',
-            }}
-          >
-            <div
-              style={{
-                width: '100%',
-                aspectRatio: '1 / 1.15',
-                borderRadius: '14px',
-                overflow: 'hidden',
-                position: 'relative',
-                backgroundColor: 'var(--bg-elevated)',
-              }}
-            >
-              {isLoading || !avatarSrc ? (
-                <div className="skeleton" style={{ width: '100%', height: '100%' }} />
-              ) : (
-                <img
-                  src={avatarSrc}
-                  alt={name || 'Shuvo Molla'}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    objectPosition: 'center 20%',
-                    display: 'block',
-                  }}
-                />
-              )}
-            </div>
+          <div className="portrait-photo-box">
+            {isLoading || !avatarSrc ? (
+              <div className="skeleton" style={{ width: '100%', height: '100%' }} />
+            ) : (
+              <img
+                src={avatarSrc}
+                alt={name || 'Shuvo Molla'}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: 'center 20%',
+                  display: 'block',
+                }}
+              />
+            )}
           </div>
         </motion.div>
       </motion.div>
-
-      <style>{`
-        .portrait-3d-card {
-          width: 100%;
-          cursor: pointer;
-          border-radius: 24px;
-          padding: 6px;
-          position: relative;
-          transition: box-shadow 0.35s ease, border-color 0.35s ease;
-        }
-        .portrait-3d-card:hover {
-          border-color: var(--accent) !important;
-          box-shadow: 0 0 35px -2px var(--accent-border), 0 20px 40px -10px rgba(0, 0, 0, 0.35) !important;
-        }
-      `}</style>
     </div>
   );
 }
@@ -172,24 +142,23 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
     <section
       id="hero"
       aria-label="Introduction"
-      className="bg-grid-pattern"
+      className="bg-grid-pattern hero-section"
       style={{
-        minHeight: '94vh',
+        minHeight: '92vh',
         display: 'flex',
         alignItems: 'center',
-        paddingTop: '7.5rem',
-        paddingBottom: '5.5rem',
         borderBottom: '1px solid var(--border)',
       }}
     >
-      <div className="container">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '4rem', alignItems: 'center' }}>
-          
+      <div className="container" style={{ width: '100%' }}>
+        <div className="hero-layout-grid">
+
           {/* Left Column: Academic Thesis & Introduction */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+            className="hero-text-column"
           >
             {/* Reusable SectionBadge / Skeleton */}
             {isLoading ? (
@@ -204,8 +173,8 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
 
             {/* Name */}
             <h1
+              className="hero-title"
               style={{
-                fontSize: 'clamp(2.75rem, 5.5vw, 4.25rem)',
                 fontWeight: 800,
                 letterSpacing: '-0.04em',
                 lineHeight: 1.06,
@@ -224,8 +193,8 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
 
             {/* Subtitle / Focus */}
             <h2
+              className="hero-subtitle"
               style={{
-                fontSize: 'clamp(1.15rem, 2.2vw, 1.35rem)',
                 fontWeight: 700,
                 color: 'var(--accent)',
                 letterSpacing: '-0.015em',
@@ -299,36 +268,32 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
             )}
           </motion.div>
 
-          {/* Right Column: 3-Side Floating Stats Surrounding User's Portrait (Zero Overlap) */}
+          {/* Right Column: Hero Portrait with Exact 3-Badge Floating Layout for All Devices */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.15, ease: [0.32, 0.72, 0, 1] }}
-            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            className="hero-visual-column"
           >
             <div className="hero-portrait-stage">
-              
-              {/* SIDE 1: Left Floating Stat Card */}
-              <motion.div
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut' }}
-                className="stat-side-left"
-              >
+
+              {/* Stat 1: Left Badge (Events Organized) */}
+              <div className="stat-pill-item stat-item-left">
                 <div className="stat-pill-card">
                   {isLoading ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                      <div className="skeleton" style={{ width: '30px', height: '30px', borderRadius: '8px', flexShrink: 0 }} />
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                        <div className="skeleton" style={{ height: '16px', width: '45px', borderRadius: '4px' }} />
-                        <div className="skeleton" style={{ height: '11px', width: '75px', borderRadius: '4px' }} />
+                    <div className="stat-skeleton">
+                      <div className="skeleton" style={{ width: '30px', height: '30px', borderRadius: '9px', flexShrink: 0 }} />
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                        <div className="skeleton" style={{ height: '14px', width: '38px', borderRadius: '4px' }} />
+                        <div className="skeleton" style={{ height: '10px', width: '65px', borderRadius: '4px' }} />
                       </div>
                     </div>
                   ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                    <div className="stat-content">
                       <div className="stat-pill-icon">
-                        <stats.events.icon size={14} strokeWidth={1.8} />
+                        <stats.events.icon size={15} strokeWidth={2} />
                       </div>
-                      <div>
+                      <div className="stat-text-group">
                         <p className="stat-pill-value">{stats.events.value}</p>
                         <p className="stat-pill-label">{stats.events.label}</p>
                         <p className="stat-pill-sublabel">{stats.events.sublabel}</p>
@@ -336,32 +301,30 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
                     </div>
                   )}
                 </div>
-              </motion.div>
+              </div>
 
-              {/* CENTER: Unobstructed 3D Tilt Portrait */}
-              <Portrait3DCard avatarSrc={avatarSrc} name={profile?.name} isLoading={isLoading} />
+              {/* CENTER: 3D Tilt Portrait Frame with Accent Blue Halo */}
+              <div className="hero-portrait-frame">
+                <Portrait3DCard avatarSrc={avatarSrc} name={profile?.name} isLoading={isLoading} />
+              </div>
 
-              {/* SIDE 2: Right Floating Stat Card */}
-              <motion.div
-                animate={{ y: [0, 8, 0] }}
-                transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
-                className="stat-side-right"
-              >
+              {/* Stat 2: Top-Right Badge (Academic Papers) */}
+              <div className="stat-pill-item stat-item-right">
                 <div className="stat-pill-card">
                   {isLoading ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                      <div className="skeleton" style={{ width: '30px', height: '30px', borderRadius: '8px', flexShrink: 0 }} />
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                        <div className="skeleton" style={{ height: '16px', width: '45px', borderRadius: '4px' }} />
-                        <div className="skeleton" style={{ height: '11px', width: '75px', borderRadius: '4px' }} />
+                    <div className="stat-skeleton">
+                      <div className="skeleton" style={{ width: '30px', height: '30px', borderRadius: '9px', flexShrink: 0 }} />
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                        <div className="skeleton" style={{ height: '14px', width: '38px', borderRadius: '4px' }} />
+                        <div className="skeleton" style={{ height: '10px', width: '65px', borderRadius: '4px' }} />
                       </div>
                     </div>
                   ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                    <div className="stat-content">
                       <div className="stat-pill-icon">
-                        <stats.papers.icon size={14} strokeWidth={1.8} />
+                        <stats.papers.icon size={15} strokeWidth={2} />
                       </div>
-                      <div>
+                      <div className="stat-text-group">
                         <p className="stat-pill-value">{stats.papers.value}</p>
                         <p className="stat-pill-label">{stats.papers.label}</p>
                         <p className="stat-pill-sublabel">{stats.papers.sublabel}</p>
@@ -369,29 +332,25 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
                     </div>
                   )}
                 </div>
-              </motion.div>
+              </div>
 
-              {/* SIDE 3: Bottom Floating Stat Card */}
-              <motion.div
-                animate={{ y: [0, -6, 0] }}
-                transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
-                className="stat-side-bottom"
-              >
-                <div className="stat-pill-card stat-pill-bottom">
+              {/* Stat 3: Bottom-Right Badge (Fieldwork Reach) */}
+              <div className="stat-pill-item stat-item-bottom">
+                <div className="stat-pill-card">
                   {isLoading ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                      <div className="skeleton" style={{ width: '30px', height: '30px', borderRadius: '8px', flexShrink: 0 }} />
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                        <div className="skeleton" style={{ height: '16px', width: '45px', borderRadius: '4px' }} />
-                        <div className="skeleton" style={{ height: '11px', width: '75px', borderRadius: '4px' }} />
+                    <div className="stat-skeleton">
+                      <div className="skeleton" style={{ width: '30px', height: '30px', borderRadius: '9px', flexShrink: 0 }} />
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                        <div className="skeleton" style={{ height: '14px', width: '38px', borderRadius: '4px' }} />
+                        <div className="skeleton" style={{ height: '10px', width: '65px', borderRadius: '4px' }} />
                       </div>
                     </div>
                   ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                    <div className="stat-content">
                       <div className="stat-pill-icon">
-                        <stats.reach.icon size={14} strokeWidth={1.8} />
+                        <stats.reach.icon size={15} strokeWidth={2} />
                       </div>
-                      <div>
+                      <div className="stat-text-group">
                         <p className="stat-pill-value">{stats.reach.value}</p>
                         <p className="stat-pill-label">{stats.reach.label}</p>
                         <p className="stat-pill-sublabel">{stats.reach.sublabel}</p>
@@ -399,7 +358,7 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
                     </div>
                   )}
                 </div>
-              </motion.div>
+              </div>
 
             </div>
           </motion.div>
@@ -408,68 +367,199 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
       </div>
 
       <style>{`
+        /* ─── Hero Base & Typography ─── */
+        .hero-section {
+          padding-top: 7.5rem;
+          padding-bottom: 5.5rem;
+          overflow: hidden;
+        }
+
+        .hero-title {
+          font-size: clamp(2.5rem, 5.2vw, 4.25rem);
+        }
+
+        .hero-subtitle {
+          font-size: clamp(1.05rem, 2vw, 1.35rem);
+        }
+
+        /* ─── Hero Layout Grid ─── */
+        .hero-layout-grid {
+          display: grid;
+          grid-template-columns: 1.15fr 0.85fr;
+          gap: 3.5rem;
+          align-items: center;
+          width: 100%;
+        }
+
+        .hero-visual-column {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+        }
+
+        /* ─── Stage Container for All Devices ─── */
         .hero-portrait-stage {
           position: relative;
           display: flex;
           align-items: center;
           justify-content: center;
           width: 100%;
-          max-width: 320px;
+          max-width: 300px;
           margin: 1.5rem auto 2.5rem;
         }
 
-        /* ─── 3-Side Floating Positions (Zero Overlap on Image) ─── */
-        .stat-side-left {
-          position: absolute;
-          left: -110px;
-          top: 30%;
-          transform: translateY(-50%);
-          z-index: 25;
+        .hero-portrait-frame {
+          position: relative;
+          z-index: 10;
+          display: flex;
+          justify-content: center;
+          width: 100%;
         }
 
-        .stat-side-right {
-          position: absolute;
-          right: -110px;
-          top: 20%;
-          transform: translateY(-50%);
-          z-index: 25;
+        .portrait-frame-wrapper {
+          position: relative;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
         }
 
-        .stat-side-bottom {
+        /* Outer Blue Accent Halo Outline (Matches Reference Exact Frame) */
+        .portrait-blue-halo {
           position: absolute;
-          bottom: -28px;
-          left: 50%;
-          transform: translateX(-50%);
-          z-index: 25;
+          inset: -10px;
+          border-radius: 30px;
+          border: 2px solid rgba(59, 130, 246, 0.75);
+          box-shadow: 0 0 24px -2px rgba(59, 130, 246, 0.25);
+          pointer-events: none;
+          z-index: 1;
         }
 
-        .stat-pill-card {
-          padding: 0.65rem 0.95rem;
-          background-color: var(--bg-surface);
-          border: 1px solid var(--border-strong);
+        /* Inner White Machined Card */
+        .portrait-white-card {
+          width: 100%;
+          cursor: pointer;
+          border-radius: 22px;
+          padding: 8px;
+          background: #ffffff;
+          border: 1px solid rgba(15, 23, 42, 0.08);
+          box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04);
+          position: relative;
+          z-index: 5;
+        }
+
+        .dark .portrait-white-card {
+          background: #0e121b;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Photo Box Inside */
+        .portrait-photo-box {
+          width: 100%;
+          aspect-ratio: 1 / 1.15;
           border-radius: 16px;
-          box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.08);
-          white-space: nowrap;
+          overflow: hidden;
+          position: relative;
+          background-color: var(--bg-elevated);
         }
 
-        .stat-pill-bottom {
-          min-width: 200px;
+        /* ─── Floating Stat Badges (Generous Spacing / Distanced from Center) ─── */
+        .stat-pill-item {
+          position: absolute;
+          z-index: 25;
+          pointer-events: auto;
+        }
+
+        /* 1. Left Badge: Events Organized (Distanced to the left, clear of face) */
+        .stat-item-left {
+          left: -100px;
+          top: 48%;
+          transform: translateY(-50%);
+          animation: badgeFloatLeft 4.6s ease-in-out infinite;
+        }
+
+        /* 2. Top-Right Badge: Academic Papers (Distanced to the upper right, clear of head) */
+        .stat-item-right {
+          right: -90px;
+          top: 16%;
+          transform: translateY(-50%);
+          animation: badgeFloatRight 4.2s ease-in-out infinite 0.6s;
+        }
+
+        /* 3. Bottom-Right Badge: Fieldwork Reach (Distanced to bottom right) */
+        .stat-item-bottom {
+          right: -36px;
+          bottom: -26px;
+          animation: badgeFloatBottom 4.8s ease-in-out infinite 1.2s;
+        }
+
+        /* ─── Stat Pill Card Look & Feel (Compact & Refined) ─── */
+        .stat-pill-card {
+          padding: 0.52rem 0.85rem;
+          background-color: #ffffff;
+          border: 1px solid rgba(226, 232, 240, 0.9);
+          border-radius: 15px;
+          box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.12), 0 3px 10px rgba(0, 0, 0, 0.04);
+          white-space: nowrap;
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1), 
+                      border-color 0.25s cubic-bezier(0.32, 0.72, 0, 1), 
+                      box-shadow 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        .dark .stat-pill-card {
+          background-color: #0e121b;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+          .stat-pill-card:hover {
+            border-color: var(--accent-border);
+            box-shadow: 0 16px 32px -6px rgba(59, 130, 246, 0.2), 0 5px 14px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px) scale(1.02);
+          }
+        }
+
+        .stat-pill-card:active {
+          transform: scale(0.98);
+        }
+
+        .stat-skeleton,
+        .stat-content {
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
         }
 
         .stat-pill-icon {
-          width: 32px;
-          height: 32px;
+          width: 30px;
+          height: 30px;
           border-radius: 9px;
-          background-color: var(--accent-subtle);
-          color: var(--accent);
+          background-color: rgba(59, 130, 246, 0.08);
+          color: #2563eb;
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
         }
 
+        .dark .stat-pill-icon {
+          background-color: rgba(59, 130, 246, 0.15);
+          color: #60a5fa;
+        }
+
+        .stat-text-group {
+          display: flex;
+          flex-direction: column;
+          min-width: 0;
+        }
+
         .stat-pill-value {
-          font-size: 1.05rem;
+          font-size: 1.02rem;
           font-weight: 800;
           color: var(--fg);
           line-height: 1.1;
@@ -478,43 +568,204 @@ export function HeroSection({ profile, isLoading }: HeroSectionProps) {
         }
 
         .stat-pill-label {
-          font-size: 0.72rem;
+          font-size: 0.7rem;
           font-weight: 700;
           color: var(--fg);
           line-height: 1.2;
-          margin: 0.15rem 0 0 0;
-        }
-
-        .stat-pill-sublabel {
-          font-size: 0.65rem;
-          color: var(--fg-muted);
-          line-height: 1.1;
           margin: 0.1rem 0 0 0;
         }
 
-        @media (max-width: 900px) {
-          .stat-side-left {
-            left: -30px;
-            top: 25%;
+        .stat-pill-sublabel {
+          font-size: 0.6rem;
+          font-weight: 500;
+          color: var(--fg-muted);
+          line-height: 1.1;
+          margin: 0.05rem 0 0 0;
+        }
+
+        /* ─── Ambient Float Keyframes ─── */
+        @keyframes badgeFloatLeft {
+          0%, 100% { transform: translateY(-50%) translateY(0); }
+          50% { transform: translateY(-50%) translateY(-5px); }
+        }
+
+        @keyframes badgeFloatRight {
+          0%, 100% { transform: translateY(-50%) translateY(0); }
+          50% { transform: translateY(-50%) translateY(5px); }
+        }
+
+        @keyframes badgeFloatBottom {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+
+        /* ─── Tablet (768px - 1023px) ─── */
+        @media (max-width: 1023px) {
+          .hero-section {
+            padding-top: 5.5rem;
+            padding-bottom: 3.5rem;
           }
-          .stat-side-right {
-            right: -30px;
-            top: 15%;
+
+          .hero-layout-grid {
+            grid-template-columns: 1fr;
+            gap: 2.75rem;
           }
-          .stat-side-bottom {
+
+          .hero-portrait-stage {
+            max-width: 270px;
+            margin: 1.5rem auto 2.5rem;
+          }
+
+          .stat-item-left {
+            left: -95px;
+            top: 48%;
+          }
+
+          .stat-item-right {
+            right: -82px;
+            top: 16%;
+          }
+
+          .stat-item-bottom {
+            right: -28px;
             bottom: -20px;
+          }
+
+          .stat-pill-card {
+            padding: 0.45rem 0.72rem;
+          }
+
+          .stat-pill-icon {
+            width: 27px;
+            height: 27px;
+            border-radius: 8px;
+          }
+
+          .stat-pill-value {
+            font-size: 0.94rem;
+          }
+
+          .stat-pill-label {
+            font-size: 0.65rem;
+          }
+
+          .stat-pill-sublabel {
+            font-size: 0.56rem;
           }
         }
 
-        @media (max-width: 640px) {
-          .stat-side-left, .stat-side-right, .stat-side-bottom {
-            position: static;
-            transform: none;
-            margin: 0.5rem 0;
-          }
+        /* ─── Mobile (380px - 767px) ─── */
+        @media (max-width: 767px) {
           .hero-portrait-stage {
-            flex-direction: column;
-            gap: 1rem;
+            max-width: 230px;
+            margin: 1.25rem auto 2.25rem;
+          }
+
+          .portrait-blue-halo {
+            inset: -8px;
+            border-radius: 26px;
+          }
+
+          .portrait-white-card {
+            padding: 6px;
+            border-radius: 18px;
+          }
+
+          .portrait-photo-box {
+            border-radius: 13px;
+          }
+
+          /* 1st stat pushed more left */
+          .stat-item-left {
+            left: -82px;
+            top: 48%;
+          }
+
+          /* 2nd stat pushed more right */
+          .stat-item-right {
+            right: -78px;
+            top: 16%;
+          }
+
+          .stat-item-bottom {
+            right: -28px;
+            bottom: -20px;
+          }
+
+          .stat-pill-card {
+            padding: 0.4rem 0.62rem;
+            border-radius: 13px;
+          }
+
+          .stat-pill-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 7px;
+          }
+
+          .stat-pill-value {
+            font-size: 0.86rem;
+          }
+
+          .stat-pill-label {
+            font-size: 0.6rem;
+          }
+
+          .stat-pill-sublabel {
+            font-size: 0.52rem;
+          }
+        }
+
+        /* ─── Extra Small Mobile (< 380px, e.g. iPhone SE) ─── */
+        @media (max-width: 379px) {
+          .hero-portrait-stage {
+            max-width: 200px;
+            margin: 1rem auto 2rem;
+          }
+
+          .portrait-blue-halo {
+            inset: -7px;
+            border-radius: 24px;
+          }
+
+          /* 1st stat pushed more left */
+          .stat-item-left {
+            left: -68px;
+            top: 48%;
+          }
+
+          /* 2nd stat pushed more right */
+          .stat-item-right {
+            right: -64px;
+            top: 16%;
+          }
+
+          .stat-item-bottom {
+            right: -20px;
+            bottom: -16px;
+          }
+
+          .stat-pill-card {
+            padding: 0.35rem 0.52rem;
+            border-radius: 11px;
+          }
+
+          .stat-pill-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+          }
+
+          .stat-pill-value {
+            font-size: 0.8rem;
+          }
+
+          .stat-pill-label {
+            font-size: 0.56rem;
+          }
+
+          .stat-pill-sublabel {
+            font-size: 0.48rem;
           }
         }
       `}</style>

@@ -53,52 +53,85 @@ export const AnimatedTestimonials = ({
   if (!testimonials || testimonials.length === 0) return null;
 
   const currentItem = testimonials[active];
-  const activeHeight = currentItem?.imageHeight || cardHeight || 380;
-  const activeFit = currentItem?.imageFit || imageFit || 'cover';
+  const activeFit = currentItem?.imageFit || imageFit || 'contain';
 
   return (
-    <div className="w-full px-2 py-4 font-sans antialiased md:px-6">
-      <div className="relative grid grid-cols-1 gap-10 md:grid-cols-[1.3fr_1.1fr] lg:gap-14 items-center">
+    <div className="w-full px-2 py-3 font-sans antialiased md:px-4">
+      <div className="relative grid grid-cols-1 gap-8 md:grid-cols-[1.25fr_1fr] lg:gap-12 items-center">
         
-        {/* 3D Rotating Stack on Left with Resizable Certificate Frame */}
-        <div className="w-full">
+        {/* 3D Rotating Stack on Left with Proportional Certificate Frame */}
+        <div className="w-full flex items-center justify-center">
           <div
-            className="relative w-full transition-all duration-300"
-            style={{ height: `${activeHeight}px`, minHeight: '260px' }}
+            className="certificate-stage-wrapper relative w-full"
+            style={{
+              aspectRatio: '1.38 / 1',
+              maxHeight: '390px',
+              minHeight: '210px',
+            }}
           >
-            <AnimatePresence>
+            <AnimatePresence mode="popLayout">
               {testimonials.map((testimonial, index) => {
                 const itemFit = testimonial.imageFit || activeFit;
+                const offset = (index - active + testimonials.length) % testimonials.length;
+                const isCurrent = offset === 0;
+                const isNext = offset === 1;
+                const isSecondNext = offset === 2;
+
+                // Subtle, agency-grade stacked rotation physics
+                let rotate = 0;
+                let scale = 0.9;
+                let opacity = 0;
+                let zIndex = 10;
+                let yOffset = 0;
+
+                if (isCurrent) {
+                  rotate = 0;
+                  scale = 1;
+                  opacity = 1;
+                  zIndex = 40;
+                  yOffset = 0;
+                } else if (isNext) {
+                  rotate = 2.5;
+                  scale = 0.96;
+                  opacity = 0.75;
+                  zIndex = 30;
+                  yOffset = 4;
+                } else if (isSecondNext) {
+                  rotate = -2;
+                  scale = 0.92;
+                  opacity = 0.45;
+                  zIndex = 20;
+                  yOffset = 8;
+                }
+
                 return (
                   <motion.div
                     key={testimonial.src + index}
                     initial={{
                       opacity: 0,
-                      scale: 0.9,
-                      z: -100,
-                      rotate: randomRotateY(),
+                      scale: 0.92,
+                      rotate: 0,
+                      y: 10,
                     }}
                     animate={{
-                      opacity: isActive(index) ? 1 : 0.7,
-                      scale: isActive(index) ? 1 : 0.95,
-                      z: isActive(index) ? 0 : -100,
-                      rotate: isActive(index) ? 0 : randomRotateY(),
-                      zIndex: isActive(index)
-                        ? 40
-                        : testimonials.length + 2 - index,
-                      y: isActive(index) ? [0, -60, 0] : 0,
+                      opacity,
+                      scale,
+                      rotate,
+                      zIndex,
+                      y: isCurrent ? [0, -18, 0] : yOffset,
                     }}
                     exit={{
                       opacity: 0,
-                      scale: 0.9,
-                      z: 100,
-                      rotate: randomRotateY(),
+                      scale: 0.92,
+                      rotate: -4,
+                      transition: { duration: 0.25 },
                     }}
                     transition={{
-                      duration: 0.4,
-                      ease: "easeInOut",
+                      duration: 0.38,
+                      ease: [0.32, 0.72, 0, 1],
                     }}
-                    className="absolute inset-0 origin-bottom"
+                    className="absolute inset-0 origin-center"
+                    style={{ pointerEvents: isCurrent ? 'auto' : 'none' }}
                   >
                     <div className="h-full w-full rounded-2xl overflow-hidden border border-[var(--border)] shadow-xl bg-[var(--bg-elevated)] p-2 sm:p-2.5 relative flex items-center justify-center">
                       <div className="w-full h-full rounded-xl overflow-hidden relative border border-[var(--border)] bg-[var(--bg-surface)] flex items-center justify-center p-1 sm:p-1.5">
@@ -107,19 +140,19 @@ export const AnimatedTestimonials = ({
                             src={testimonial.src}
                             alt=""
                             aria-hidden="true"
-                            className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-20 scale-110 pointer-events-none"
+                            className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-15 scale-110 pointer-events-none"
                           />
                         )}
                         <img
                           src={testimonial.src}
                           alt={testimonial.name}
-                          width={800}
-                          height={600}
+                          width={900}
+                          height={650}
                           draggable={false}
-                          className={`h-full w-full relative z-10 transition-all duration-300 rounded-[10px] ${
-                            itemFit === 'contain'
-                              ? 'object-contain object-center drop-shadow-sm p-2 sm:p-3'
-                              : 'object-cover object-center p-0.5'
+                          className={`h-full w-full relative z-10 transition-all duration-300 rounded-[8px] ${
+                            itemFit === 'cover'
+                              ? 'object-cover object-center'
+                              : 'object-contain object-center'
                           }`}
                         />
                       </div>

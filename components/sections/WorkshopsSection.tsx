@@ -61,7 +61,7 @@ export function WorkshopsSection({ workshops = [], profile, isLoading }: Worksho
       src: img,
       year: ws.year,
       imageHeight: ws.imageHeight || wsConfig?.certificateHeight || 380,
-      imageFit: ws.imageFit || wsConfig?.certificateFit || 'cover',
+      imageFit: ws.imageFit || wsConfig?.certificateFit || 'contain',
     };
   });
 
@@ -84,10 +84,10 @@ export function WorkshopsSection({ workshops = [], profile, isLoading }: Worksho
         {isLoading ? (
           <div className="bezel-card">
             <div className="bezel-core" style={{ padding: '2rem 1.5rem' }}>
-              <div className="relative grid grid-cols-1 gap-10 md:grid-cols-[1.3fr_1.1fr] lg:gap-14 items-center">
+              <div className="relative grid grid-cols-1 gap-8 md:grid-cols-[1.25fr_1fr] lg:gap-12 items-center">
                 
                 {/* Left Framed Certificate Skeleton */}
-                <div className="skeleton" style={{ height: '380px', borderRadius: '16px', padding: '0.85rem' }}>
+                <div className="skeleton" style={{ width: '100%', aspectRatio: '1.38 / 1', borderRadius: '16px', padding: '0.85rem' }}>
                   <div className="skeleton" style={{ width: '100%', height: '100%', borderRadius: '12px' }} />
                 </div>
 
@@ -125,7 +125,7 @@ export function WorkshopsSection({ workshops = [], profile, isLoading }: Worksho
                 testimonials={formattedWorkshops}
                 autoplay={false}
                 cardHeight={wsConfig?.certificateHeight || 380}
-                imageFit={wsConfig?.certificateFit || 'cover'}
+                imageFit={wsConfig?.certificateFit || 'contain'}
               />
             </div>
           </div>
